@@ -1,0 +1,13 @@
+input[readonly],
+textarea[readonly] {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: default;
+}
+
+.time-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}

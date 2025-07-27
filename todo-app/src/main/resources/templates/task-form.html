@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/task-form.css}">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Add New Task</h2>
+
+        <form th:action="@{${formAction}}" th:object="${task}" method="post">
+
+        <input type="hidden"/>
+
+        <div class="mb-3">
+            <label th:for="*{title}" class="form-label">Title</label>
+            <input type="text"
+                   class="form-control"
+                   th:field="*{title}"
+                   placeholder="e.g. Buy milk" />
+        </div>
+
+        <div class="mb-3">
+            <label th:for="*{description}" class="form-label">Description</label>
+            <textarea class="form-control"
+                      th:field="*{description}"
+                      rows="3"
+                      placeholder="Task details"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label th:for="*{priority}" class="form-label">Priority</label>
+            <select class="form-select"
+                    th:field="*{priority}">
+                <option th:each="p : ${priorities}"
+                        th:value="${p}"
+                        th:text="${p}">Priority</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label th:for="*{taskDate}" class="form-label">Date</label>
+            <input type="date"
+                   class="form-control"
+                   th:field="*{taskDate}" />
+        </div>
+
+        <fieldset class="mb-4">
+            <legend class="form-label">Hours</legend>
+            <div class="time-input-container mb-2">
+                <button type="button" class="btn btn-secondary btn-sm" id="startMinusBtn">-</button>
+                <input type="time"
+                       class="form-control"
+                       th:field="*{startTime}"
+                       id="startTimeInput" />
+                <button type="button" class="btn btn-secondary btn-sm" id="startPlusBtn">+</button>
+
+                <span class="mx-2">–</span>
+
+                <button type="button" class="btn btn-secondary btn-sm" id="endMinusBtn">-</button>
+                <input type="time"
+                       class="form-control"
+                       th:field="*{endTime}"
+                       id="endTimeInput" />
+                <button type="button" class="btn btn-secondary btn-sm" id="endPlusBtn">+</button>
+            </div>
+
+            <div class="range-container">
+                <div class="slider-track"></div>
+                <input type="range" min="0" max="1439"
+                       th:value="${task.startTime != null ? task.startTime.hour * 60 + task.startTime.minute : 480}"
+                       id="startRange" />
+                <input type="range" min="0" max="1439"
+                       th:value="${task.endTime != null ? task.endTime.hour * 60 + task.endTime.minute : 960}"
+                       id="endRange" />
+            </div>
+        </fieldset>
+
+            <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary">Back</button>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </div>
+    </form>
+</div>
+
+    <script th:src="@{/js/task-form.js}"></script>
+
+</body>
+</html>

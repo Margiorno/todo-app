@@ -44,14 +44,15 @@ public class TaskController {
 
         // TODO FORM HANDLING
 
-        if (bindingResult.hasErrors())
-            model.addAttribute("message", "Error: \n" + bindingResult.getAllErrors());
-        else{
-
-            TaskResponseDTO response = taskService.save(taskDto);
-
-            model.addAttribute("message", "Task saved: " + taskDto.toString());
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("priorities", Priority.values());
+            model.addAttribute("formAction", "/task/new");
+            return "task-form";
         }
+
+        TaskResponseDTO response = taskService.save(taskDto);
+        model.addAttribute("taskResponse", response);
+        model.addAttribute("message", "Task saved successfully!");
 
         return "task-result";
     }

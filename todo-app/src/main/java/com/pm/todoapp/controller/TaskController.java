@@ -1,8 +1,11 @@
 package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskRequestDTO;
+import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.model.Priority;
+import com.pm.todoapp.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/task")
 public class TaskController {
 
+    private final TaskService taskService;
+
+    @Autowired
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
     @GetMapping("/new")
     public String showNewTaskForm(Model model) {
 
@@ -25,8 +35,10 @@ public class TaskController {
         return "task-form";
     }
 
+
+    // TODO USERS DISTINGUISHING
     @PostMapping("/new")
-    public String createTask(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
+    public String save(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
                              BindingResult bindingResult,
                              Model model) {
 
@@ -34,8 +46,12 @@ public class TaskController {
 
         if (bindingResult.hasErrors())
             model.addAttribute("message", "Error: \n" + bindingResult.getAllErrors());
-        else
+        else{
+
+            TaskResponseDTO response = taskService.save(taskDto);
+
             model.addAttribute("message", "Task saved: " + taskDto.toString());
+        }
 
         return "task-result";
     }

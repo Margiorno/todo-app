@@ -79,9 +79,8 @@ public class TaskController {
             tasks = taskService.findAll();
             isAllViewActive = true;
         } else {
-            // TODO filter by center date
-            tasks = taskService.findAll();
             centerDate = selectedDate;
+            tasks = taskService.findByDate(centerDate);
             isAllViewActive = false;
         }
 

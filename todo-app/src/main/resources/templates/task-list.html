@@ -17,7 +17,7 @@
        th:style="${!isAllViewActive} ? 'font-weight:bold;' : ''">Calendar</a>
 </div>
 
-<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+<div th:if="${!isAllViewActive}" style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
 
     <a th:href="@{/task/list(date=${centerDate.minusDays(1)})}" style="padding: 10px; text-decoration: none;"><-</a>
 
@@ -31,6 +31,11 @@
     </div>
 
     <a th:href="@{/task/list(date=${centerDate.plusDays(1)})}" style="padding: 10px; text-decoration: none;">-></a>
+
+    <form th:action="@{/task/list}" method="get" style="display: flex; align-items: center; margin-left: 20px;">
+        <input type="date" name="date" th:value="${centerDate}" style="padding: 8px;" />
+        <button type="submit" style="padding: 9px;">Go</button>
+    </form>
 </div>
 
 <h2>All</h2>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+</head>
+<body>
+
+id <p th:text="${task.getId()}"></p>
+title <p th:text="${task.getTitle()}"></p>
+description <p th:text="${task.getDescription()}"></p>
+priority <p th:text="${task.getPriority()}"></p>
+date <p th:text="${task.getTaskDate()}"></p>
+time <p th:text="${task.getStartTime()} +' '+ ${task.getEndTime()}"></p>
+
+<a th:href="@{'/task/edit/' + ${task.id}}" class="btn btn-warning">Edit</a>
+
+</body>
+</html>

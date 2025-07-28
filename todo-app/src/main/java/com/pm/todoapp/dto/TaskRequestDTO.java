@@ -21,12 +21,13 @@ public class TaskRequestDTO {
     @NotBlank
     private String title;
 
-    @NotBlank
     private String description;
 
     @NotNull
     @Builder.Default
     private Priority priority = Priority.MEDIUM;
+
+    private String status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Builder.Default

@@ -83,7 +83,7 @@
             <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
 
         <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary">Back</button>
+            <a th:href="@{/task/list}" class="btn btn-secondary">Back</a>
             <button type="submit" class="btn btn-primary">Add Task</button>
         </div>
     </form>

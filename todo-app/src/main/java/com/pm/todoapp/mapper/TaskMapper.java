@@ -21,6 +21,7 @@ public class TaskMapper {
 
     public static TaskResponseDTO toResponseDTO(Task task) {
         return TaskResponseDTO.builder()
+                .id(task.getId().toString())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .priority(task.getPriority().name())

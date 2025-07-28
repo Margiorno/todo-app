@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+</head>
+<body>
+<h1>Task List</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Title</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Details</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.getId()}"></td>
+        <td th:text="${task.getTitle()}"></td>
+        <td th:text="${task.getPriority()}"></td>
+        <td th:text="${task.getStatus()}"></td>
+        <td th:text="${task.getTaskDate()}"></td>
+        <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
+        <td><a
+                th:href="@{'/task/' + ${task.getId()}}"
+                th:text="details"></a>
+        </td>
+    </tr>
+    </tbody>
+
+    <div class="card-footer text-end">
+        <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
+    </div>
+</table>
+
+</body>
+</html>

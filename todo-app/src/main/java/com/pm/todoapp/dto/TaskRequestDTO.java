@@ -1,6 +1,7 @@
 package com.pm.todoapp.dto;
 
 import com.pm.todoapp.model.Priority;
+import com.pm.todoapp.model.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,12 +22,15 @@ public class TaskRequestDTO {
     @NotBlank
     private String title;
 
-    @NotBlank
     private String description;
 
     @NotNull
     @Builder.Default
     private Priority priority = Priority.MEDIUM;
+
+    @NotNull
+    @Builder.Default
+    private Status status = Status.TODO;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Builder.Default

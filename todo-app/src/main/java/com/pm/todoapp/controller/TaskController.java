@@ -9,6 +9,7 @@ import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -64,11 +65,35 @@ public class TaskController {
     }
 
     @GetMapping("/list")
-    public String showTasks(Model model) {
+    public String showTasks(
+            @RequestParam(name = "view", defaultValue = "all") String view,
+            @RequestParam(name = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
+            @RequestParam(name = "priority", required = false) Priority priority,
+            @RequestParam(name = "status", required = false) Status status,
+            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            Model model) {
 
-        List<TaskResponseDTO> tasks = taskService.findAll();
+        List<TaskResponseDTO> tasks;
+        LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
+        tasks = switch (view) {
+            case "calendar" -> taskService.findByDate(centerDate);
+            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate);
+            default -> taskService.findAll();
+        };
+
+        model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);
+        model.addAttribute("priorities", Priority.values());
+        model.addAttribute("statuses", Status.values());
+        model.addAttribute("view", view);
+
+        model.addAttribute("selectedPriority", priority);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedStartDate", startDate);
+        model.addAttribute("selectedEndDate", endDate);
 
         return "task-list";
     }

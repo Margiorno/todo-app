@@ -44,4 +44,11 @@ public class TaskService {
 
         return TaskMapper.toResponseDTO(task);
     }
+
+    public TaskResponseDTO update(UUID id, TaskRequestDTO taskDto) {
+        Task task = TaskMapper.toEntity(taskDto, id);
+
+        Task savedTask = taskRepository.save(task);
+        return TaskMapper.toResponseDTO(savedTask);
+    }
 }

@@ -10,6 +10,7 @@
 <table border="1">
     <thead>
     <tr>
+        <th>Id</th>
         <th>Title</th>
         <th>Priority</th>
         <th>Status</th>
@@ -20,6 +21,7 @@
     </thead>
     <tbody>
     <tr th:each="task : ${tasks}">
+        <td th:text="${task.getId()}"></td>
         <td th:text="${task.getTitle()}"></td>
         <td th:text="${task.getPriority()}"></td>
         <td th:text="${task.getStatus()}"></td>

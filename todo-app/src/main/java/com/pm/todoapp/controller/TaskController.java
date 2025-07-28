@@ -4,6 +4,7 @@ import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.model.Priority;
+import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +35,7 @@ public class TaskController {
         model.addAttribute("task", new TaskRequestDTO());
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("formAction", "/task/new");
+        model.addAttribute("isEditMode", false);
 
         return "task-form";
     }
@@ -83,18 +87,54 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/task/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String editTaskForm(@PathVariable UUID id, Model model) {
-        try{
-            TaskResponseDTO task = taskService.findById(id);
-            model.addAttribute("task", task);
-            return "task-edit";
-        } catch (TaskNotFoundException e) {
+        try {
+            // TODO cleaner version of this fragment
+            TaskResponseDTO taskResponse = taskService.findById(id);
 
-            // TODO logic of not found
+            TaskRequestDTO taskRequest = TaskRequestDTO.builder()
+                    .title(taskResponse.getTitle())
+                    .description(taskResponse.getDescription())
+                    .priority(Priority.valueOf(taskResponse.getPriority()))
+                    .status(Status.valueOf(taskResponse.getStatus()))
+                    .taskDate(LocalDate.parse(taskResponse.getTaskDate()))
+                    .startTime(LocalTime.parse(taskResponse.getStartTime()))
+                    .endTime(LocalTime.parse(taskResponse.getEndTime()))
+                    .build();
+
+            model.addAttribute("task", taskRequest);
+            model.addAttribute("taskId", id);
+            model.addAttribute("priorities", Priority.values());
+            model.addAttribute("statuses", Status.values());
+
+            model.addAttribute("isEditMode", true);
+
+            return "task-form";
+
+        } catch (TaskNotFoundException e) {
             model.addAttribute("message", "Task not found!");
-            return "task-list";
+            return "redirect:/task/list";
         }
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateTask(@PathVariable UUID id,
+                             @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
+                             BindingResult bindingResult,
+                             Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("taskId", id);
+            model.addAttribute("priorities", Priority.values());
+            model.addAttribute("statuses", Status.values());
+            model.addAttribute("isEditMode", true);
+            return "task-form";
+        }
+
+        TaskResponseDTO updated = taskService.update(id, taskDto);
+
+        return "redirect:/task/list";
     }
 
 }

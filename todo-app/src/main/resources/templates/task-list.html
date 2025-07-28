@@ -8,6 +8,15 @@
 
 <h1>Task List</h1>
 
+<div style="margin-bottom: 20px; font-size: 1.2em;">
+
+    <a th:href="@{/task/list}"
+       th:style="${isAllViewActive} ? 'font-weight:bold;' : ''">All</a>
+
+    <a th:href="@{/task/list(date=${T(java.time.LocalDate).now()})}"
+       th:style="${!isAllViewActive} ? 'font-weight:bold;' : ''">Calendar</a>
+</div>
+
 <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
 
     <a th:href="@{/task/list(date=${centerDate.minusDays(1)})}" style="padding: 10px; text-decoration: none;"><-</a>
@@ -23,6 +32,8 @@
 
     <a th:href="@{/task/list(date=${centerDate.plusDays(1)})}" style="padding: 10px; text-decoration: none;">-></a>
 </div>
+
+<h2>All</h2>
 
 <table border="1">
     <thead>

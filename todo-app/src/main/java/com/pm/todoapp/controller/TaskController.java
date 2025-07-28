@@ -70,20 +70,26 @@ public class TaskController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
             Model model) {
 
+        List<TaskResponseDTO> tasks;
         LocalDate centerDate;
+        boolean isAllViewActive;
+
         if (selectedDate == null) {
             centerDate = LocalDate.now();
+            tasks = taskService.findAll();
+            isAllViewActive = true;
         } else {
+            // TODO filter by center date
+            tasks = taskService.findAll();
             centerDate = selectedDate;
+            isAllViewActive = false;
         }
-
-        // TODO filter by center date
-        List<TaskResponseDTO> tasks = taskService.findAll();
 
         model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("statuses", Status.values());
+        model.addAttribute("isAllViewActive", isAllViewActive);
 
         return "task-list";
     }

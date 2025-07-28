@@ -3,6 +3,7 @@ package com.pm.todoapp.controller;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
+import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
@@ -93,15 +94,7 @@ public class TaskController {
             // TODO cleaner version of this fragment
             TaskResponseDTO taskResponse = taskService.findById(id);
 
-            TaskRequestDTO taskRequest = TaskRequestDTO.builder()
-                    .title(taskResponse.getTitle())
-                    .description(taskResponse.getDescription())
-                    .priority(Priority.valueOf(taskResponse.getPriority()))
-                    .status(Status.valueOf(taskResponse.getStatus()))
-                    .taskDate(LocalDate.parse(taskResponse.getTaskDate()))
-                    .startTime(LocalTime.parse(taskResponse.getStartTime()))
-                    .endTime(LocalTime.parse(taskResponse.getEndTime()))
-                    .build();
+            TaskRequestDTO taskRequest = TaskMapper.fromResponseToRequest(taskResponse);
 
             model.addAttribute("task", taskRequest);
             model.addAttribute("taskId", id);
@@ -118,6 +111,7 @@ public class TaskController {
         }
     }
 
+    //TODO userId
     @PostMapping("/update/{id}")
     public String updateTask(@PathVariable UUID id,
                              @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
@@ -132,7 +126,7 @@ public class TaskController {
             return "task-form";
         }
 
-        TaskResponseDTO updated = taskService.update(id, taskDto);
+        TaskResponseDTO updated = taskService.update(taskDto, id);
 
         return "redirect:/task/list";
     }

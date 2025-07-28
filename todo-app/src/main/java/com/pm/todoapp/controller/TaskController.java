@@ -9,6 +9,7 @@ import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -64,11 +65,25 @@ public class TaskController {
     }
 
     @GetMapping("/list")
-    public String showTasks(Model model) {
+    public String showTasks(
+            @RequestParam(name = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
+            Model model) {
 
+        LocalDate centerDate;
+        if (selectedDate == null) {
+            centerDate = LocalDate.now();
+        } else {
+            centerDate = selectedDate;
+        }
+
+        // TODO filter by center date
         List<TaskResponseDTO> tasks = taskService.findAll();
 
+        model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);
+        model.addAttribute("priorities", Priority.values());
+        model.addAttribute("statuses", Status.values());
 
         return "task-list";
     }

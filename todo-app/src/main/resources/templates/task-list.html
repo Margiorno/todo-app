@@ -5,7 +5,24 @@
     <title>Task List</title>
 </head>
 <body>
+
 <h1>Task List</h1>
+
+<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+
+    <a th:href="@{/task/list(date=${centerDate.minusDays(1)})}" style="padding: 10px; text-decoration: none;"><-</a>
+
+    <div th:each="i : ${#numbers.sequence(-2, 2)}">
+        <th:block th:with="currentDate=${centerDate.plusDays(i)}">
+            <a th:href="@{/task/list(date=${currentDate})}"
+               th:text="${#temporals.format(currentDate, 'dd.MM.YYYY')}"
+               style="padding: 10px 15px; text-decoration: none; margin: 0 2px;">
+            </a>
+        </th:block>
+    </div>
+
+    <a th:href="@{/task/list(date=${centerDate.plusDays(1)})}" style="padding: 10px; text-decoration: none;">-></a>
+</div>
 
 <table border="1">
     <thead>
@@ -27,17 +44,14 @@
         <td th:text="${task.getStatus()}"></td>
         <td th:text="${task.getTaskDate()}"></td>
         <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
-        <td><a
-                th:href="@{'/task/' + ${task.getId()}}"
-                th:text="details"></a>
-        </td>
+        <td><a th:href="@{'/task/' + ${task.getId()}}" th:text="details"></a></td>
     </tr>
     </tbody>
-
-    <div class="card-footer text-end">
-        <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
-    </div>
 </table>
+
+<div class="card-footer text-end" style="margin-top: 10px;">
+    <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
+</div>
 
 </body>
 </html>

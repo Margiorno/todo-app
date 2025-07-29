@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +60,7 @@ public class TaskController {
         model.addAttribute("taskResponse", response);
         model.addAttribute("message", "Task saved successfully!");
 
-        return "task-result";
+        return "task-details";
     }
 
     @GetMapping("/list")
@@ -101,16 +100,22 @@ public class TaskController {
     @GetMapping("/{id}")
     public String showTask(@PathVariable UUID id, Model model) {
 
-        try{
-            TaskResponseDTO task = taskService.findById(id);
-            model.addAttribute("task", task);
-            return "task-details";
-        } catch (TaskNotFoundException e) {
+//        try{
+//            TaskResponseDTO task = taskService.findById(id);
+//            model.addAttribute("task", task);
+//            return "task-details";
+//        } catch (TaskNotFoundException e) {
+//
+//            // TODO logic of not found
+//            model.addAttribute("message", "Task not found!");
+//            return "task-list";
+//        }
 
-            // TODO logic of not found
-            model.addAttribute("message", "Task not found!");
-            return "task-list";
-        }
+
+        TaskResponseDTO response = taskService.findById(id);
+        model.addAttribute("taskResponse", response);
+
+        return "task-details";
     }
 
     @GetMapping("/edit/{id}")
@@ -152,8 +157,10 @@ public class TaskController {
         }
 
         TaskResponseDTO updated = taskService.update(taskDto, id);
+        model.addAttribute("taskResponse", updated);
+        model.addAttribute("message", "Task updated successfully!");
 
-        return "redirect:/task/list";
+        return "task-details";
     }
 
 }

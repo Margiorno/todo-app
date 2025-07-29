@@ -3,122 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <title>Task List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/task-list.css}">
 </head>
 <body>
+<div class="container-fluid mt-4">
+<div class="row">
+    <div class="col-md-2 menu-column">
 
-<h1>Task List</h1>
+        <h2 class="mb-4">Menu</h2>
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link" th:classappend="${view == 'all' or view == null ? 'active' : ''}"
+               th:href="@{/task/list(view='all')}">All</a>
+            <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
+               th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()})}">Calendar</a>
+            <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
+               th:href="@{/task/list(view='filter')}">Filters</a>
+        </div>
 
-<div style="width: 200px; border-right: 1px solid #ccc;">
-    <h2>Menu</h2>
-    <a th:href="@{/task/new}">Add New</a>
-    <br><br>
-    <a th:href="@{/task/list(view='all')}">All</a>
-    <br>
-    <a th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()})}">Calendar</a>
-    <br>
-    <a th:href="@{/task/list(view='filter')}">Filters</a>
-    <br>
-    <a href="#">Find o-</a>
-    <br><br>
-    <a>Projects</a>
-    <br>
-    <a>projects list</a>
-    <br><br>
-    <a>Teams</a>
-    <br>
-    <a>teams list</a>
-</div>
+        <h4 class="mt-4 mb-3">Projects</h4>
+        <div class="nav flex-column">
+            <a class="nav-link" href="#">Project A</a>
+            <a class="nav-link" href="#">Project B</a>
+        </div>
 
-<div th:if="${view == 'calendar'}" style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-
-    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)})}" style="padding: 10px; text-decoration: none;"><-</a>
-
-    <div th:each="i : ${#numbers.sequence(-2, 2)}">
-        <th:block th:with="currentDate=${centerDate.plusDays(i)}">
-            <a th:href="@{/task/list(view='calendar', date=${currentDate})}"
-               th:text="${#temporals.format(currentDate, 'dd.MM.YYYY')}"
-               style="padding: 10px 15px; text-decoration: none; margin: 0 2px;">
-            </a>
-        </th:block>
+        <h4 class="mt-4 mb-3">Teams</h4>
+        <div class="nav flex-column">
+            <a class="nav-link" href="#">Team X</a>
+            <a class="nav-link" href="#">Team Y</a>
+        </div>
     </div>
 
-    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)})}" style="padding: 10px; text-decoration: none;">-></a>
+    <div class="col-md-10 main-content">
 
-    <form th:action="@{/task/list}" method="get" style="display: flex; align-items: center; margin-left: 20px;">
-        <input type="date" name="date" th:value="${centerDate}" style="padding: 8px;" />
-        <button type="submit" style="padding: 9px;">Go</button>
-    </form>
+        <div th:if="${view == 'calendar'}" class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-center align-items-center flex-wrap">
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)})}"
+                       class="btn btn-outline-secondary"><</a>
+                    <div class="btn-group mx-2" role="group">
+                        <th:block th:each="i : ${#numbers.sequence(-2, 2)}">
+                            <th:block th:with="currentDate=${centerDate.plusDays(i)}">
+                                <a th:href="@{/task/list(view='calendar', date=${currentDate})}"
+                                   th:text="${#temporals.format(currentDate, 'dd.MM')}"
+                                   class="btn"
+                                   th:classappend="${#temporals.format(currentDate, 'yyyy-MM-dd') == #temporals.format(centerDate, 'yyyy-MM-dd')} ? 'btn-primary' : 'btn-outline-primary'">
+                                </a>
+                            </th:block>
+                        </th:block>
+                    </div>
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)})}"
+                       class="btn btn-outline-secondary">></a>
+                    <form th:action="@{/task/list}" method="get" class="d-flex align-items-center ms-auto mt-2 mt-md-0">
+                        <input type="hidden" name="view" value="calendar">
+                        <input type="date" name="date" th:value="${#temporals.format(centerDate, 'yyyy-MM-dd')}"
+                               class="form-control"/>
+                        <button type="submit" class="btn btn-primary ms-2">Go</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${view == 'filter'}" class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Filters</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/task/list}" method="get">
+                    <input type="hidden" name="view" value="filter">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6 col-lg-3">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select id="priority" name="priority" class="form-select">
+                                <option value="">-- All --</option>
+                                <option th:each="p : ${priorities}" th:value="${p.name()}" th:text="${p}"
+                                        th:selected="${selectedPriority != null and p == selectedPriority}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="">-- All --</option>
+                                <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s}"
+                                        th:selected="${selectedStatus != null and s == selectedStatus}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="startDate" class="form-label">Start</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control"
+                                   th:value="${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}">
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label for="endDate" class="form-label">End</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control"
+                                   th:value="${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''}">
+                        </div>
+                        <div class="col-12 text-end">
+                            <a th:href="@{/task/list(view='all')}" class="btn btn-secondary">Reset</a>
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">All tasks</h2>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Id</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Hours</th>
+                        <th class="text-end pe-3">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task, iterStat : ${tasks}">
+
+                        <td class="ps-3" th:text="${task.getId()}"></td>
+                        <td th:text="${task.getTitle()}"></td>
+                        <td th:text="${task.getPriority()}"></td>
+                        <td th:text="${task.getStatus()}"></td>
+                        <td th:text="${task.getTaskDate()}"></td>
+                        <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
+                        <td class="text-end pe-3">
+                            <a th:href="@{'/task/' + ${task.getId()}}" class="btn btn-sm btn-outline-primary">Details</a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${tasks == null or tasks.isEmpty()}">
+                        <td colspan="7" class="text-center p-4">Tasks not found</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer text-end" style="margin-top: 10px;">
+                <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
+            </div>
+
+
+        </div>
+    </div>
+
 </div>
-
-
-<div th:if="${view == 'filter'}" style="margin-bottom: 20px;">
-    <h2>Filters</h2>
-    <form th:action="@{/task/list}" method="get">
-        <input type="hidden" name="view" value="filter">
-
-        <!-- POPRAWKA 1: Porównywanie nazw enumów zamiast obiektów -->
-        <label for="priority">Priority:</label>
-        <select id="priority" name="priority">
-            <option value="">-- All --</option>
-            <option th:each="p : ${priorities}"
-                    th:value="${p.name()}"
-                    th:text="${p}"
-                    th:selected="${selectedPriority != null and p == selectedPriority}"></option>
-        </select>
-
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="">-- All --</option>
-            <option th:each="s : ${statuses}"
-                    th:value="${s.name()}"
-                    th:text="${s}"
-                    th:selected="${selectedStatus != null and s == selectedStatus}"></option>
-        </select>
-
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate"
-               th:value="${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}">
-
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate"
-               th:value="${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''}">
-
-        <button type="submit">Filter</button>
-    </form>
 </div>
-
-
-
-<h2>All</h2>
-
-<table border="1">
-    <thead>
-    <tr>
-        <th>Id</th>
-        <th>Title</th>
-        <th>Priority</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Details</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="task : ${tasks}">
-        <td th:text="${task.getId()}"></td>
-        <td th:text="${task.getTitle()}"></td>
-        <td th:text="${task.getPriority()}"></td>
-        <td th:text="${task.getStatus()}"></td>
-        <td th:text="${task.getTaskDate()}"></td>
-        <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
-        <td><a th:href="@{'/task/' + ${task.getId()}}" th:text="details"></a></td>
-    </tr>
-    </tbody>
-</table>
-
-<div class="card-footer text-end" style="margin-top: 10px;">
-    <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
-</div>
-
 </body>
 </html>

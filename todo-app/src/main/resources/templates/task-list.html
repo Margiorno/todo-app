@@ -36,7 +36,7 @@
                th:text="${team.name}">
                 Team Name
             </a>
-            <a class="nav-link text-muted small"
+            <a class="nav-link"
                th:href="@{/task/list(view=${view})}"
                th:classappend="${selectedTeamId == null ? 'active' : ''}">
                 -- All Teams --

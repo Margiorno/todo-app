@@ -8,6 +8,7 @@ import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.model.Team;
 import com.pm.todoapp.service.TaskService;
+import com.pm.todoapp.service.TeamService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,19 +28,26 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TeamService teamService;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TeamService teamService) {
         this.taskService = taskService;
+        this.teamService = teamService;
     }
 
     @GetMapping("/new")
-    public String showNewTaskForm(Model model) {
+    public String showNewTaskForm(@RequestParam(name = "team", required = false) UUID teamId,
+                                  Model model) {
 
         model.addAttribute("task", new TaskRequestDTO());
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("formAction", "/task/new");
         model.addAttribute("isEditMode", false);
+
+        if (teamId != null) {
+            model.addAttribute("teamId", teamId);
+        }
 
         return "task-form";
     }
@@ -48,8 +56,9 @@ public class TaskController {
     // TODO USERS IDENTIFICATION
     @PostMapping("/new")
     public String save(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-                             BindingResult bindingResult,
-                             Model model) {
+                       @RequestParam(name = "team", required = false) UUID teamId,
+                       BindingResult bindingResult,
+                       Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
@@ -57,7 +66,11 @@ public class TaskController {
             return "task-form";
         }
 
-        TaskResponseDTO response = taskService.save(taskDto);
+        System.out.println(teamId);
+
+        //TODO finish team assigning inside service
+        TaskResponseDTO response = taskService.save(taskDto, teamId);
+
         model.addAttribute("taskResponse", response);
         model.addAttribute("message", "Task saved successfully!");
 
@@ -76,14 +89,28 @@ public class TaskController {
             @RequestParam(name = "team", required = false) UUID teamId,
             Model model) {
 
+
+        // TODO to rebuild this fragment
+        List<Team> allTeams = teamService.findAll();
+
+        model.addAttribute("allTeams", allTeams);
+
+        model.addAttribute("selectedTeamId", teamId);
+        ////////////////////////////////////////////////////////////////////////////
+
+
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
-        tasks = switch (view) {
-            case "calendar" -> taskService.findByDate(centerDate);
-            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate);
-            default -> taskService.findAll();
-        };
+        if (teamId != null) {
+            tasks = taskService.findByTeam(teamId);
+        } else {
+            tasks = switch (view) {
+                case "calendar" -> taskService.findByDate(centerDate);
+                case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate);
+                default -> taskService.findAll();
+            };
+        }
 
         model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);
@@ -95,33 +122,6 @@ public class TaskController {
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedStartDate", startDate);
         model.addAttribute("selectedEndDate", endDate);
-
-
-        // TODO dynamic downloads of teams (at the moment PROWIZORKA :DDDDDDD)
-        // TODO to rebuild this fragment
-        Team teamA = new Team();
-        teamA.setName("Team A");
-        teamA.setId(UUID.fromString("1d8b9432-8362-4410-a128-2b8a2e5a1926"));
-
-        Team teamB = new Team();
-        teamB.setName("Team B");
-        teamB.setId(UUID.fromString("1d8b9432-8362-4410-a128-2b8a2e5a1927"));
-
-        Set<Team> allTeams = Set.of(teamA, teamB);
-
-        model.addAttribute("allTeams", allTeams);
-
-        if (teamId != null) {
-            Optional<Team> selectedTeamOptional = allTeams.stream()
-                    .filter(team -> team.getId().equals(teamId))
-                    .findFirst();
-
-            selectedTeamOptional.ifPresent(team -> {
-                model.addAttribute("selectedTeamName", team.getName());
-            });
-        }
-        model.addAttribute("selectedTeamId", teamId);
-        ////////////////////////////////////////////////////////////////////////////
 
         return "task-list";
     }

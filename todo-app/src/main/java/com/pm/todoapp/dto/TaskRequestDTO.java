@@ -21,8 +21,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TaskRequestDTO {
 
-    private UUID teamId;
-
     private Set<UUID> assigneeIds;
 
     @NotBlank

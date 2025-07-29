@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface TaskRepository extends CrudRepository<Task, UUID> {
     Iterable<Task> findByTaskDate(LocalDate taskDate);
+    Iterable<Task> findByTeamId(UUID teamId);
 }

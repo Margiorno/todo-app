@@ -12,12 +12,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskRequestDTO {
+
+    private UUID teamId;
+
+    private Set<UUID> assigneeIds;
 
     @NotBlank
     private String title;

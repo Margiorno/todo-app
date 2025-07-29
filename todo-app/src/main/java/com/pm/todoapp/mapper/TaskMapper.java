@@ -5,15 +5,15 @@ import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.model.Task;
+import com.pm.todoapp.model.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 public class TaskMapper {
-    public static Task toEntity(TaskRequestDTO dto, UUID userId) {
+    public static Task toEntity(TaskRequestDTO dto, User user) {
         return Task.builder()
-                .userId(userId)
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .priority(dto.getPriority())
@@ -24,8 +24,8 @@ public class TaskMapper {
                 .build();
     }
 
-    public static Task toEntity(TaskRequestDTO dto, UUID userId, UUID taskId) {
-        Task task = toEntity(dto, userId);
+    public static Task toEntity(TaskRequestDTO dto, User user, UUID taskId) {
+        Task task = toEntity(dto, user);
         task.setId(taskId);
 
         return task;

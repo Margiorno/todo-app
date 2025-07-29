@@ -7,6 +7,7 @@ import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.model.Task;
+import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.TaskDAO;
 import com.pm.todoapp.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class TaskService {
     public TaskResponseDTO save(TaskRequestDTO taskDto) {
 
         // TODO not random id
-        Task task = TaskMapper.toEntity(taskDto, UUID.randomUUID());
+        Task task = TaskMapper.toEntity(taskDto, new User());
         Task savedTask = taskRepository.save(task);
 
         return TaskMapper.toResponseDTO(savedTask);
@@ -55,7 +56,7 @@ public class TaskService {
         if(taskRepository.existsById(taskId))
             throw new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId));
 
-        Task task = TaskMapper.toEntity(taskDto, taskId, taskId);
+        Task task = TaskMapper.toEntity(taskDto, new User(), taskId);
         Task savedTask = taskRepository.save(task);
 
         return TaskMapper.toResponseDTO(savedTask);

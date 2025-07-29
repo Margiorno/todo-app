@@ -6,6 +6,7 @@ import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
+import com.pm.todoapp.model.Team;
 import com.pm.todoapp.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -91,6 +93,19 @@ public class TaskController {
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedStartDate", startDate);
         model.addAttribute("selectedEndDate", endDate);
+
+
+        // TODO dynamic downloads of teams (at the moment PROWIZORKA :DDDDDDD)
+        Team teamA = new Team();
+        teamA.setName("Team A");
+
+        Team teamB = new Team();
+        teamB.setName("Team B");
+
+        Set<Team> allTeams = Set.of(teamA, teamB);
+
+        model.addAttribute("allTeams", allTeams);
+        ////////////////////////////////////////////////////////////////////////////
 
         return "task-list";
     }

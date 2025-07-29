@@ -1,6 +1,8 @@
 package com.pm.todoapp.service;
 
+import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.exceptions.TeamNotFoundException;
+import com.pm.todoapp.mapper.TeamMapper;
 import com.pm.todoapp.model.Team;
 import com.pm.todoapp.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,8 @@ public class TeamService {
     }
 
     //TODO TO REBUILD
-    public List<Team> findAll() {
-        return StreamSupport.stream(teamRepository.findAll().spliterator(), false).toList();
+    public List<TeamResponseDTO> findAll() {
+        return StreamSupport.stream(teamRepository.findAll().spliterator(), false).map(TeamMapper::toResponseDTO).toList();
     }
 
 }

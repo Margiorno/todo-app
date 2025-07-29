@@ -76,8 +76,13 @@ public class TaskService {
         return TaskMapper.toResponseDTO(task);
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate) {
-        Iterable<Task> tasks = taskRepository.findByTaskDate(centerDate);
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID teamId) {
+
+        Iterable<Task> tasks = switch (teamId){
+            case null -> taskRepository.findByTaskDate(centerDate);
+            default -> taskRepository.findByTaskDateAndTeamId(centerDate, teamId);
+        };
+
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
@@ -92,9 +97,10 @@ public class TaskService {
             Priority priority,
             Status status,
             LocalDate startDate,
-            LocalDate endDate
+            LocalDate endDate,
+            UUID teamId
     ) {
-        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate);
+        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, teamId);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }

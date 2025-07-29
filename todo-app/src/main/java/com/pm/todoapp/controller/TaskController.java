@@ -2,6 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
+import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
@@ -66,8 +67,6 @@ public class TaskController {
             return "task-form";
         }
 
-        System.out.println(teamId);
-
         //TODO finish team assigning inside service
         TaskResponseDTO response = taskService.save(taskDto, teamId);
 
@@ -89,28 +88,26 @@ public class TaskController {
             @RequestParam(name = "team", required = false) UUID teamId,
             Model model) {
 
-
-        // TODO to rebuild this fragment
-        List<Team> allTeams = teamService.findAll();
-
+        // TODO only user teams
+        List<TeamResponseDTO> allTeams = teamService.findAll();
         model.addAttribute("allTeams", allTeams);
-
-        model.addAttribute("selectedTeamId", teamId);
-        ////////////////////////////////////////////////////////////////////////////
 
 
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
+        tasks = switch (view) {
+            case "calendar" -> taskService.findByDate(centerDate, teamId);
+            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, teamId);
+            default -> (teamId != null)
+                    ? taskService.findByTeam(teamId)
+                    : taskService.findAll();
+        };
+
         if (teamId != null) {
-            tasks = taskService.findByTeam(teamId);
-        } else {
-            tasks = switch (view) {
-                case "calendar" -> taskService.findByDate(centerDate);
-                case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate);
-                default -> taskService.findAll();
-            };
+            model.addAttribute("selectedTeamId", teamId.toString());
         }
+
 
         model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);

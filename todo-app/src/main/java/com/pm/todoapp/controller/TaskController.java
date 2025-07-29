@@ -2,11 +2,14 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
+import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
+import com.pm.todoapp.model.Team;
 import com.pm.todoapp.service.TaskService;
+import com.pm.todoapp.service.TeamService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -24,19 +29,26 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TeamService teamService;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TeamService teamService) {
         this.taskService = taskService;
+        this.teamService = teamService;
     }
 
     @GetMapping("/new")
-    public String showNewTaskForm(Model model) {
+    public String showNewTaskForm(@RequestParam(name = "team", required = false) UUID teamId,
+                                  Model model) {
 
         model.addAttribute("task", new TaskRequestDTO());
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("formAction", "/task/new");
         model.addAttribute("isEditMode", false);
+
+        if (teamId != null) {
+            model.addAttribute("teamId", teamId);
+        }
 
         return "task-form";
     }
@@ -45,8 +57,9 @@ public class TaskController {
     // TODO USERS IDENTIFICATION
     @PostMapping("/new")
     public String save(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-                             BindingResult bindingResult,
-                             Model model) {
+                       @RequestParam(name = "team", required = false) UUID teamId,
+                       BindingResult bindingResult,
+                       Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
@@ -54,7 +67,8 @@ public class TaskController {
             return "task-form";
         }
 
-        TaskResponseDTO response = taskService.save(taskDto);
+        TaskResponseDTO response = taskService.save(taskDto, teamId);
+
         model.addAttribute("taskResponse", response);
         model.addAttribute("message", "Task saved successfully!");
 
@@ -70,16 +84,29 @@ public class TaskController {
             @RequestParam(name = "status", required = false) Status status,
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(name = "team", required = false) UUID teamId,
             Model model) {
+
+        // TODO only user teams
+        List<TeamResponseDTO> allTeams = teamService.findAll();
+        model.addAttribute("allTeams", allTeams);
 
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
         tasks = switch (view) {
-            case "calendar" -> taskService.findByDate(centerDate);
-            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate);
-            default -> taskService.findAll();
+            case "calendar" -> taskService.findByDate(centerDate, teamId);
+            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, teamId);
+            default -> (teamId != null)
+                    ? taskService.findByTeam(teamId)
+                    : taskService.findAll();
         };
+
+        if (teamId != null) {
+            model.addAttribute("selectedTeamId", teamId.toString());
+            model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
+        }
+
 
         model.addAttribute("centerDate", centerDate);
         model.addAttribute("tasks", tasks);

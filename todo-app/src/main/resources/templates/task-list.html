@@ -14,11 +14,11 @@
         <h2 class="mb-4">Menu</h2>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             <a class="nav-link" th:classappend="${view == 'all' or view == null ? 'active' : ''}"
-               th:href="@{/task/list(view='all')}">All</a>
+               th:href="@{/task/list(view='all', team=${selectedTeamId})}">All</a>
             <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
-               th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()})}">Calendar</a>
+               th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()}, team=${selectedTeamId})}">Calendar</a>
             <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
-               th:href="@{/task/list(view='filter')}">Filters</a>
+               th:href="@{/task/list(view='filter', team=${selectedTeamId})}">Filters</a>
         </div>
 
         <h4 class="mt-4 mb-3">Projects</h4>
@@ -29,22 +29,44 @@
 
         <h4 class="mt-4 mb-3">Teams</h4>
         <div class="nav flex-column">
-            <a class="nav-link" href="#">Team X</a>
-            <a class="nav-link" href="#">Team Y</a>
+            <a th:each="team : ${allTeams}"
+               class="nav-link"
+               th:classappend="${team.id == selectedTeamId ? 'active' : ''}"
+               th:href="@{/task/list(view=${view}, team=${team.id})}"
+               th:text="${team.name}">
+                Team Name
+            </a>
+            <a class="nav-link"
+               th:href="@{/task/list(view=${view})}"
+               th:classappend="${selectedTeamId == null ? 'active' : ''}">
+                -- All Teams --
+            </a>
         </div>
     </div>
 
     <div class="col-md-10 main-content">
 
+        <div th:if="${selectedTeamId != null and not #strings.isEmpty(selectedTeamId)}" class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0" th:text="'Team manage: ' + ${selectedTeamName}"></h3>
+                <a th:href="@{/task/list(view=${view})}" class="btn-close btn-close-white" aria-label="Close team view"></a>
+            </div>
+            <div class="card-body bg-light">
+                <p class="mb-2 text-muted">Options (placeholders):</p>
+                <a href="#" class="btn btn-sm btn-outline-secondary">Manage members</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">Team setting</a>
+            </div>
+        </div>
+
         <div th:if="${view == 'calendar'}" class="card mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-center align-items-center flex-wrap">
-                    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)})}"
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)}, team=${selectedTeamId})}"
                        class="btn btn-outline-secondary"><</a>
                     <div class="btn-group mx-2" role="group">
                         <th:block th:each="i : ${#numbers.sequence(-2, 2)}">
                             <th:block th:with="currentDate=${centerDate.plusDays(i)}">
-                                <a th:href="@{/task/list(view='calendar', date=${currentDate})}"
+                                <a th:href="@{/task/list(view='calendar', date=${currentDate}, team=${selectedTeamId})}"
                                    th:text="${#temporals.format(currentDate, 'dd.MM')}"
                                    class="btn"
                                    th:classappend="${#temporals.format(currentDate, 'yyyy-MM-dd') == #temporals.format(centerDate, 'yyyy-MM-dd')} ? 'btn-primary' : 'btn-outline-primary'">
@@ -52,10 +74,11 @@
                             </th:block>
                         </th:block>
                     </div>
-                    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)})}"
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)}, team=${selectedTeamId})}"
                        class="btn btn-outline-secondary">></a>
                     <form th:action="@{/task/list}" method="get" class="d-flex align-items-center ms-auto mt-2 mt-md-0">
                         <input type="hidden" name="view" value="calendar">
+                        <input type="hidden" name="team" th:if="${selectedTeamId}" th:value="${selectedTeamId}">
                         <input type="date" name="date" th:value="${#temporals.format(centerDate, 'yyyy-MM-dd')}"
                                class="form-control"/>
                         <button type="submit" class="btn btn-primary ms-2">Go</button>
@@ -71,6 +94,7 @@
             <div class="card-body">
                 <form th:action="@{/task/list}" method="get">
                     <input type="hidden" name="view" value="filter">
+                    <input type="hidden" name="team" th:if="${selectedTeamId}" th:value="${selectedTeamId}">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-3">
                             <label for="priority" class="form-label">Priority</label>
@@ -99,7 +123,7 @@
                                    th:value="${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''}">
                         </div>
                         <div class="col-12 text-end">
-                            <a th:href="@{/task/list(view='all')}" class="btn btn-secondary">Reset</a>
+                            <a th:href="@{/task/list(view='all', team=${selectedTeamId})}" class="btn btn-secondary">Reset</a>
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
                     </div>
@@ -146,7 +170,7 @@
             </div>
 
             <div class="card-footer text-end" style="margin-top: 10px;">
-                <a th:href="@{/task/new}" class="btn btn-primary me-2">Add New</a>
+                <a th:href="@{/task/new(team=${selectedTeamId})}" class="btn btn-primary me-2">Add New</a>
             </div>
 
 

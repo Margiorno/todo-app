@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class TaskDAO {
@@ -29,7 +30,8 @@ public class TaskDAO {
             Priority priority,
             Status status,
             LocalDate startDate,
-            LocalDate endDate
+            LocalDate endDate,
+            UUID teamId
     ) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Task> criteriaQuery = criteriaBuilder.createQuery(Task.class);
@@ -51,6 +53,9 @@ public class TaskDAO {
         }
         if (endDate != null) {
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("taskDate"), endDate));
+        }
+        if (teamId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("team").get("id"), teamId));
         }
 
         criteriaQuery.where(predicates.toArray(new Predicate[0]));

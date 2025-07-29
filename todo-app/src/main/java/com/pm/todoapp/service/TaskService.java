@@ -4,9 +4,7 @@ import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.mapper.TaskMapper;
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
-import com.pm.todoapp.model.Task;
+import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.TaskDAO;
 import com.pm.todoapp.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +20,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskDAO taskDAO;
 
+    private final TeamService teamService;
+
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO) {
+    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService) {
         this.taskRepository = taskRepository;
         this.taskDAO = taskDAO;
+        this.teamService = teamService;
     }
 
     public List<TaskResponseDTO> findAll() {
@@ -34,14 +35,39 @@ public class TaskService {
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
-    public TaskResponseDTO save(TaskRequestDTO taskDto) {
+    public TaskResponseDTO save(TaskRequestDTO taskDto, UUID teamId) {
 
         // TODO not random id
-        Task task = TaskMapper.toEntity(taskDto, UUID.randomUUID());
+        Task task = TaskMapper.toEntity(taskDto, new User());
+
+        if (teamId != null) {
+            Team team = teamService.findById(teamId);
+            task.setTeam(team);
+        }
+
+        Task savedTask = taskRepository.save(task);
+        return TaskMapper.toResponseDTO(savedTask);
+    }
+
+
+
+
+
+
+    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId) {
+
+        if(!taskRepository.existsById(taskId))
+            throw new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId));
+
+        //TODO USERS
+        Task task = TaskMapper.toEntity(taskDto, new User(), taskId);
         Task savedTask = taskRepository.save(task);
 
         return TaskMapper.toResponseDTO(savedTask);
     }
+
+
+    // FINDING
 
     public TaskResponseDTO findById(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(
@@ -50,19 +76,19 @@ public class TaskService {
         return TaskMapper.toResponseDTO(task);
     }
 
-    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId) {
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID teamId) {
 
-        if(taskRepository.existsById(taskId))
-            throw new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId));
+        Iterable<Task> tasks = switch (teamId){
+            case null -> taskRepository.findByTaskDate(centerDate);
+            default -> taskRepository.findByTaskDateAndTeamId(centerDate, teamId);
+        };
 
-        Task task = TaskMapper.toEntity(taskDto, taskId, taskId);
-        Task savedTask = taskRepository.save(task);
 
-        return TaskMapper.toResponseDTO(savedTask);
+        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate) {
-        Iterable<Task> tasks = taskRepository.findByTaskDate(centerDate);
+    public List<TaskResponseDTO> findByTeam(UUID teamId) {
+        Iterable<Task> tasks = taskRepository.findByTeamId(teamId);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
@@ -71,9 +97,10 @@ public class TaskService {
             Priority priority,
             Status status,
             LocalDate startDate,
-            LocalDate endDate
+            LocalDate endDate,
+            UUID teamId
     ) {
-        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate);
+        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, teamId);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }

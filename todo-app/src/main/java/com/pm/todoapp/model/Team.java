@@ -26,5 +26,4 @@ public class Team {
 
     @ManyToMany(mappedBy = "teams")
     private Set<User> members = new HashSet<>();
-
 }

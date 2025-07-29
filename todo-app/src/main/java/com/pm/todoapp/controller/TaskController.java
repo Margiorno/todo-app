@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,6 +73,7 @@ public class TaskController {
             @RequestParam(name = "status", required = false) Status status,
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(name = "team", required = false) UUID teamId,
             Model model) {
 
         List<TaskResponseDTO> tasks;
@@ -96,15 +98,29 @@ public class TaskController {
 
 
         // TODO dynamic downloads of teams (at the moment PROWIZORKA :DDDDDDD)
+        // TODO to rebuild this fragment
         Team teamA = new Team();
         teamA.setName("Team A");
+        teamA.setId(UUID.fromString("1d8b9432-8362-4410-a128-2b8a2e5a1926"));
 
         Team teamB = new Team();
         teamB.setName("Team B");
+        teamB.setId(UUID.fromString("1d8b9432-8362-4410-a128-2b8a2e5a1927"));
 
         Set<Team> allTeams = Set.of(teamA, teamB);
 
         model.addAttribute("allTeams", allTeams);
+
+        if (teamId != null) {
+            Optional<Team> selectedTeamOptional = allTeams.stream()
+                    .filter(team -> team.getId().equals(teamId))
+                    .findFirst();
+
+            selectedTeamOptional.ifPresent(team -> {
+                model.addAttribute("selectedTeamName", team.getName());
+            });
+        }
+        model.addAttribute("selectedTeamId", teamId);
         ////////////////////////////////////////////////////////////////////////////
 
         return "task-list";

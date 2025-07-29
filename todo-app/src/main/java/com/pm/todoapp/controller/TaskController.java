@@ -67,7 +67,6 @@ public class TaskController {
             return "task-form";
         }
 
-        //TODO finish team assigning inside service
         TaskResponseDTO response = taskService.save(taskDto, teamId);
 
         model.addAttribute("taskResponse", response);
@@ -92,7 +91,6 @@ public class TaskController {
         List<TeamResponseDTO> allTeams = teamService.findAll();
         model.addAttribute("allTeams", allTeams);
 
-
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
@@ -106,6 +104,7 @@ public class TaskController {
 
         if (teamId != null) {
             model.addAttribute("selectedTeamId", teamId.toString());
+            model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
         }
 
 

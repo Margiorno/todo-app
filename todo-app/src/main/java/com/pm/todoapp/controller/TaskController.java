@@ -48,8 +48,6 @@ public class TaskController {
                              BindingResult bindingResult,
                              Model model) {
 
-        // TODO FORM HANDLING
-
         if (bindingResult.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
             model.addAttribute("formAction", "/task/new");
@@ -100,45 +98,25 @@ public class TaskController {
     @GetMapping("/{id}")
     public String showTask(@PathVariable UUID id, Model model) {
 
-//        try{
-//            TaskResponseDTO task = taskService.findById(id);
-//            model.addAttribute("task", task);
-//            return "task-details";
-//        } catch (TaskNotFoundException e) {
-//
-//            // TODO logic of not found
-//            model.addAttribute("message", "Task not found!");
-//            return "task-list";
-//        }
-
-
         TaskResponseDTO response = taskService.findById(id);
         model.addAttribute("taskResponse", response);
-
         return "task-details";
     }
 
     @GetMapping("/edit/{id}")
     public String editTaskForm(@PathVariable UUID id, Model model) {
-        try {
-            // TODO cleaner version of this fragment
-            TaskResponseDTO taskResponse = taskService.findById(id);
 
-            TaskRequestDTO taskRequest = TaskMapper.fromResponseToRequest(taskResponse);
+        TaskResponseDTO taskResponse = taskService.findById(id);
+        TaskRequestDTO taskRequest = TaskMapper.fromResponseToRequest(taskResponse);
 
-            model.addAttribute("task", taskRequest);
-            model.addAttribute("taskId", id);
-            model.addAttribute("priorities", Priority.values());
-            model.addAttribute("statuses", Status.values());
+        model.addAttribute("task", taskRequest);
+        model.addAttribute("taskId", id);
+        model.addAttribute("priorities", Priority.values());
+        model.addAttribute("statuses", Status.values());
 
-            model.addAttribute("isEditMode", true);
+        model.addAttribute("isEditMode", true);
 
-            return "task-form";
-
-        } catch (TaskNotFoundException e) {
-            model.addAttribute("message", "Task not found!");
-            return "redirect:/task/list";
-        }
+        return "task-form";
     }
 
     //TODO userId

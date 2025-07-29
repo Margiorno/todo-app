@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
@@ -46,15 +45,19 @@ public class TaskService {
 
     public TaskResponseDTO findById(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(
-                ()->new TaskNotFoundException("Task with this id does not exists"));
+                ()->new TaskNotFoundException("Task with this id does not exists: %s".formatted(id)));
 
         return TaskMapper.toResponseDTO(task);
     }
 
     public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId) {
-        Task task = TaskMapper.toEntity(taskDto, taskId, taskId);
 
+        if(taskRepository.existsById(taskId))
+            throw new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId));
+
+        Task task = TaskMapper.toEntity(taskDto, taskId, taskId);
         Task savedTask = taskRepository.save(task);
+
         return TaskMapper.toResponseDTO(savedTask);
     }
 

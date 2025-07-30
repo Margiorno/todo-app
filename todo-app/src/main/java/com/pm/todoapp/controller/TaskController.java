@@ -89,6 +89,7 @@ public class TaskController {
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(name = "team", required = false) UUID teamId,
+            @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope taskFetchScope,
             Model model) {
 
         // TODO USER GET DIFFERENT WAY
@@ -99,9 +100,6 @@ public class TaskController {
 
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
-
-        // TODO download from front
-        TaskFetchScope taskFetchScope = TaskFetchScope.USER_TASKS;
 
         tasks = switch (view) {
             case "calendar" -> taskService.findByDate(centerDate, userId, teamId, taskFetchScope);
@@ -121,17 +119,20 @@ public class TaskController {
         model.addAttribute("tasks", tasks);
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("statuses", Status.values());
+        model.addAttribute("scopes", TaskFetchScope.values());
 
         model.addAttribute("view", view);
 
         //calendar view
         model.addAttribute("centerDate", centerDate);
+        model.addAttribute("selectedScope", taskFetchScope);
 
         // filter view
         model.addAttribute("selectedPriority", priority);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedStartDate", startDate);
         model.addAttribute("selectedEndDate", endDate);
+
 
         return "task-list";
     }

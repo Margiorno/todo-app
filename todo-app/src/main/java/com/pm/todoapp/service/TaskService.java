@@ -1,8 +1,11 @@
 package com.pm.todoapp.service;
 
+import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
+import com.pm.todoapp.exceptions.TeamRequiredException;
+import com.pm.todoapp.exceptions.UserRequiredException;
 import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.TaskDAO;
@@ -79,7 +82,7 @@ public class TaskService {
         return TaskMapper.toResponseDTO(task);
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, boolean allTeamTasksFlag) {
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, TaskFetchScope taskFetchScope) {
 
         User user = usersService.findById(userId);
 
@@ -87,25 +90,27 @@ public class TaskService {
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
             default -> {
                 Team team = teamService.findById(teamId);
-                yield allTeamTasksFlag?
-                        taskRepository.findByTeamAndTaskDate(team, centerDate)
-                        : taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
+                yield switch (taskFetchScope){
+                    case TEAM_TASKS -> taskRepository.findByTeamAndTaskDate(team, centerDate);
+                    case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
+                };
             }
         };
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
-    public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, boolean allTeamTasksFlag) {
+    public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
 
         User user = usersService.findById(userId);
         Team team = teamService.findById(teamId);
 
         Iterable<Task> tasks;
 
-        tasks = allTeamTasksFlag?
-                taskRepository.findByTeam(team) :
-                taskRepository.findByAssigneesContainingAndTeam(user, team);
+        tasks = switch (taskFetchScope){
+            case TEAM_TASKS -> taskRepository.findByTeam(team);
+            case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeam(user, team);
+        };
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
@@ -117,11 +122,31 @@ public class TaskService {
             LocalDate endDate,
             UUID userId,
             UUID teamId,
-            boolean allTeamTasksFlag
+            TaskFetchScope taskFetchScope
     ) {
 
-        User user = allTeamTasksFlag? null : usersService.findById(userId);
-        Team team = teamService.findById(teamId);
+        User user = null;
+        Team team = null;
+
+        switch (taskFetchScope) {
+            case USER_TASKS:
+                if (userId == null) {
+                    throw new UserRequiredException("User ID is required when fetching user-specific tasks.");
+                }
+                user = usersService.findById(userId);
+
+                if (teamId != null) {
+                    team = teamService.findById(teamId);
+                }
+                break;
+
+            case TEAM_TASKS:
+                if (teamId == null) {
+                    throw new TeamRequiredException("Team ID is required when fetching tasks for an entire team.");
+                }
+                team = teamService.findById(teamId);
+                break;
+        }
 
         Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, user, team);
 

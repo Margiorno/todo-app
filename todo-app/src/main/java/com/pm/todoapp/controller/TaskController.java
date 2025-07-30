@@ -1,5 +1,6 @@
 package com.pm.todoapp.controller;
 
+import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.TeamResponseDTO;
@@ -99,13 +100,14 @@ public class TaskController {
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
-        boolean allTeamTasksFlag = true;
+        // TODO download from front
+        TaskFetchScope taskFetchScope = TaskFetchScope.USER_TASKS;
 
         tasks = switch (view) {
-            case "calendar" -> taskService.findByDate(centerDate, userId, teamId, allTeamTasksFlag);
-            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, userId, teamId, allTeamTasksFlag);
+            case "calendar" -> taskService.findByDate(centerDate, userId, teamId, taskFetchScope);
+            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, userId, teamId, taskFetchScope);
             default -> (teamId != null)
-                    ? taskService.findByTeam(teamId, userId, allTeamTasksFlag) // TODO in front select if we want to display all team task, or just assigned to user
+                    ? taskService.findByTeam(teamId, userId, taskFetchScope)
                     : taskService.findByUserId(userId);
         };
 

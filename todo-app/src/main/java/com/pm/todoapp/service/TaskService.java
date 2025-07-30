@@ -64,11 +64,11 @@ public class TaskService {
 
 
     // FINDING
-    // TODO IN FUTURE: USER CAN SEE NOT ONLY OWN TASKS, BUT ALSO TEAM TASKS
 
-    public List<TaskResponseDTO> findAll() {
-        Iterable<Task> tasks = taskRepository.findAll();
+    public List<TaskResponseDTO> findByUserId(UUID userId) {
+        User user = usersService.findById(userId);
 
+        Iterable<Task> tasks = taskRepository.findByAssigneesContaining(user);
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
@@ -79,7 +79,7 @@ public class TaskService {
         return TaskMapper.toResponseDTO(task);
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId) {
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, boolean allTeamTasksFlag) {
 
         User user = usersService.findById(userId);
 
@@ -87,15 +87,25 @@ public class TaskService {
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
             default -> {
                 Team team = teamService.findById(teamId);
-                yield taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
+                yield allTeamTasksFlag?
+                        taskRepository.findByTeamAndTaskDate(team, centerDate)
+                        : taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
             }
         };
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
-    public List<TaskResponseDTO> findByTeam(UUID teamId) {
-        Iterable<Task> tasks = taskRepository.findByTeamId(teamId);
+    public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, boolean allTeamTasksFlag) {
+
+        User user = usersService.findById(userId);
+        Team team = teamService.findById(teamId);
+
+        Iterable<Task> tasks;
+
+        tasks = allTeamTasksFlag?
+                taskRepository.findByTeam(team) :
+                taskRepository.findByAssigneesContainingAndTeam(user, team);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
@@ -105,9 +115,15 @@ public class TaskService {
             Status status,
             LocalDate startDate,
             LocalDate endDate,
-            UUID teamId
+            UUID userId,
+            UUID teamId,
+            boolean allTeamTasksFlag
     ) {
-        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, teamId);
+
+        User user = allTeamTasksFlag? null : usersService.findById(userId);
+        Team team = teamService.findById(teamId);
+
+        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, user, team);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }

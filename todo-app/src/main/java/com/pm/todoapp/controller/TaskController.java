@@ -99,12 +99,14 @@ public class TaskController {
         List<TaskResponseDTO> tasks;
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
+        boolean allTeamTasksFlag = true;
+
         tasks = switch (view) {
-            case "calendar" -> taskService.findByDate(centerDate, userId, teamId);
-            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, teamId);
+            case "calendar" -> taskService.findByDate(centerDate, userId, teamId, allTeamTasksFlag);
+            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, userId, teamId, allTeamTasksFlag);
             default -> (teamId != null)
-                    ? taskService.findByTeam(teamId)
-                    : taskService.findAll();
+                    ? taskService.findByTeam(teamId, userId, allTeamTasksFlag) // TODO in front select if we want to display all team task, or just assigned to user
+                    : taskService.findByUserId(userId);
         };
 
         if (teamId != null) {

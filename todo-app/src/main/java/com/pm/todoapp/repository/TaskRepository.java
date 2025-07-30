@@ -10,8 +10,13 @@ import java.util.UUID;
 
 public interface TaskRepository extends CrudRepository<Task, UUID> {
 
+    Iterable<Task> findByAssigneesContaining(User user);
+
     Iterable<Task> findByAssigneesContainingAndTaskDate(User user, LocalDate taskDate);
     Iterable<Task> findByAssigneesContainingAndTeamAndTaskDate(User user, Team team, LocalDate taskDate);
 
-    Iterable<Task> findByTeamId(UUID teamId);
+    Iterable<Task> findByTeam(Team team);
+    Iterable<Task> findByAssigneesContainingAndTeam(User user, Team team);
+
+    Iterable<Task> findByTeamAndTaskDate(Team team, LocalDate taskDate);
 }

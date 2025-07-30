@@ -13,14 +13,11 @@ import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -28,13 +25,11 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
-    private final TeamService teamService;
     private final UsersService usersService;
 
     @Autowired
-    public TaskController(TaskService taskService, TeamService teamService, UsersService usersService) {
+    public TaskController(TaskService taskService, UsersService usersService) {
         this.taskService = taskService;
-        this.teamService = teamService;
         this.usersService = usersService;
     }
 
@@ -53,7 +48,6 @@ public class TaskController {
 
         return "task-form";
     }
-
 
     // TODO USERS IDENTIFICATION
     @PostMapping("/new")
@@ -79,63 +73,6 @@ public class TaskController {
         return "task-details";
     }
 
-    @GetMapping("/list")
-    public String showTasks(
-            @RequestParam(name = "view", defaultValue = "all") String view,
-            @RequestParam(name = "date", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
-            @RequestParam(name = "priority", required = false) Priority priority,
-            @RequestParam(name = "status", required = false) Status status,
-            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(name = "team", required = false) UUID teamId,
-            @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope taskFetchScope,
-            Model model) {
-
-        // TODO USER GET DIFFERENT WAY
-        UUID userId = usersService.getTestUser().getId();
-
-        List<TeamResponseDTO> teams = teamService.findAll(userId);
-
-
-        List<TaskResponseDTO> tasks;
-        LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
-
-        tasks = switch (view) {
-            case "calendar" -> taskService.findByDate(centerDate, userId, teamId, taskFetchScope);
-            case "filter" -> taskService.findByBasicFilters(priority, status, startDate, endDate, userId, teamId, taskFetchScope);
-            default -> (teamId != null)
-                    ? taskService.findByTeam(teamId, userId, taskFetchScope)
-                    : taskService.findByUserId(userId);
-        };
-
-        if (teamId != null) {
-            model.addAttribute("selectedTeamId", teamId.toString());
-            model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
-        }
-
-
-        model.addAttribute("allTeams", teams);
-        model.addAttribute("tasks", tasks);
-        model.addAttribute("priorities", Priority.values());
-        model.addAttribute("statuses", Status.values());
-        model.addAttribute("scopes", TaskFetchScope.values());
-
-        model.addAttribute("view", view);
-
-        //calendar view
-        model.addAttribute("centerDate", centerDate);
-        model.addAttribute("selectedScope", taskFetchScope);
-
-        // filter view
-        model.addAttribute("selectedPriority", priority);
-        model.addAttribute("selectedStatus", status);
-        model.addAttribute("selectedStartDate", startDate);
-        model.addAttribute("selectedEndDate", endDate);
-
-
-        return "task-list";
-    }
 
     @GetMapping("/{id}")
     public String showTask(@PathVariable UUID id, Model model) {
@@ -144,6 +81,8 @@ public class TaskController {
         model.addAttribute("taskResponse", response);
         return "task-details";
     }
+
+
 
     @GetMapping("/edit/{id}")
     public String editTaskForm(@PathVariable UUID id, Model model) {

@@ -1,8 +1,11 @@
 package com.pm.todoapp.service;
 
+import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
+import com.pm.todoapp.exceptions.TeamRequiredException;
+import com.pm.todoapp.exceptions.UserRequiredException;
 import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.TaskDAO;
@@ -21,24 +24,20 @@ public class TaskService {
     private final TaskDAO taskDAO;
 
     private final TeamService teamService;
+    private final UsersService usersService;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService) {
+    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService, UsersService usersService) {
         this.taskRepository = taskRepository;
         this.taskDAO = taskDAO;
         this.teamService = teamService;
+        this.usersService = usersService;
     }
 
-    public List<TaskResponseDTO> findAll() {
-        Iterable<Task> tasks = taskRepository.findAll();
+    public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
-    }
-
-    public TaskResponseDTO save(TaskRequestDTO taskDto, UUID teamId) {
-
-        // TODO not random id
-        Task task = TaskMapper.toEntity(taskDto, new User());
+        User user = usersService.findById(userId);
+        Task task = TaskMapper.toEntity(taskDto, user);
 
         if (teamId != null) {
             Team team = teamService.findById(teamId);
@@ -69,26 +68,49 @@ public class TaskService {
 
     // FINDING
 
-    public TaskResponseDTO findById(UUID id) {
+    public List<TaskResponseDTO> findByUserId(UUID userId) {
+        User user = usersService.findById(userId);
+
+        Iterable<Task> tasks = taskRepository.findByAssigneesContaining(user);
+        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+    }
+
+    public TaskResponseDTO findByTaskId(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(
                 ()->new TaskNotFoundException("Task with this id does not exists: %s".formatted(id)));
 
         return TaskMapper.toResponseDTO(task);
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID teamId) {
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, TaskFetchScope taskFetchScope) {
+
+        User user = usersService.findById(userId);
 
         Iterable<Task> tasks = switch (teamId){
-            case null -> taskRepository.findByTaskDate(centerDate);
-            default -> taskRepository.findByTaskDateAndTeamId(centerDate, teamId);
+            case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
+            default -> {
+                Team team = teamService.findById(teamId);
+                yield switch (taskFetchScope){
+                    case TEAM_TASKS -> taskRepository.findByTeamAndTaskDate(team, centerDate);
+                    case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
+                };
+            }
         };
-
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
 
-    public List<TaskResponseDTO> findByTeam(UUID teamId) {
-        Iterable<Task> tasks = taskRepository.findByTeamId(teamId);
+    public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
+
+        User user = usersService.findById(userId);
+        Team team = teamService.findById(teamId);
+
+        Iterable<Task> tasks;
+
+        tasks = switch (taskFetchScope){
+            case TEAM_TASKS -> taskRepository.findByTeam(team);
+            case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeam(user, team);
+        };
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }
@@ -98,9 +120,35 @@ public class TaskService {
             Status status,
             LocalDate startDate,
             LocalDate endDate,
-            UUID teamId
+            UUID userId,
+            UUID teamId,
+            TaskFetchScope taskFetchScope
     ) {
-        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, teamId);
+
+        User user = null;
+        Team team = null;
+
+        switch (taskFetchScope) {
+            case USER_TASKS:
+                if (userId == null) {
+                    throw new UserRequiredException("User ID is required when fetching user-specific tasks.");
+                }
+                user = usersService.findById(userId);
+
+                if (teamId != null) {
+                    team = teamService.findById(teamId);
+                }
+                break;
+
+            case TEAM_TASKS:
+                if (teamId == null) {
+                    throw new TeamRequiredException("Team ID is required when fetching tasks for an entire team.");
+                }
+                team = teamService.findById(teamId);
+                break;
+        }
+
+        Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, user, team);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }

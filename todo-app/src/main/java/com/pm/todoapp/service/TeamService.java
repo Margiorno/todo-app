@@ -4,6 +4,7 @@ import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.exceptions.TeamNotFoundException;
 import com.pm.todoapp.mapper.TeamMapper;
 import com.pm.todoapp.model.Team;
+import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,20 +16,26 @@ import java.util.stream.StreamSupport;
 @Service
 public class TeamService {
     private final TeamRepository teamRepository;
+    private final UsersService usersService;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository) {
+    public TeamService(TeamRepository teamRepository, UsersService usersService) {
         this.teamRepository = teamRepository;
+        this.usersService = usersService;
     }
 
+    // needed in task service
     public Team findById(UUID teamId) {
         return teamRepository.findById(teamId).
                 orElseThrow(()->new TeamNotFoundException("Team with this id does not exist: " + teamId));
     }
 
-    //TODO TO REBUILD
-    public List<TeamResponseDTO> findAll() {
-        return StreamSupport.stream(teamRepository.findAll().spliterator(), false).map(TeamMapper::toResponseDTO).toList();
+    public List<TeamResponseDTO> findAll(UUID userId) {
+
+        User user = usersService.findById(userId);
+        Iterable<Team> teams = teamRepository.findByMembersContaining(user);
+
+        return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
     }
 
 }

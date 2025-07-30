@@ -8,7 +8,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface TeamRepository extends CrudRepository<Team, UUID> {
-
-    Iterable<Team> findByMembersContaining(User member);
+public interface UsersRepository extends CrudRepository<User, UUID> {
 }

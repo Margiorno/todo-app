@@ -14,11 +14,11 @@
         <h2 class="mb-4">Menu</h2>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             <a class="nav-link" th:classappend="${view == 'all' or view == null ? 'active' : ''}"
-               th:href="@{/task/list(view='all', team=${selectedTeamId})}">All</a>
+               th:href="@{/task/list(view='all', team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">All</a>
             <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
-               th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()}, team=${selectedTeamId})}">Calendar</a>
+               th:href="@{/task/list(view='calendar', date=${T(java.time.LocalDate).now()}, team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Calendar</a>
             <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
-               th:href="@{/task/list(view='filter', team=${selectedTeamId})}">Filters</a>
+               th:href="@{/task/list(view='filter', team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Filters</a>
         </div>
 
         <h4 class="mt-4 mb-3">Projects</h4>
@@ -31,8 +31,8 @@
         <div class="nav flex-column">
             <a th:each="team : ${allTeams}"
                class="nav-link"
-               th:classappend="${team.id == selectedTeamId ? 'active' : ''}"
-               th:href="@{/task/list(view=${view}, team=${team.id})}"
+               th:classappend="${selectedTeamId != null and team.id.toString() == selectedTeamId ? 'active' : ''}"
+               th:href="@{/task/list(view=${view}, team=${team.id}, scope=${selectedScope != null ? selectedScope.name() : 'USER_TASKS'})}"
                th:text="${team.name}">
                 Team Name
             </a>
@@ -61,12 +61,12 @@
         <div th:if="${view == 'calendar'}" class="card mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-center align-items-center flex-wrap">
-                    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)}, team=${selectedTeamId})}"
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.minusDays(1)}, team=${selectedTeamId}, scope=${selectedScope})}"
                        class="btn btn-outline-secondary"><</a>
                     <div class="btn-group mx-2" role="group">
                         <th:block th:each="i : ${#numbers.sequence(-2, 2)}">
                             <th:block th:with="currentDate=${centerDate.plusDays(i)}">
-                                <a th:href="@{/task/list(view='calendar', date=${currentDate}, team=${selectedTeamId})}"
+                                <a th:href="@{/task/list(view='calendar', date=${currentDate}, team=${selectedTeamId}, scope=${selectedScope})}"
                                    th:text="${#temporals.format(currentDate, 'dd.MM')}"
                                    class="btn"
                                    th:classappend="${#temporals.format(currentDate, 'yyyy-MM-dd') == #temporals.format(centerDate, 'yyyy-MM-dd')} ? 'btn-primary' : 'btn-outline-primary'">
@@ -74,11 +74,12 @@
                             </th:block>
                         </th:block>
                     </div>
-                    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)}, team=${selectedTeamId})}"
+                    <a th:href="@{/task/list(view='calendar', date=${centerDate.plusDays(1)}, team=${selectedTeamId}, scope=${selectedScope})}"
                        class="btn btn-outline-secondary">></a>
                     <form th:action="@{/task/list}" method="get" class="d-flex align-items-center ms-auto mt-2 mt-md-0">
                         <input type="hidden" name="view" value="calendar">
                         <input type="hidden" name="team" th:if="${selectedTeamId}" th:value="${selectedTeamId}">
+                        <input type="hidden" name="scope" th:if="${selectedTeamId}" th:value="${selectedScope}">
                         <input type="date" name="date" th:value="${#temporals.format(centerDate, 'yyyy-MM-dd')}"
                                class="form-control"/>
                         <button type="submit" class="btn btn-primary ms-2">Go</button>
@@ -95,6 +96,7 @@
                 <form th:action="@{/task/list}" method="get">
                     <input type="hidden" name="view" value="filter">
                     <input type="hidden" name="team" th:if="${selectedTeamId}" th:value="${selectedTeamId}">
+                    <input type="hidden" name="scope" th:if="${selectedTeamId}" th:value="${selectedScope}">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-3">
                             <label for="priority" class="form-label">Priority</label>
@@ -123,7 +125,7 @@
                                    th:value="${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''}">
                         </div>
                         <div class="col-12 text-end">
-                            <a th:href="@{/task/list(view='all', team=${selectedTeamId})}" class="btn btn-secondary">Reset</a>
+                            <a th:href="@{/task/list(view='all', team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}" class="btn btn-secondary">Reset</a>
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
                     </div>
@@ -132,8 +134,30 @@
         </div>
 
         <div class="card">
+
             <div class="card-header d-flex justify-content-between align-items-center">
+
                 <h2 class="h5 mb-0">All tasks</h2>
+
+                <div th:if="${selectedTeamId != null}" class="d-flex align-items-center">
+                    <span class="me-3">Task Scope:</span>
+                    <div class="btn-group" role="group" aria-label="Task scope selection">
+                        <th:block th:each="scopeOpt : ${scopes}">
+                            <a th:if="${view != 'filter'}"
+                               class="btn btn-sm"
+                               th:classappend="${scopeOpt == selectedScope ? 'btn-primary' : 'btn-outline-primary'}"
+                               th:href="@{/task/list(view=${view}, date=${view == 'calendar' ? #temporals.format(centerDate, 'yyyy-MM-dd') : null}, team=${selectedTeamId}, scope=${scopeOpt.name()})}"
+                               th:text="${scopeOpt.name()}">
+                            </a>
+                            <a th:if="${view == 'filter'}"
+                               class="btn btn-sm"
+                               th:classappend="${scopeOpt == selectedScope ? 'btn-primary' : 'btn-outline-primary'}"
+                               th:href="@{/task/list(view='filter', team=${selectedTeamId}, scope=${scopeOpt.name()}, priority=${selectedPriority}, status=${selectedStatus}, startDate=${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}, endDate=${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''})}"
+                               th:text="${scopeOpt.name()}">
+                            </a>
+                        </th:block>
+                    </div>
+                </div>
             </div>
             <div class="card-body p-0">
                 <table class="table table-hover align-middle mb-0">

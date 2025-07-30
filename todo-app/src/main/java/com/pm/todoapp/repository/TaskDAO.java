@@ -1,8 +1,6 @@
 package com.pm.todoapp.repository;
 
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
-import com.pm.todoapp.model.Task;
+import com.pm.todoapp.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -31,7 +29,8 @@ public class TaskDAO {
             Status status,
             LocalDate startDate,
             LocalDate endDate,
-            UUID teamId
+            User user,
+            Team team
     ) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Task> criteriaQuery = criteriaBuilder.createQuery(Task.class);
@@ -54,8 +53,11 @@ public class TaskDAO {
         if (endDate != null) {
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("taskDate"), endDate));
         }
-        if (teamId != null) {
-            predicates.add(criteriaBuilder.equal(root.get("team").get("id"), teamId));
+        if (user != null) {
+            predicates.add(criteriaBuilder.isMember(user, root.get("assignees")));
+        }
+        if (team != null) {
+            predicates.add(criteriaBuilder.equal(root.get("team"), team));
         }
 
         criteriaQuery.where(predicates.toArray(new Predicate[0]));

@@ -87,8 +87,7 @@ public class TaskController {
     @GetMapping("/edit/{id}")
     public String editTaskForm(@PathVariable UUID id, Model model) {
 
-        TaskResponseDTO taskResponse = taskService.findByTaskId(id);
-        TaskRequestDTO taskRequest = TaskMapper.fromResponseToRequest(taskResponse);
+        TaskRequestDTO taskRequest = taskService.findTaskRequestById(id);
 
         model.addAttribute("task", taskRequest);
         model.addAttribute("taskId", id);
@@ -107,6 +106,8 @@ public class TaskController {
                              BindingResult bindingResult,
                              Model model) {
 
+        UUID userId = getCurrentUserId();
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("taskId", id);
             model.addAttribute("priorities", Priority.values());
@@ -115,11 +116,16 @@ public class TaskController {
             return "task-form";
         }
 
-        TaskResponseDTO updated = taskService.update(taskDto, id);
+        TaskResponseDTO updated = taskService.update(taskDto, id, userId);
         model.addAttribute("taskResponse", updated);
         model.addAttribute("message", "Task updated successfully!");
 
         return "task-details";
+    }
+
+    private UUID getCurrentUserId() {
+        // TODO: to refactor
+        return usersService.getTestUser().getId();
     }
 
 }

@@ -30,7 +30,13 @@ public class TeamService {
                 orElseThrow(()->new TeamNotFoundException("Team with this id does not exist: " + teamId));
     }
 
-    public List<TeamResponseDTO> findAll(UUID userId) {
+    public List<TeamResponseDTO> findAll() {
+        Iterable<Team> teams = teamRepository.findAll();
+
+        return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
+    }
+
+    public List<TeamResponseDTO> findAllByUserId(UUID userId) {
 
         User user = usersService.findById(userId);
         Iterable<Team> teams = teamRepository.findByMembersContaining(user);

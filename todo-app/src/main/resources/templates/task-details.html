@@ -42,11 +42,24 @@
                          – 
                         <span th:text="${taskResponse.endTime}"></span>
                     </dd>
+
+                    <dt th:if="${taskResponse.team != null}" class="col-sm-3">Team</dt>
+                    <dd th:if="${taskResponse.team != null}" class="col-sm-9" th:text="${taskResponse.team.name}"></dd>
+
+                    <dt th:if="${taskResponse.assignees != null and !taskResponse.assignees.isEmpty()}" class="col-sm-3">Assigned users</dt>
+                    <dd th:if="${taskResponse.assignees != null and !taskResponse.assignees.isEmpty()}"
+                        class="col-sm-9"
+                        th:each="assignee : ${taskResponse.assignees}"
+                        th:text="${assignee.id}">
+                    </dd>
+
                 </dl>
             </div>
+
+<!--            TODO USER VERIFICATION -->
             <div class="card-footer text-end">
                 <a th:href="@{'/task/edit/' + ${taskResponse.id}}" class="btn btn-primary me-2">Edit</a>
-                <a th:href="@{/task/list}" class="btn btn-secondary">Tasks list</a>
+                <a th:href="@{/}" class="btn btn-secondary">Dashboard</a>
             </div>
         </div>
     </div>

@@ -2,7 +2,6 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
@@ -116,7 +115,7 @@ public class DashboardController {
             model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
         }
 
-        model.addAttribute("allTeams", teamService.findAll(userId));
+        model.addAttribute("allTeams", teamService.findAllByUserId(userId));
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("statuses", Status.values());
         model.addAttribute("scopes", TaskFetchScope.values());

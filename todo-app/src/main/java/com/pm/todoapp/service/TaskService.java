@@ -3,6 +3,7 @@ package com.pm.todoapp.service;
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
+import com.pm.todoapp.exceptions.TaskAccessDeniedException;
 import com.pm.todoapp.exceptions.TaskNotFoundException;
 import com.pm.todoapp.exceptions.TeamRequiredException;
 import com.pm.todoapp.exceptions.UserRequiredException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
@@ -37,7 +39,7 @@ public class TaskService {
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 
         User user = usersService.findById(userId);
-        Task task = TaskMapper.toEntity(taskDto, user);
+        Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
         if (teamId != null) {
             Team team = teamService.findById(teamId);
@@ -48,18 +50,19 @@ public class TaskService {
         return TaskMapper.toResponseDTO(savedTask);
     }
 
+    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId, UUID userId) {
 
+        User user = usersService.findById(userId);
 
+        Task fromDb = taskRepository.findById(taskId).orElseThrow(
+                () -> new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId))
+        );
 
+        if (!fromDb.getAssignees().contains(user)) {
+            throw new TaskAccessDeniedException("User '%s' is not authorized to modify task '%s'".formatted(userId, taskId));
+        }
 
-
-    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId) {
-
-        if(!taskRepository.existsById(taskId))
-            throw new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId));
-
-        //TODO USERS
-        Task task = TaskMapper.toEntity(taskDto, new User(), taskId);
+        Task task = TaskMapper.toEntity(taskDto, fromDb.getAssignees(), taskId);
         Task savedTask = taskRepository.save(task);
 
         return TaskMapper.toResponseDTO(savedTask);
@@ -151,5 +154,13 @@ public class TaskService {
         Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, user, team);
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+    }
+
+    public TaskRequestDTO findTaskRequestById(UUID id) {
+        Task task = taskRepository.findById(id).orElseThrow(
+                () -> new TaskNotFoundException("Task with this id does not exists: %s".formatted(id))
+        );
+
+        return TaskMapper.toRequestDto(task);
     }
 }

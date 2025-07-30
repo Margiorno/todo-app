@@ -21,24 +21,20 @@ public class TaskService {
     private final TaskDAO taskDAO;
 
     private final TeamService teamService;
+    private final UsersService usersService;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService) {
+    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService, UsersService usersService) {
         this.taskRepository = taskRepository;
         this.taskDAO = taskDAO;
         this.teamService = teamService;
+        this.usersService = usersService;
     }
 
-    public List<TaskResponseDTO> findAll() {
-        Iterable<Task> tasks = taskRepository.findAll();
+    public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
-    }
-
-    public TaskResponseDTO save(TaskRequestDTO taskDto, UUID teamId) {
-
-        // TODO not random id
-        Task task = TaskMapper.toEntity(taskDto, new User());
+        User user = usersService.findById(userId);
+        Task task = TaskMapper.toEntity(taskDto, user);
 
         if (teamId != null) {
             Team team = teamService.findById(teamId);
@@ -68,21 +64,32 @@ public class TaskService {
 
 
     // FINDING
+    // TODO IN FUTURE: USER CAN SEE NOT ONLY OWN TASKS, BUT ALSO TEAM TASKS
 
-    public TaskResponseDTO findById(UUID id) {
+    public List<TaskResponseDTO> findAll() {
+        Iterable<Task> tasks = taskRepository.findAll();
+
+        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+    }
+
+    public TaskResponseDTO findByTaskId(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(
                 ()->new TaskNotFoundException("Task with this id does not exists: %s".formatted(id)));
 
         return TaskMapper.toResponseDTO(task);
     }
 
-    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID teamId) {
+    public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId) {
+
+        User user = usersService.findById(userId);
 
         Iterable<Task> tasks = switch (teamId){
-            case null -> taskRepository.findByTaskDate(centerDate);
-            default -> taskRepository.findByTaskDateAndTeamId(centerDate, teamId);
+            case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
+            default -> {
+                Team team = teamService.findById(teamId);
+                yield taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
+            }
         };
-
 
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
     }

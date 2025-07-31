@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidTokenException.class)
     public RedirectView handleInvalidToken(InvalidTokenException ex) {
 
-        return new RedirectView("/login");
+        return new RedirectView("/auth");
     }
 
 }

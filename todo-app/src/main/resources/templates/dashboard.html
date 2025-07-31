@@ -7,44 +7,56 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body>
-<div class="container-fluid mt-4">
+<div class="container-fluid">
 <div class="row">
-    <div class="col-md-2 menu-column">
 
-        <h2 class="mb-4">Menu</h2>
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <a class="nav-link" th:classappend="${view == 'all' ? 'active' : ''}"
-               th:href="@{/(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">All</a>
-            <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
-               th:href="@{/calendar(date=${T(java.time.LocalDate).now()}, team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Calendar</a>
-            <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
-               th:href="@{/filter(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Filters</a>
+    <div class="col-md-2 menu-column d-flex flex-column">
+        <div>
+            <h2 class="mb-4">Menu</h2>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link" th:classappend="${view == 'all' ? 'active' : ''}"
+                   th:href="@{/(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">All</a>
+                <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
+                   th:href="@{/calendar(date=${T(java.time.LocalDate).now()}, team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Calendar</a>
+                <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
+                   th:href="@{/filter(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Filters</a>
+            </div>
+
+            <h4 class="mt-4 mb-3">Projects</h4>
+            <div class="nav flex-column">
+                <a class="nav-link" href="#">Project A</a>
+                <a class="nav-link" href="#">Project B</a>
+            </div>
+
+            <h4 class="mt-4 mb-3">Teams</h4>
+            <div class="nav flex-column">
+                <a th:each="team : ${allTeams}"
+                   class="nav-link"
+                   th:classappend="${selectedTeamId != null and team.id.toString() == selectedTeamId ? 'active' : ''}"
+                   th:href="@{/(view=${view}, team=${team.id}, scope=${selectedScope != null ? selectedScope.name() : 'USER_TASKS'})}"
+                   th:text="${team.name}">
+                    Team Name
+                </a>
+                <a class="nav-link"
+                   th:href="@{/(view=${view})}"
+                   th:classappend="${selectedTeamId == null ? 'active' : ''}">
+                    -- All Teams --
+                </a>
+            </div>
         </div>
 
-        <h4 class="mt-4 mb-3">Projects</h4>
-        <div class="nav flex-column">
-            <a class="nav-link" href="#">Project A</a>
-            <a class="nav-link" href="#">Project B</a>
-        </div>
-
-        <h4 class="mt-4 mb-3">Teams</h4>
-        <div class="nav flex-column">
-            <a th:each="team : ${allTeams}"
-               class="nav-link"
-               th:classappend="${selectedTeamId != null and team.id.toString() == selectedTeamId ? 'active' : ''}"
-               th:href="@{/(view=${view}, team=${team.id}, scope=${selectedScope != null ? selectedScope.name() : 'USER_TASKS'})}"
-               th:text="${team.name}">
-                Team Name
-            </a>
-            <a class="nav-link"
-               th:href="@{/(view=${view})}"
-               th:classappend="${selectedTeamId == null ? 'active' : ''}">
-                -- All Teams --
-            </a>
+        <div class="mt-auto">
+            <hr>
+            <div class="nav flex-column">
+                <a class="nav-link" href="#">Profile</a>
+                <a class="nav-link" th:href="@{/auth/logout}">Log out</a>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-10 main-content">
+
+
+    <div class="col-md-10 main-content mt-4">
 
         <div th:if="${selectedTeamId != null and not #strings.isEmpty(selectedTeamId)}" class="card mb-4 border-primary">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

@@ -4,7 +4,9 @@ import com.pm.todoapp.dto.LoginRequestDTO;
 import com.pm.todoapp.dto.RegisterRequestDTO;
 import com.pm.todoapp.service.AuthService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +62,19 @@ public class AuthController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Login success");
         return "redirect:/";
+    }
+
+    @GetMapping("/logout")
+    public String handleLogout(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        Cookie userCookie = new Cookie("userCookie", null);
+        userCookie.setPath("/");
+
+        return "redirect:/auth";
     }
 }

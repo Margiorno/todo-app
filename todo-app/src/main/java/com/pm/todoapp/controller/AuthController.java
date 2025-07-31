@@ -4,6 +4,7 @@ import com.pm.todoapp.dto.LoginRequestDTO;
 import com.pm.todoapp.dto.RegisterRequestDTO;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.model.Priority;
+import com.pm.todoapp.service.AuthService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,10 +19,10 @@ import java.util.UUID;
 @RequestMapping("/")
 public class AuthController {
 
-    private final UsersService usersService;
+    private final AuthService authService;
 
-    public AuthController(UsersService usersService) {
-        this.usersService = usersService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
 
@@ -36,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute RegisterRequestDTO registerRequest, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        UUID userId = usersService.registerUser(registerRequest);
+        UUID userId = authService.registerUser(registerRequest);
 
 
         Cookie userCookie = new Cookie("userCookie", userId.toString());
@@ -59,7 +60,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(@ModelAttribute LoginRequestDTO loginRequestDTO, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        UUID userId = usersService.loginUser(loginRequestDTO);
+        UUID userId = authService.loginUser(loginRequestDTO);
 
         Cookie userCookie = new Cookie("userCookie", userId.toString());
         userCookie.setPath("/");

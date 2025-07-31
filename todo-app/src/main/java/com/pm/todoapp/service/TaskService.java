@@ -78,7 +78,6 @@ public class TaskService {
 
 
     // FINDING
-
     public List<TaskResponseDTO> findByUserId(UUID userId) {
         User user = usersService.findById(userId);
 

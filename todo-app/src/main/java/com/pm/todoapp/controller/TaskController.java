@@ -4,7 +4,7 @@ import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
-import com.pm.todoapp.model.User;
+import com.pm.todoapp.service.AuthService;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
@@ -21,16 +21,15 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
-    private final UsersService usersService;
 
     @Autowired
-    public TaskController(TaskService taskService, UsersService usersService) {
+    public TaskController(TaskService taskService) {
         this.taskService = taskService;
-        this.usersService = usersService;
     }
 
     @GetMapping("/new")
-    public String showNewTaskForm(@RequestParam(name = "team", required = false) UUID teamId,
+    public String showNewTaskForm(
+            @RequestParam(name = "team", required = false) UUID teamId,
                                   Model model) {
 
         model.addAttribute("task", new TaskRequestDTO());
@@ -46,13 +45,13 @@ public class TaskController {
     }
 
     @PostMapping("/new")
-    public String save(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-                       @RequestParam(name = "team", required = false) UUID teamId,
-                       BindingResult bindingResult,
-                       Model model) {
+    public String save(
+            @RequestAttribute("userId") UUID userId,
+            @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
+            @RequestParam(name = "team", required = false) UUID teamId,
+            BindingResult bindingResult,
+            Model model) {
 
-        // TODO refactor
-        UUID userId = getCurrentUserId();
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
@@ -69,7 +68,8 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public String showTask(@PathVariable UUID id, Model model) {
+    public String showTask(
+            @PathVariable UUID id, Model model) {
 
         TaskResponseDTO response = taskService.findByTaskId(id);
         model.addAttribute("taskResponse", response);
@@ -77,7 +77,8 @@ public class TaskController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editTaskForm(@PathVariable UUID id, Model model) {
+    public String editTaskForm(
+            @PathVariable UUID id, Model model) {
 
         TaskResponseDTO taskResponse = taskService.findByTaskId(id);
         TaskRequestDTO taskRequest = taskService.findTaskRequestById(id);
@@ -96,13 +97,13 @@ public class TaskController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateTask(@PathVariable UUID id,
-                             @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-                             @RequestParam(name = "team", required = false) UUID teamId,
-                             BindingResult bindingResult,
-                             Model model) {
-
-        UUID userId = getCurrentUserId();
+    public String updateTask(
+            @RequestAttribute("userId") UUID userId,
+            @PathVariable UUID id,
+            @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
+            @RequestParam(name = "team", required = false) UUID teamId,
+            BindingResult bindingResult,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("taskId", id);
@@ -120,11 +121,6 @@ public class TaskController {
         model.addAttribute("message", "Task updated successfully!");
 
         return "task-details";
-    }
-
-    private UUID getCurrentUserId() {
-        // TODO: to refactor
-        return usersService.getTestUser().getId();
     }
 
 }

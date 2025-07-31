@@ -4,6 +4,7 @@ import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
+import com.pm.todoapp.service.AuthService;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,13 +24,11 @@ import java.util.UUID;
 public class DashboardController {
 
     private final TaskService taskService;
-    private final UsersService usersService;
     private final TeamService teamService;
 
     @Autowired
-    public DashboardController(TaskService taskService, UsersService usersService, TeamService teamService) {
+    public DashboardController(TaskService taskService, TeamService teamService) {
         this.taskService = taskService;
-        this.usersService = usersService;
         this.teamService = teamService;
     }
 
@@ -48,11 +44,11 @@ public class DashboardController {
 
     @GetMapping
     public String showAllTasks(
+            @RequestAttribute("userId") UUID userId,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
 
-        UUID userId = getCurrentUserId();
         List<TaskResponseDTO> tasks = (teamId != null)
                 ? taskService.findByTeam(teamId, userId, scope)
                 : taskService.findByUserId(userId);
@@ -66,12 +62,12 @@ public class DashboardController {
 
     @GetMapping("/calendar")
     public String showCalendarView(
+            @RequestAttribute("userId") UUID userId,
             @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
 
-        UUID userId = getCurrentUserId();
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
         List<TaskResponseDTO> tasks = taskService.findByDate(centerDate, userId, teamId, scope);
@@ -86,12 +82,12 @@ public class DashboardController {
 
     @GetMapping("/filter")
     public String showFilteredTasks(
+            @RequestAttribute("userId") UUID userId,
             @ModelAttribute TaskFilterCriteria criteria,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
 
-        UUID userId = getCurrentUserId();
         List<TaskResponseDTO> tasks = taskService.findByBasicFilters(
                 criteria.getPriority(), criteria.getStatus(), criteria.getStartDate(), criteria.getEndDate(),
                 userId, teamId, scope);
@@ -122,9 +118,5 @@ public class DashboardController {
         model.addAttribute("selectedScope", scope);
     }
 
-    private UUID getCurrentUserId() {
-        // TODO: to refactor
-        return usersService.getTestUser().getId();
-    }
 
 }

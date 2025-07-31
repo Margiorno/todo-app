@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,6 +17,8 @@ public class TaskResponseDTO {
     private String description;
     private String priority;
     private String status;
+    private TeamResponseDTO team;
+    private Set<UserResponseDTO> assignees;
     private String taskDate;
     private String startTime;
     private String endTime;

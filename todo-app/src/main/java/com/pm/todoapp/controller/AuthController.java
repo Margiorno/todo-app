@@ -74,6 +74,8 @@ public class AuthController {
 
         Cookie userCookie = new Cookie("userCookie", null);
         userCookie.setPath("/");
+        userCookie.setMaxAge(0);
+        response.addCookie(userCookie);
 
         return "redirect:/auth";
     }

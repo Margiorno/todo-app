@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -43,6 +44,12 @@ public class GlobalExceptionHandler {
         model.addAttribute("message", errorMessage);
         model.addAttribute("link", "/task/list");
         return "error/400";
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public RedirectView handleInvalidToken(InvalidTokenException ex) {
+
+        return new RedirectView("/login");
     }
 
 }

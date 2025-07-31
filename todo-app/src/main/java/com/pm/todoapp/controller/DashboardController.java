@@ -24,16 +24,12 @@ import java.util.UUID;
 public class DashboardController {
 
     private final TaskService taskService;
-    private final UsersService usersService;
     private final TeamService teamService;
-    private final AuthService authService;
 
     @Autowired
-    public DashboardController(TaskService taskService, UsersService usersService, TeamService teamService, AuthService authService) {
+    public DashboardController(TaskService taskService, TeamService teamService) {
         this.taskService = taskService;
-        this.usersService = usersService;
         this.teamService = teamService;
-        this.authService = authService;
     }
 
     @Data
@@ -48,12 +44,10 @@ public class DashboardController {
 
     @GetMapping
     public String showAllTasks(
-            @CookieValue(name = "userId", required = false) String userIdCookie,
+            @RequestAttribute("userId") UUID userId,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
-
-        UUID userId = authorizeToken(userIdCookie);
 
         List<TaskResponseDTO> tasks = (teamId != null)
                 ? taskService.findByTeam(teamId, userId, scope)
@@ -68,13 +62,12 @@ public class DashboardController {
 
     @GetMapping("/calendar")
     public String showCalendarView(
-            @CookieValue(name = "userId", required = false) String userIdCookie,
+            @RequestAttribute("userId") UUID userId,
             @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
 
-        UUID userId = authorizeToken(userIdCookie);
         LocalDate centerDate = (selectedDate != null) ? selectedDate : LocalDate.now();
 
         List<TaskResponseDTO> tasks = taskService.findByDate(centerDate, userId, teamId, scope);
@@ -89,13 +82,11 @@ public class DashboardController {
 
     @GetMapping("/filter")
     public String showFilteredTasks(
-            @CookieValue(name = "userId", required = false) String userIdCookie,
+            @RequestAttribute("userId") UUID userId,
             @ModelAttribute TaskFilterCriteria criteria,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
-
-        UUID userId = authorizeToken(userIdCookie);
 
         List<TaskResponseDTO> tasks = taskService.findByBasicFilters(
                 criteria.getPriority(), criteria.getStatus(), criteria.getStartDate(), criteria.getEndDate(),
@@ -127,14 +118,5 @@ public class DashboardController {
         model.addAttribute("selectedScope", scope);
     }
 
-    // TODO in future string will be JWT
-    private UUID authorizeToken(String userIdCookie) {
-
-        if (userIdCookie == null || userIdCookie.isBlank()) {
-            return null;
-        }
-
-        return authService.verifyToken(userIdCookie);
-    }
 
 }

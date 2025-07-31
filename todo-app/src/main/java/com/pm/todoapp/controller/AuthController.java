@@ -39,7 +39,7 @@ public class AuthController {
         UUID userId = usersService.registerUser(registerRequest);
 
 
-        Cookie userCookie = new Cookie("userId", userId.toString());
+        Cookie userCookie = new Cookie("userCookie", userId.toString());
         userCookie.setPath("/");
         response.addCookie(userCookie);
 
@@ -61,7 +61,7 @@ public class AuthController {
     public String handleLogin(@ModelAttribute LoginRequestDTO loginRequestDTO, HttpServletResponse response, RedirectAttributes redirectAttributes) {
         UUID userId = usersService.loginUser(loginRequestDTO);
 
-        Cookie userCookie = new Cookie("userId", userId.toString());
+        Cookie userCookie = new Cookie("userCookie", userId.toString());
         userCookie.setPath("/");
         response.addCookie(userCookie);
 

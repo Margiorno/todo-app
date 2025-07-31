@@ -9,6 +9,7 @@ import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,7 +47,7 @@ public class TaskController {
 
     @PostMapping("/new")
     public String save(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal UUID userId,
             @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
             @RequestParam(name = "team", required = false) UUID teamId,
             BindingResult bindingResult,
@@ -98,7 +99,7 @@ public class TaskController {
 
     @PostMapping("/update/{id}")
     public String updateTask(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal UUID userId,
             @PathVariable UUID id,
             @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
             @RequestParam(name = "team", required = false) UUID teamId,

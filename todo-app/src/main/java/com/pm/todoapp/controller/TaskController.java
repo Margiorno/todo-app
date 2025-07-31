@@ -4,7 +4,6 @@ import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
-import com.pm.todoapp.model.User;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;

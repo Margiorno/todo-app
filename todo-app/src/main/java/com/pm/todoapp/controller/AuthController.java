@@ -41,9 +41,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute RegisterRequestDTO registerRequest, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        UUID userId = authService.registerUser(registerRequest);
+        String userId = authService.registerUser(registerRequest);
 
-        Cookie userCookie = new Cookie("userCookie", userId.toString());
+        Cookie userCookie = new Cookie("userCookie", userId);
         userCookie.setPath("/");
         response.addCookie(userCookie);
 
@@ -54,9 +54,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(@ModelAttribute LoginRequestDTO loginRequestDTO, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        UUID userId = authService.loginUser(loginRequestDTO);
+        String userId = authService.loginUser(loginRequestDTO);
 
-        Cookie userCookie = new Cookie("userCookie", userId.toString());
+        Cookie userCookie = new Cookie("userCookie", userId);
         userCookie.setPath("/");
         response.addCookie(userCookie);
 

@@ -11,6 +11,7 @@ import com.pm.todoapp.service.UsersService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class DashboardController {
 
     @GetMapping
     public String showAllTasks(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal UUID userId,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
             Model model) {
@@ -62,7 +63,7 @@ public class DashboardController {
 
     @GetMapping("/calendar")
     public String showCalendarView(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal UUID userId,
             @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,
@@ -82,7 +83,7 @@ public class DashboardController {
 
     @GetMapping("/filter")
     public String showFilteredTasks(
-            @RequestAttribute("userId") UUID userId,
+            @AuthenticationPrincipal UUID userId,
             @ModelAttribute TaskFilterCriteria criteria,
             @RequestParam(name = "team", required = false) UUID teamId,
             @RequestParam(name = "scope", required = false, defaultValue = "USER_TASKS") TaskFetchScope scope,

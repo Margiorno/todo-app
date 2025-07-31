@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Login</title>
 </head>
 <body>
 
-<h2>Register</h2>
+<h2>Login</h2>
 
-<form action="/register" th:action="@{/register}" th:object="${registerRequest}" method="post">
+<form action="/login" th:action="@{/login}" th:object="${loginRequest}" method="post">
     <div>
         <label for="email">Email:</label>
-        <input type="email" id="email" th:field="*{email}" required minlength="1">
+        <input type="email" id="email" th:field="*{email}" required>
     </div>
     <br>
     <div>
@@ -19,12 +19,10 @@
         <input type="password" id="password" th:field="*{password}" required minlength="8">
     </div>
     <br>
-    <button type="submit">Register</button>
+    <button type="submit">Login</button>
 </form>
 
-<div th:if="${successMessage}">
-    <p th:text="${successMessage}" style="color: green;"></p>
-</div>
+<p>Don't have an account? <a href="/register">Register here</a>.</p>
 
 </body>
 </html>

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
@@ -50,7 +51,7 @@ public class TaskService {
         return TaskMapper.toResponseDTO(savedTask);
     }
 
-    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId, UUID userId) {
+    public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId, UUID userId, UUID teamId) {
 
         User user = usersService.findById(userId);
 
@@ -62,9 +63,16 @@ public class TaskService {
             throw new TaskAccessDeniedException("User '%s' is not authorized to modify task '%s'".formatted(userId, taskId));
         }
 
-        Task task = TaskMapper.toEntity(taskDto, fromDb.getAssignees(), taskId);
-        Task savedTask = taskRepository.save(task);
+        UUID existingTeamId = fromDb.getTeam() != null ? fromDb.getTeam().getId() : null;
 
+        if (!Objects.equals(existingTeamId, teamId)) {
+            throw new TaskAccessDeniedException("Cannot change team of the task '%s'".formatted(taskId));
+        }
+
+        Task task = TaskMapper.toEntity(taskDto, fromDb.getAssignees(), taskId);
+        task.setTeam(fromDb.getTeam());
+
+        Task savedTask = taskRepository.save(task);
         return TaskMapper.toResponseDTO(savedTask);
     }
 

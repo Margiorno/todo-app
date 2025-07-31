@@ -58,7 +58,7 @@
 
 <!--            TODO USER VERIFICATION -->
             <div class="card-footer text-end">
-                <a th:href="@{'/task/edit/' + ${taskResponse.id}}" class="btn btn-primary me-2">Edit</a>
+                <a th:href="@{/task/edit/{id}(id=${taskResponse.id}, team=${taskResponse.team?.id})}" class="btn btn-primary me-2">Edit</a>
                 <a th:href="@{/}" class="btn btn-secondary">Dashboard</a>
             </div>
         </div>

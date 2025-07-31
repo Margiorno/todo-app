@@ -12,10 +12,8 @@
 
         <h2 class="mb-4" th:text="${isEditMode} ? 'Edit Task' : 'Add New Task'"></h2>
 
-        <form th:action="${isEditMode ? '/task/update/' + taskId : '/task/new' + (teamId != null ? '?team=' + teamId : '')}"
+        <form th:action="@{${isEditMode ? '/task/update/' + taskId : '/task/new'}(team=${teamId})}"
               th:object="${task}" method="post">
-
-            <input type="hidden" name="team" th:if="${teamId}" th:value="${teamId}" />
 
             <input type="hidden"/>
 

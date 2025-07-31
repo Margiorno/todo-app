@@ -1,15 +1,11 @@
 package com.pm.todoapp.controller;
 
-import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.dto.TeamResponseDTO;
-import com.pm.todoapp.mapper.TaskMapper;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.service.TaskService;
-import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +45,6 @@ public class TaskController {
         return "task-form";
     }
 
-    // TODO USERS IDENTIFICATION
     @PostMapping("/new")
     public String save(@ModelAttribute("task") @Valid TaskRequestDTO taskDto,
                        @RequestParam(name = "team", required = false) UUID teamId,
@@ -57,7 +52,7 @@ public class TaskController {
                        Model model) {
 
         // TODO refactor
-        User user = usersService.getTestUser();
+        UUID userId = getCurrentUserId();
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
@@ -65,14 +60,13 @@ public class TaskController {
             return "task-form";
         }
 
-        TaskResponseDTO response = taskService.save(taskDto, user.getId(), teamId);
+        TaskResponseDTO response = taskService.save(taskDto, userId, teamId);
 
         model.addAttribute("taskResponse", response);
         model.addAttribute("message", "Task saved successfully!");
 
         return "task-details";
     }
-
 
     @GetMapping("/{id}")
     public String showTask(@PathVariable UUID id, Model model) {
@@ -82,11 +76,10 @@ public class TaskController {
         return "task-details";
     }
 
-
-
     @GetMapping("/edit/{id}")
     public String editTaskForm(@PathVariable UUID id, Model model) {
 
+        TaskResponseDTO taskResponse = taskService.findByTaskId(id);
         TaskRequestDTO taskRequest = taskService.findTaskRequestById(id);
 
         model.addAttribute("task", taskRequest);
@@ -96,13 +89,16 @@ public class TaskController {
 
         model.addAttribute("isEditMode", true);
 
+        if (taskResponse.getTeam() != null)
+            model.addAttribute("teamId", taskResponse.getTeam().getId());
+
         return "task-form";
     }
 
-    //TODO userId
     @PostMapping("/update/{id}")
     public String updateTask(@PathVariable UUID id,
                              @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
+                             @RequestParam(name = "team", required = false) UUID teamId,
                              BindingResult bindingResult,
                              Model model) {
 
@@ -113,10 +109,13 @@ public class TaskController {
             model.addAttribute("priorities", Priority.values());
             model.addAttribute("statuses", Status.values());
             model.addAttribute("isEditMode", true);
+            if (teamId != null) {
+                model.addAttribute("teamId", teamId);
+            }
             return "task-form";
         }
 
-        TaskResponseDTO updated = taskService.update(taskDto, id, userId);
+        TaskResponseDTO updated = taskService.update(taskDto, id, userId, teamId);
         model.addAttribute("taskResponse", updated);
         model.addAttribute("message", "Task updated successfully!");
 

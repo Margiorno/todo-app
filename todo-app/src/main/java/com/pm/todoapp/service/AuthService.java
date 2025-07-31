@@ -6,6 +6,8 @@ import com.pm.todoapp.exceptions.InvalidTokenException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.UsersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -14,11 +16,12 @@ import java.util.UUID;
 public class AuthService {
 
     private final UsersService usersService;
-    private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UsersService usersService, UsersRepository usersRepository) {
+    @Autowired
+    public AuthService(UsersService usersService, PasswordEncoder passwordEncoder) {
         this.usersService = usersService;
-        this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // TODO return token
@@ -27,18 +30,16 @@ public class AuthService {
     public UUID registerUser(RegisterRequestDTO registerRequest) {
         User user = new User();
         user.setEmail(registerRequest.getEmail());
-        user.setPassword(registerRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        User savedUser = usersRepository.save(user);
+        User savedUser = usersService.save(user);
         return savedUser.getId();
     }
 
     public UUID loginUser(LoginRequestDTO loginRequestDTO) {
-        User user = usersRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(
-                ()-> new UserNotFoundException("User with this email does not exist: " + loginRequestDTO.getEmail())
-        );
+        User user = usersService.findByEmail(loginRequestDTO.getEmail());
 
-        if(!user.getPassword().equals(loginRequestDTO.getPassword())){
+        if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())){
             throw new InvalidTokenException("Wrong password");
         }
 

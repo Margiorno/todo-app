@@ -26,4 +26,14 @@ public class UsersService {
                 ()->new UserNotFoundException("User with this id does not exist: " + userId.toString())
         );
     }
+
+    public User save(User user) {
+        return usersRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return usersRepository.findByEmail(email).orElseThrow(
+                ()-> new UserNotFoundException("User with this email does not exist: " + email)
+        );
+    }
 }

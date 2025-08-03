@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
@@ -42,6 +43,18 @@ public class TeamService {
         Iterable<Team> teams = teamRepository.findByMembersContaining(user);
 
         return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
+    }
+
+    public void createTeam(String teamName, UUID userId) {
+
+        User user = usersService.findById(userId);
+
+        Team team = new Team();
+        team.setName(teamName);
+        team.getMembers().add(user);
+        user.getTeams().add(team);
+
+        teamRepository.save(team);
     }
 
 }

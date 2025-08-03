@@ -2,6 +2,7 @@ package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.LoginRequestDTO;
 import com.pm.todoapp.dto.RegisterRequestDTO;
+import com.pm.todoapp.exceptions.EmailAlreadyExistsException;
 import com.pm.todoapp.exceptions.UnauthorizedException;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.util.JwtUtil;
@@ -24,6 +25,11 @@ public class AuthService {
     }
 
     public String registerUser(RegisterRequestDTO registerRequest) {
+
+        if (usersService.findByEmail(registerRequest.getEmail()) != null) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+
         User user = new User();
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));

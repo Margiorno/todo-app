@@ -69,6 +69,13 @@ public class GlobalExceptionHandler {
 
         redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
 
-        return "redirect:/auth";
+        return "redirect:/auth?form=login";
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public String handleRegistrationExceptions(RuntimeException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+
+        return "redirect:/auth?form=register";
     }
 }

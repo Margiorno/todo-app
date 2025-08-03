@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     public String handleNotFoundExceptions(RuntimeException e, Model model) {
 
         model.addAttribute("message", e.getMessage());
-        model.addAttribute("link","/task/list");
+        model.addAttribute("link","/");
 
         return "error/404";
     }
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         }
 
         model.addAttribute("message", errorMessage);
-        model.addAttribute("link", "/task/list");
+        model.addAttribute("link", "/");
         return "error/400";
     }
 
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public String handleBadRequestExceptions(RuntimeException ex, Model model) {
 
         model.addAttribute("message", ex.getMessage());
-        model.addAttribute("link", "/task/list");
+        model.addAttribute("link", "/");
 
         return "error/400";
     }

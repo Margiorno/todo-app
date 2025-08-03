@@ -16,6 +16,10 @@
             <div th:if="${successMessage}" class="alert alert-success text-center" role="alert">
                 <p th:text="${successMessage}" class="mb-0"></p>
             </div>
+            <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert">
+                <p th:text="${errorMessage}" class="mb-0"></p>
+            </div>
+
 
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center">

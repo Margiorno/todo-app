@@ -79,4 +79,11 @@ public class AuthController {
 
         return "redirect:/auth";
     }
+
+    @GetMapping("/unauthorized")
+    public String handleUnauthorized(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Your session has expired or token is invalid. Login required.");
+
+        return "redirect:/auth";
+    }
 }

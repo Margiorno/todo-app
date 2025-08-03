@@ -82,7 +82,7 @@
             </div>
             <div class="card-body bg-light">
                 <p class="mb-2 text-muted">Options (placeholders):</p>
-                <a href="#" class="btn btn-sm btn-outline-secondary">Manage members</a>
+                <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#manageMembersModal">Manage members</a>
                 <a href="#" class="btn btn-sm btn-outline-secondary">Team setting</a>
             </div>
         </div>
@@ -282,6 +282,41 @@
                     <button type="submit" class="btn btn-primary">Create</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manageMembersModal" tabindex="-1" aria-labelledby="manageMembersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageMembersModalLabel">Manage Team Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="member : ${teamMembers}">
+                        <td th:text="${member.id}"></td>
+                        <td th:text="${member.email}"></td>
+                        <td><a href="#" class="btn btn-sm btn-danger">Remove</a></td>
+                    </tr>
+                    <tr th:if="${teamMembers == null or #lists.isEmpty(teamMembers)}">
+                        <td colspan="5" class="text-center">No members found in this team.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

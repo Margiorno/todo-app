@@ -2,6 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.AuthService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -54,8 +56,11 @@ public class DashboardController {
                 ? taskService.findByTeam(teamId, userId, scope)
                 : taskService.findByUserId(userId);
 
+        List<UserResponseDTO> teamMembers = teamService.findUsersByTeamId(teamId);
+
         model.addAttribute("tasks", tasks);
         model.addAttribute("view", "all");
+        model.addAttribute("teamMembers", teamMembers);
         populateCommonModelAttributes(model, userId, teamId, scope);
 
         return "dashboard";

@@ -1,8 +1,10 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.TeamResponseDTO;
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.TeamNotFoundException;
 import com.pm.todoapp.mapper.TeamMapper;
+import com.pm.todoapp.mapper.UserMapper;
 import com.pm.todoapp.model.Team;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.TeamRepository;
@@ -55,6 +57,13 @@ public class TeamService {
         user.getTeams().add(team);
 
         teamRepository.save(team);
+    }
+
+    public List<UserResponseDTO> findUsersByTeamId(UUID teamId) {
+
+        Team team = findById(teamId);
+
+        return team.getMembers().stream().map(UserMapper::toUserResponseDTO).toList();
     }
 
 }

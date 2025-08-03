@@ -1,11 +1,5 @@
 package com.pm.todoapp.config;
 
-import com.pm.todoapp.exceptions.InvalidTokenException;
-import com.pm.todoapp.service.AuthService;
-import com.pm.todoapp.util.JwtUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import jakarta.persistence.Access;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -69,7 +63,7 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-           throw new InvalidTokenException("Could not set user authentication from token: ");
+           logger.warn("Session has expired or token is invalid.");
         }
 
         filterChain.doFilter(request, response);

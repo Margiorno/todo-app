@@ -13,6 +13,7 @@ import com.pm.todoapp.model.Invite;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.InviteRepository;
 import com.pm.todoapp.repository.TeamRepository;
+import com.pm.todoapp.repository.UsersRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class TeamService {
     private final InviteRepository inviteRepository;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, UsersService usersService, InviteRepository inviteRepository) {
+    public TeamService(TeamRepository teamRepository, UsersService usersService, InviteRepository inviteRepository, UsersRepository usersRepository) {
         this.teamRepository = teamRepository;
         this.usersService = usersService;
         this.inviteRepository = inviteRepository;
@@ -71,6 +72,7 @@ public class TeamService {
         user.getTeams().add(team);
 
         teamRepository.save(team);
+        usersService.save(user);
     }
 
     public List<UserResponseDTO> findUsersByTeamId(UUID teamId) {
@@ -122,5 +124,20 @@ public class TeamService {
         } while (inviteRepository.existsByCode(generatedCode));
 
         return generatedCode;
+    }
+
+    public void deleteUserFromTeam(UUID teamId, UUID userId) {
+
+        System.out.println(teamId);
+        System.out.println(userId);
+
+        Team team = findById(teamId);
+        User user = usersService.findById(userId);
+
+        team.getMembers().remove(user);
+        user.getTeams().remove(team);
+
+        teamRepository.save(team);
+        usersService.save(user);
     }
 }

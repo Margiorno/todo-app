@@ -39,6 +39,17 @@ public class TeamsController {
         return ResponseEntity.ok(code);
     }
 
+    @PostMapping("{teamId}/delete-member")
+    public ResponseEntity<InviteResponseDTO> deleteUser(
+            @PathVariable UUID teamId,
+            @RequestParam UUID userId
+    ) {
+
+        teamService.deleteUserFromTeam(teamId, userId);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/join")
     public ResponseEntity<String> joinTeam(
             @AuthenticationPrincipal UUID userId,
@@ -48,5 +59,7 @@ public class TeamsController {
         teamService.join(request.getCode(), userId);
         return ResponseEntity.ok("Joined");
     }
+
+
 
 }

@@ -308,7 +308,9 @@
                     <tr th:each="member : ${teamMembers}">
                         <td th:text="${member.id}"></td>
                         <td th:text="${member.email}"></td>
-                        <td><a href="#" class="btn btn-sm btn-danger">Remove</a></td>
+                        <td><a class="btn btn-sm btn-danger remove-member-btn"
+                            th:attr="data-member-id=${member.id}, data-team-id=${selectedTeamId}"
+                            role="button">Remove</a></td>
                     </tr>
                     <tr th:if="${teamMembers == null or #lists.isEmpty(teamMembers)}">
                         <td colspan="5" class="text-center">No members found in this team.</td>
@@ -349,8 +351,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/team-invitation.js}"></script>
-<script th:src="@{/js/team-join.js}"></script>
+<script th:src="@{/js/team-management.js}"></script>
 
 </body>
 </html>

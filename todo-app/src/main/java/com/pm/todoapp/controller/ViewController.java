@@ -5,10 +5,8 @@ import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
-import com.pm.todoapp.service.AuthService;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
-import com.pm.todoapp.service.UsersService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,18 +18,17 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Controller
 @RequestMapping("/")
-public class DashboardController {
+public class ViewController {
 
     private final TaskService taskService;
     private final TeamService teamService;
 
     @Autowired
-    public DashboardController(TaskService taskService, TeamService teamService) {
+    public ViewController(TaskService taskService, TeamService teamService) {
         this.taskService = taskService;
         this.teamService = teamService;
     }
@@ -127,6 +124,12 @@ public class DashboardController {
         model.addAttribute("scopes", TaskFetchScope.values());
         model.addAttribute("selectedScope", scope);
         model.addAttribute("teamMembers", teamMembers);
+    }
+
+    @GetMapping("/chat")
+    public String showChatView(Model model) {
+
+        return "chat";
     }
 
 

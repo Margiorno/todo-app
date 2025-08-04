@@ -5,33 +5,34 @@
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/top-navbar.css}">
     <link rel="stylesheet" th:href="@{/css/task-form.css}">
 
 </head>
 <body>
 
 <!--TOP NAVBAR-->
-<div th:replace="~{dashboard_fragments/top-navbar :: navbar}"></div>
+<div th:replace="~{fragments/top-navbar :: navbar}"></div>
 
 <div class="container-fluid main-page-container">
 <div class="row">
 
     <!--SIDE NAVBAR-->
-    <div th:replace="~{dashboard_fragments/side-navbar :: navbar}"></div>
+    <div th:replace="~{fragments/side-navbar :: navbar}"></div>
 
     <div class="col-md-10 main-content mt-4">
 
         <div id="notification-container"></div>
 
         <!--TEAM MANAGEMENT MENU-->
-        <div th:replace="~{dashboard_fragments/team_navigation :: team_management}"></div>
+        <div th:replace="~{fragments/team_navigation :: team_management}"></div>
 
         <!--CALENDAR AND FILTER NAVIGATIONS-->
-        <div th:replace="~{dashboard_fragments/calendar_navigation :: navigation}"></div>
-        <div th:replace="~{dashboard_fragments/filter_navigation :: navigation}"></div>
+        <div th:replace="~{fragments/calendar_navigation :: navigation}"></div>
+        <div th:replace="~{fragments/filter_navigation :: navigation}"></div>
 
         <!--TASKS LIST-->
-        <div th:replace="~{dashboard_fragments/tasks_list :: list}"></div>
+        <div th:replace="~{fragments/tasks_list :: list}"></div>
 
     </div>
 
@@ -39,15 +40,15 @@
 </div>
 
 <!--TEAM MEMBERS MANAGEMENT MODALS-->
-<div th:replace="~{dashboard_fragments/modals/join_team_modal :: modal}"></div>
-<div th:replace="~{dashboard_fragments/modals/create_team_modal :: modal}"></div>
-<div th:replace="~{dashboard_fragments/modals/manage_team_members_modal :: modal}"></div>
-<div th:replace="~{dashboard_fragments/modals/invite_code_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/join_team_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/create_team_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/manage_team_members_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/invite_code_modal :: modal}"></div>
 
 
 <!--TASK DETAILS AND TASK EDIT/UPDATE FORM MODALS-->
-<div th:replace="~{dashboard_fragments/modals/task_details_modal :: modal}"></div>
-<div th:replace="~{dashboard_fragments/modals/task_form_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/task_details_modal :: modal}"></div>
+<div th:replace="~{fragments/modals/task_form_modal :: modal}"></div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -19,35 +19,16 @@
         <div class="col-md-4 col-lg-2 menu-column">
             <h4 class="mt-4 mb-3">Conversations</h4>
             <div class="nav flex-column" id="conversation-list">
-                <a href="#" class="nav-link active">John Doe</a>
-                <a href="#" class="nav-link">Project Alpha</a>
-                <a href="#" class="nav-link">Anna Smith</a>
-                <a href="#" class="nav-link">Marketing Team</a>
+
             </div>
         </div>
 
         <div class="col-md-8 col-lg-10 main-content">
             <div class="chat-area-wrapper">
-                <div class="chat-header" id="chat-header">
-                    John Doe
-                </div>
+                <div class="chat-header" id="chat-header"></div>
 
                 <div class="chat-messages" id="chat-messages">
-                    <div class="message received">
-                        Hey, how's the project going?
-                    </div>
-                    <div class="message sent">
-                        Hi John! Going well. I just pushed the latest updates to the main branch.
-                    </div>
-                    <div class="message sent">
-                        Let me know what you think of the new dashboard design.
-                    </div>
-                    <div class="message received">
-                        Great! I'll take a look right now.
-                    </div>
-                    <div class="message received">
-                        The design looks clean. Good job!
-                    </div>
+
                 </div>
 
                 <div class="chat-input-area">
@@ -58,6 +39,108 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const conversationList = document.getElementById('conversation-list');
+        const chatHeader = document.getElementById('chat-header');
+        const chatMessages = document.getElementById('chat-messages');
+
+        const fetchConversations = async () => {
+            try {
+                const response = await fetch('/chat/get-all', {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`Network Error: ${response.status}`);
+                }
+                const conversations = await response.json();
+                displayConversations(conversations);
+            } catch (error) {
+                console.error('Failed to fetch conversations:', error);
+                chatMessages.innerHTML = `<div class="message received text-danger">Failed to load conversations.</div>`;
+            }
+        };
+
+        const displayConversations = (conversations) => {
+            conversationList.innerHTML = '';
+
+            if (conversations.length === 0) {
+                chatHeader.textContent = 'No conversations';
+                return;
+            }
+
+            conversations.forEach((conversation, index) => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.classList.add('nav-link');
+                a.setAttribute('data-conversation-id', conversation.id);
+                a.textContent = `Conversation ${conversation.id}`;
+
+                a.addEventListener('click', (event) => {
+                    event.preventDefault();
+
+                    document.querySelectorAll('#conversation-list .nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    a.classList.add('active');
+                    chatHeader.textContent = `Conversation ${conversation.id}`;
+
+                    fetchMessages(conversation.id);
+                });
+
+                conversationList.appendChild(a);
+
+                if (index === 0) {
+                    a.classList.add('active');
+                    chatHeader.textContent = `Conversation ${conversation.id}`;
+                    fetchMessages(conversation.id);
+                }
+            });
+        };
+
+        const fetchMessages = async (conversationId) => {
+            chatMessages.innerHTML = '<div>Loading messages...</div>';
+            try {
+                const response = await fetch(`/chat/${conversationId}/messages`, {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`Network Error: ${response.status}`);
+                }
+                const messages = await response.json();
+                displayMessages(messages);
+            } catch (error) {
+                console.error('Failed to fetch messages:', error);
+                chatMessages.innerHTML = `<div class="message received text-danger">Failed to load messages.</div>`;
+            }
+        };
+
+        const displayMessages = (messages) => {
+            chatMessages.innerHTML = '';
+            if (!messages || messages.length === 0) {
+                chatMessages.innerHTML = '<div>No messages in this conversation.</div>';
+                return;
+            }
+
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+
+                if (message.sentByCurrentUser) {
+                    messageElement.classList.add('message', 'sent');
+                } else {
+                    messageElement.classList.add('message', 'received');
+                }
+
+                messageElement.textContent = message.context;
+                chatMessages.appendChild(messageElement);
+            });
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+        fetchConversations();
+    });
+</script>
 
 </body>
 </html>

@@ -1,7 +1,11 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.ConversationResponseDTO;
+import com.pm.todoapp.dto.MessageResponseDTO;
+import com.pm.todoapp.exceptions.ConversationNotFoundException;
+import com.pm.todoapp.exceptions.UnauthorizedException;
 import com.pm.todoapp.mapper.ConversationMapper;
+import com.pm.todoapp.mapper.MessageMapper;
 import com.pm.todoapp.model.Conversation;
 import com.pm.todoapp.model.Message;
 import com.pm.todoapp.model.User;
@@ -47,5 +51,19 @@ public class ConversationService {
                 })
                 .map(ConversationMapper::toResponseDTO)
                 .toList();
+    }
+
+    public List<MessageResponseDTO> getMessages(UUID conversationId, UUID userId) {
+        User user = usersService.findById(userId);
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(
+                ()-> new ConversationNotFoundException("Conversation with this id does not exists: " + conversationId)
+        );
+
+        if (!conversation.getParticipants().contains(user))
+            throw new UnauthorizedException("You do not have permission to access this conversation");
+
+        return conversation.getMessages().stream().map(
+                message ->  MessageMapper.toResponseDTO(message, userId)
+        ).toList();
     }
 }

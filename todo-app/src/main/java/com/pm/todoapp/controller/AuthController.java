@@ -24,7 +24,6 @@ public class AuthController {
     }
 
 
-    //TODO token generation instead of simple id
     @GetMapping
     public String showAuthForm(Model model, @RequestParam(value = "form", defaultValue = "login") String form) {
         if (!model.containsAttribute("loginRequest")) {
@@ -85,4 +84,6 @@ public class AuthController {
 
         return "redirect:/auth";
     }
+
+
 }

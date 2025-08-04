@@ -62,7 +62,12 @@
                 <td th:text="${task.getTaskDate()}"></td>
                 <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
                 <td class="text-end pe-3">
-                    <a th:href="@{'/task/' + ${task.getId()}}" class="btn btn-sm btn-outline-primary">Details</a>
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#taskDetailsModal"
+                            th:attr="data-task-id=${task.getId()}"
+                            th:text="details">
+                    </button>
                 </td>
             </tr>
 

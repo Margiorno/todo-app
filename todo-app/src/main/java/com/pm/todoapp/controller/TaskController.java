@@ -9,6 +9,7 @@ import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,16 +66,14 @@ public class TaskController {
         model.addAttribute("taskResponse", response);
         model.addAttribute("message", "Task saved successfully!");
 
-        return "task-details";
+        return "redirect:/";
     }
 
     @GetMapping("/{id}")
-    public String showTask(
-            @PathVariable UUID id, Model model) {
+    public ResponseEntity<TaskResponseDTO> getTaskById(@PathVariable UUID id) {
+        TaskResponseDTO taskResponse = taskService.findByTaskId(id);
 
-        TaskResponseDTO response = taskService.findByTaskId(id);
-        model.addAttribute("taskResponse", response);
-        return "task-details";
+        return ResponseEntity.ok(taskResponse);
     }
 
     @GetMapping("/edit/{id}")

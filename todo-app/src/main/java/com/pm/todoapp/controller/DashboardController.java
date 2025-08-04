@@ -2,6 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.AuthService;
@@ -17,7 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -53,6 +56,7 @@ public class DashboardController {
         List<TaskResponseDTO> tasks = (teamId != null)
                 ? taskService.findByTeam(teamId, userId, scope)
                 : taskService.findByUserId(userId);
+
 
         model.addAttribute("tasks", tasks);
         model.addAttribute("view", "all");
@@ -93,6 +97,7 @@ public class DashboardController {
                 criteria.getPriority(), criteria.getStatus(), criteria.getStartDate(), criteria.getEndDate(),
                 userId, teamId, scope);
 
+
         model.addAttribute("tasks", tasks);
         model.addAttribute("view", "filter");
 
@@ -112,11 +117,16 @@ public class DashboardController {
             model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
         }
 
+        List<UserResponseDTO> teamMembers = (teamId != null)
+                ? teamService.findUsersByTeamId(teamId)
+                : Collections.emptyList();
+
         model.addAttribute("allTeams", teamService.findAllByUserId(userId));
         model.addAttribute("priorities", Priority.values());
         model.addAttribute("statuses", Status.values());
         model.addAttribute("scopes", TaskFetchScope.values());
         model.addAttribute("selectedScope", scope);
+        model.addAttribute("teamMembers", teamMembers);
     }
 
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+<div th:fragment="list" class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h2 class="h5 mb-0">All tasks</h2>
+
+        <div th:if="${selectedTeamId != null}" class="d-flex align-items-center">
+            <span class="me-3">Task Scope:</span>
+            <div class="btn-group" role="group" aria-label="Task scope selection">
+                <th:block th:each="scopeOpt : ${scopes}">
+                    <div th:switch="${view}" class="d-inline">
+                        <a th:case="'calendar'"
+                           class="btn btn-sm"
+                           th:classappend="${scopeOpt == selectedScope ? 'btn-primary' : 'btn-outline-primary'}"
+                           th:href="@{/calendar(date=${#temporals.format(centerDate, 'yyyy-MM-dd')}, team=${selectedTeamId}, scope=${scopeOpt.name()})}"
+                           th:text="${scopeOpt.name()}">
+                        </a>
+                        <a th:case="'filter'"
+                           class="btn btn-sm"
+                           th:classappend="${scopeOpt == selectedScope ? 'btn-primary' : 'btn-outline-primary'}"
+                           th:href="@{/filter(team=${selectedTeamId}, scope=${scopeOpt.name()}, priority=${selectedPriority}, status=${selectedStatus}, startDate=${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}, endDate=${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''})}"
+                           th:text="${scopeOpt.name()}">
+                        </a>
+                        <a th:case="*"
+                           class="btn btn-sm"
+                           th:classappend="${scopeOpt == selectedScope ? 'btn-primary' : 'btn-outline-primary'}"
+                           th:href="@{/(team=${selectedTeamId}, scope=${scopeOpt.name()})}"
+                           th:text="${scopeOpt.name()}">
+                        </a>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th class="ps-3">Id</th>
+                <th>Title</th>
+                <th>Assignees</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Hours</th>
+                <th class="text-end pe-3"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task, iterStat : ${tasks}">
+                <td class="ps-3" th:text="${task.getId()}"></td>
+                <td th:text="${task.getTitle()}"></td>
+                <td th:text="${task.assignees != null ? #strings.arrayJoin(task.assignees.toArray(), ', ') : ''}"></td>
+                <td th:text="${task.getPriority()}"></td>
+                <td th:text="${task.getStatus()}"></td>
+                <td th:text="${task.getTaskDate()}"></td>
+                <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
+                <td class="text-end pe-3">
+                    <a th:href="@{'/task/' + ${task.getId()}}" class="btn btn-sm btn-outline-primary">Details</a>
+                </td>
+            </tr>
+
+            <tr th:if="${tasks == null or tasks.isEmpty()}">
+                <td colspan="9" class="text-center p-4">Tasks not found</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer text-end" style="margin-top: 10px;">
+        <a th:href="@{/task/new(team=${selectedTeamId})}" class="btn btn-primary me-2">Add New</a>
+    </div>
+</div>
+
+
+
+</body>

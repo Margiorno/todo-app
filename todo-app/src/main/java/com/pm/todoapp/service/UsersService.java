@@ -33,4 +33,8 @@ public class UsersService {
                 ()-> new UserNotFoundException("User with this email does not exist: " + email)
         );
     }
+
+    public boolean existByEmail(String email) {
+        return usersRepository.existsByEmail(email);
+    }
 }

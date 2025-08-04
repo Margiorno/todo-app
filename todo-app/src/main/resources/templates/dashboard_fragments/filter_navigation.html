@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+
+<div th:fragment="navigation" th:if="${view == 'filter'}" class="card mb-4">
+    <div class="card-header">
+        <h2 class="h5 mb-0">Filters</h2>
+    </div>
+    <div class="card-body">
+        <form th:action="@{/filter}" method="get">
+            <input type="hidden" name="team" th:if="${selectedTeamId}" th:value="${selectedTeamId}">
+            <input type="hidden" name="scope" th:if="${selectedTeamId}" th:value="${selectedScope}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6 col-lg-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select id="priority" name="priority" class="form-select">
+                        <option value="">-- All --</option>
+                        <option th:each="p : ${priorities}" th:value="${p.name()}" th:text="${p}"
+                                th:selected="${selectedPriority != null and p == selectedPriority}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">-- All --</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s}"
+                                th:selected="${selectedStatus != null and s == selectedStatus}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="startDate" class="form-label">Start</label>
+                    <input type="date" id="startDate" name="startDate" class="form-control"
+                           th:value="${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="endDate" class="form-label">End</label>
+                    <input type="date" id="endDate" name="endDate" class="form-control"
+                           th:value="${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-12 text-end">
+                    <a th:href="@{/(view='all', team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}" class="btn btn-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>

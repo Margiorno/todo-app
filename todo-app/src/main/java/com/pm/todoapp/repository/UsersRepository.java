@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface UsersRepository extends CrudRepository<User, UUID> {
     Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 }

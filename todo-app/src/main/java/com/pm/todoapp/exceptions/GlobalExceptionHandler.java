@@ -1,6 +1,7 @@
 package com.pm.todoapp.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     public String handleNotFoundExceptions(RuntimeException e, Model model) {
 
         model.addAttribute("message", e.getMessage());
-        model.addAttribute("link","/task/list");
+        model.addAttribute("link","/");
 
         return "error/404";
     }
@@ -44,20 +45,28 @@ public class GlobalExceptionHandler {
         }
 
         model.addAttribute("message", errorMessage);
-        model.addAttribute("link", "/task/list");
+        model.addAttribute("link", "/");
         return "error/400";
     }
 
     @ExceptionHandler({
             TeamRequiredException.class,
-            TaskAccessDeniedException.class
+            TaskAccessDeniedException.class,
     })
     public String handleBadRequestExceptions(RuntimeException ex, Model model) {
 
         model.addAttribute("message", ex.getMessage());
-        model.addAttribute("link", "/task/list");
+        model.addAttribute("link", "/");
 
         return "error/400";
+    }
+
+    @ExceptionHandler({
+            InvalidInviteException.class
+    })
+    public ResponseEntity<String> handleBadRequestException(RuntimeException ex) {
+
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({

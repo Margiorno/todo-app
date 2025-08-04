@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="sidebar"  class="col-md-2 menu-column d-flex flex-column">
+    <div>
+        <h2 class="mb-4">Menu</h2>
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link" th:classappend="${view == 'all' ? 'active' : ''}"
+               th:href="@{/(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">All</a>
+            <a class="nav-link" th:classappend="${view == 'calendar' ? 'active' : ''}"
+               th:href="@{/calendar(date=${T(java.time.LocalDate).now()}, team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Calendar</a>
+            <a class="nav-link" th:classappend="${view == 'filter' ? 'active' : ''}"
+               th:href="@{/filter(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">Filters</a>
+        </div>
+
+        <h4 class="mt-4 mb-3">Projects</h4>
+        <div class="nav flex-column">
+            <a class="nav-link" href="#">Project A</a>
+            <a class="nav-link" href="#">Project B</a>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h4 class="mb-0">Teams</h4>
+            <div class="dropdown">
+                <a
+                        class="text-primary text-decoration-none"
+                        role="button"
+                        id="dropdownMenuLink"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style="font-size: 1.75rem; line-height: 1; font-weight: 300;">
+                    +
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#createTeamModal">Create new</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#joinTeamModal">Join</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="nav flex-column">
+            <a th:each="team : ${allTeams}"
+               class="nav-link"
+               th:classappend="${selectedTeamId != null and team.id.toString() == selectedTeamId ? 'active' : ''}"
+               th:href="@{/(view=${view}, team=${team.id}, scope=${selectedScope != null ? selectedScope.name() : 'USER_TASKS'})}"
+               th:text="${team.name}">
+                Team Name
+            </a>
+            <a class="nav-link"
+               th:href="@{/(view=${view})}"
+               th:classappend="${selectedTeamId == null ? 'active' : ''}">
+                -- All Teams --
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-auto">
+        <hr>
+        <div class="nav flex-column">
+            <a class="nav-link" href="#">Profile</a>
+            <a class="nav-link" th:href="@{/auth/logout}">Log out</a>
+        </div>
+    </div>
+</div>
+
+</body>

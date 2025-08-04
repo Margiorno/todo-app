@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponseDTO {
-    private String id;
-    private String email;
+public class JoinTeamRequestDTO {
+    private String code;
 }

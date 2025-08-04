@@ -3,6 +3,7 @@ package com.pm.todoapp.service;
 import com.pm.todoapp.dto.InviteResponseDTO;
 import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.exceptions.InvalidInviteException;
 import com.pm.todoapp.exceptions.TeamNotFoundException;
 import com.pm.todoapp.mapper.InviteMapper;
 import com.pm.todoapp.mapper.TeamMapper;
@@ -16,7 +17,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -90,6 +90,26 @@ public class TeamService {
         Invite savedInvite = inviteRepository.save(invite);
 
         return InviteMapper.toResponseDTO(savedInvite);
+    }
+
+
+
+    public void join(String code, UUID userId) {
+
+        User user = usersService.findById(userId);
+        Invite invite = inviteRepository.findByCode(code).orElseThrow(
+                ()->new InvalidInviteException("There is no invitation with this code")
+        );
+        Team team = invite.getTeam();
+
+        if (team.getMembers().contains(user))
+            throw new InvalidInviteException("You are already in a member of this team");
+
+        team.getMembers().add(user);
+        user.getTeams().add(team);
+
+        teamRepository.save(team);
+        inviteRepository.delete(invite);
     }
 
     private String generateInvitationCode() {

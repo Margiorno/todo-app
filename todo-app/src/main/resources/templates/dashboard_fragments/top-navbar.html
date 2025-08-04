@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg top-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand ms-3" th:href="@{/}">todoApp</a>
+
+            <ul class="navbar-nav ms-auto flex-row">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Powiadomienia</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Chat</a>
+                </li>
+                <li class="nav-item">
+                    <span class="navbar-text separator">|</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Profil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Wyloguj</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+</body>

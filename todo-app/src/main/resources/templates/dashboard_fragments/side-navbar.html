@@ -3,9 +3,9 @@
 
 <body>
 
-<div th:fragment="sidebar"  class="col-md-2 menu-column d-flex flex-column">
+<div th:fragment="navbar"  class="col-md-2 menu-column d-flex flex-column">
     <div>
-        <h2 class="mb-4">Menu</h2>
+        <h4 class="mt-4 mb-3">Menu</h4>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             <a class="nav-link" th:classappend="${view == 'all' ? 'active' : ''}"
                th:href="@{/(team=${selectedTeamId}, scope=${selectedTeamId != null ? selectedScope : null})}">All</a>
@@ -52,14 +52,6 @@
                th:classappend="${selectedTeamId == null ? 'active' : ''}">
                 -- All Teams --
             </a>
-        </div>
-    </div>
-
-    <div class="mt-auto">
-        <hr>
-        <div class="nav flex-column">
-            <a class="nav-link" href="#">Profile</a>
-            <a class="nav-link" th:href="@{/auth/logout}">Log out</a>
         </div>
     </div>
 </div>

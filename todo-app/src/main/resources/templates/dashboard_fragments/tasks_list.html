@@ -79,7 +79,12 @@
     </div>
 
     <div class="card-footer text-end" style="margin-top: 10px;">
-        <a th:href="@{/task/new(team=${selectedTeamId})}" class="btn btn-primary me-2">Add New</a>
+        <button type="button" class="btn btn-primary me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#taskFormModal"
+                th:attr="data-team-id=${selectedTeamId}">
+            Add New
+        </button>
     </div>
 </div>
 

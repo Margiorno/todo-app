@@ -2,23 +2,17 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
-import com.pm.todoapp.service.AuthService;
 import com.pm.todoapp.service.TaskService;
-import com.pm.todoapp.service.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("/task")
 public class TaskController {
 
@@ -29,44 +23,24 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("/new")
-    public String showNewTaskForm(
-            @RequestParam(name = "team", required = false) UUID teamId,
-                                  Model model) {
+    @PostMapping("/new")
+    public ResponseEntity<TaskResponseDTO> create(
+            @AuthenticationPrincipal UUID userId,
+            @RequestBody @Valid TaskRequestDTO taskDto,
+            @RequestParam(name = "team", required = false) UUID teamId) {
 
-        model.addAttribute("task", new TaskRequestDTO());
-        model.addAttribute("priorities", Priority.values());
-        model.addAttribute("formAction", "/task/new");
-        model.addAttribute("isEditMode", false);
+        TaskResponseDTO saved = taskService.save(taskDto, userId, teamId);
 
-        if (teamId != null) {
-            model.addAttribute("teamId", teamId);
-        }
-
-        return "task-form";
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    @PostMapping("/new")
-    public String save(
-            @AuthenticationPrincipal UUID userId,
-            @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-            @RequestParam(name = "team", required = false) UUID teamId,
-            BindingResult bindingResult,
-            Model model) {
-
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("priorities", Priority.values());
-            model.addAttribute("formAction", "/task/new");
-            return "task-form";
-        }
-
-        TaskResponseDTO response = taskService.save(taskDto, userId, teamId);
-
-        model.addAttribute("taskResponse", response);
-        model.addAttribute("message", "Task saved successfully!");
-
-        return "redirect:/";
+    @PutMapping("/update/{id}")
+    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable UUID id,
+                                                      @Valid @RequestBody TaskRequestDTO taskDto,
+                                                      @AuthenticationPrincipal UUID userId,
+                                                      @RequestParam(name = "team", required = false) UUID teamId) {
+        TaskResponseDTO updatedTask = taskService.update(taskDto, id, userId, teamId);
+        return ResponseEntity.ok(updatedTask);
     }
 
     @GetMapping("/{id}")
@@ -75,52 +49,4 @@ public class TaskController {
 
         return ResponseEntity.ok(taskResponse);
     }
-
-    @GetMapping("/edit/{id}")
-    public String editTaskForm(
-            @PathVariable UUID id, Model model) {
-
-        TaskResponseDTO taskResponse = taskService.findByTaskId(id);
-        TaskRequestDTO taskRequest = taskService.findTaskRequestById(id);
-
-        model.addAttribute("task", taskRequest);
-        model.addAttribute("taskId", id);
-        model.addAttribute("priorities", Priority.values());
-        model.addAttribute("statuses", Status.values());
-
-        model.addAttribute("isEditMode", true);
-
-        if (taskResponse.getTeam() != null)
-            model.addAttribute("teamId", taskResponse.getTeam().getId());
-
-        return "task-form";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateTask(
-            @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID id,
-            @ModelAttribute("task") @Valid TaskRequestDTO taskDto,
-            @RequestParam(name = "team", required = false) UUID teamId,
-            BindingResult bindingResult,
-            Model model) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("taskId", id);
-            model.addAttribute("priorities", Priority.values());
-            model.addAttribute("statuses", Status.values());
-            model.addAttribute("isEditMode", true);
-            if (teamId != null) {
-                model.addAttribute("teamId", teamId);
-            }
-            return "task-form";
-        }
-
-        TaskResponseDTO updated = taskService.update(taskDto, id, userId, teamId);
-        model.addAttribute("taskResponse", updated);
-        model.addAttribute("message", "Task updated successfully!");
-
-        return "task-details";
-    }
-
 }

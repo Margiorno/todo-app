@@ -6,19 +6,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskId = button.getAttribute('data-task-id');
 
             const modalBody = taskDetailsModal.querySelector('.modal-body');
-            const editTaskBtn = document.getElementById('editTaskBtn');
+            const editTaskBtn = document.getElementById('editTaskBtn'); // Pobieramy przycisk "Edit"
 
             modalBody.innerHTML = '<p>Loading...</p>';
-            editTaskBtn.href = '#';
 
             fetch(`/task/${taskId}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network error');
+                        throw new Error('Network error while fetching task details.');
                     }
                     return response.json();
                 })
                 .then(task => {
+                    if(editTaskBtn) {
+                        editTaskBtn.setAttribute('data-task-id', task.id);
+                    }
+
                     let assigneesHtml = '-';
                     if (task.assignees && task.assignees.length > 0) {
                         assigneesHtml = task.assignees.map(a => a.id).join(', ');
@@ -43,21 +46,21 @@ document.addEventListener('DOMContentLoaded', function () {
                             <dd class="col-sm-9">${task.status}</dd>
 
                             <dt class="col-sm-3">Date</dt>
-                            <dd class="col-sm-9">${task.date}</dd>
+                            <dd class="col-sm-9">${task.taskDate}</dd>
 
                             <dt class="col-sm-3">Hours</dt>
                             <dd class="col-sm-9">${task.startTime} – ${task.endTime}</dd>
+
+                            ${teamHtml}
                             
                             <dt class="col-sm-3">Assignees</dt>
                             <dd class="col-sm-9">${assigneesHtml}</dd>
                         </dl>
                     `;
-
-                    const teamParam = task.team ? `&team=${task.team.id}` : '';
-                    editTaskBtn.href = `/task/edit/${task.id}?${teamParam}`;
                 })
                 .catch(error => {
-                    modalBody.innerHTML = '<p class="text-danger">Error while downloading tasks.</p>';
+                    console.error("Error in task-details.js:", error);
+                    modalBody.innerHTML = '<p class="text-danger">Could not load task details.</p>';
                 });
         });
     }

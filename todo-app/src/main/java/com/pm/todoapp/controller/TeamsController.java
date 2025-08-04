@@ -39,6 +39,7 @@ public class TeamsController {
         return ResponseEntity.ok(code);
     }
 
+    //TODO team task with deleted member (find solution)
     @PostMapping("{teamId}/delete-member")
     public ResponseEntity<InviteResponseDTO> deleteUser(
             @PathVariable UUID teamId,

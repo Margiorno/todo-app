@@ -62,7 +62,12 @@
                 <td th:text="${task.getTaskDate()}"></td>
                 <td th:text="${task.getStartTime()} + ' - ' + ${task.getEndTime()}"></td>
                 <td class="text-end pe-3">
-                    <a th:href="@{'/task/' + ${task.getId()}}" class="btn btn-sm btn-outline-primary">Details</a>
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#taskDetailsModal"
+                            th:attr="data-task-id=${task.getId()}"
+                            th:text="details">
+                    </button>
                 </td>
             </tr>
 
@@ -74,7 +79,12 @@
     </div>
 
     <div class="card-footer text-end" style="margin-top: 10px;">
-        <a th:href="@{/task/new(team=${selectedTeamId})}" class="btn btn-primary me-2">Add New</a>
+        <button type="button" class="btn btn-primary me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#taskFormModal"
+                th:attr="data-team-id=${selectedTeamId}">
+            Add New
+        </button>
     </div>
 </div>
 

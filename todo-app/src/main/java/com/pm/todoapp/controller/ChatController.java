@@ -2,9 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.ConversationResponseDTO;
 import com.pm.todoapp.dto.MessageResponseDTO;
-import com.pm.todoapp.service.ConversationService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.pm.todoapp.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,30 +13,30 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/chat")
-public class ConversationController {
+public class ChatController {
 
-    private final ConversationService conversationService;
+    private final ChatService chatService;
 
     @Autowired
-    public ConversationController(ConversationService conversationService) {
-        this.conversationService = conversationService;
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
     }
 
-    @GetMapping("/get-all")
+    @GetMapping("/conversations")
     public ResponseEntity<List<ConversationResponseDTO>> getAll(@AuthenticationPrincipal UUID userId) {
 
-        List<ConversationResponseDTO> conversations = conversationService.findByUserId(userId);
+        List<ConversationResponseDTO> conversations = chatService.findByUserId(userId);
 
         return ResponseEntity.ok(conversations);
     }
 
-    @GetMapping("/{groupId}/messages")
+    @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<MessageResponseDTO>> getMessages(
             @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID groupId
+            @PathVariable UUID chatId
     ){
 
-        List<MessageResponseDTO> messages = conversationService.getMessages(groupId, userId);
+        List<MessageResponseDTO> messages = chatService.getMessages(chatId, userId);
 
         return ResponseEntity.ok(messages);
     }

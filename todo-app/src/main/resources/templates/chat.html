@@ -48,7 +48,7 @@
 
         const fetchConversations = async () => {
             try {
-                const response = await fetch('/chat/get-all', {
+                const response = await fetch('/chat/conversations', {
                     credentials: 'include'
                 });
                 if (!response.ok) {

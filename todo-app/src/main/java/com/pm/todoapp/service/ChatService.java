@@ -10,25 +10,27 @@ import com.pm.todoapp.model.Conversation;
 import com.pm.todoapp.model.Message;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.ConversationRepository;
-import org.hibernate.query.sqm.tree.domain.SqmTreatedBagJoin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 @Service
-public class ConversationService {
+public class ChatService {
     private final ConversationRepository conversationRepository;
     private final UsersService usersService;
 
     @Autowired
-    public ConversationService(ConversationRepository conversationRepository, UsersService usersService) {
+    public ChatService(ConversationRepository conversationRepository, UsersService usersService) {
         this.conversationRepository = conversationRepository;
         this.usersService = usersService;
+    }
+
+    public Conversation findConversationById(UUID id){
+        return conversationRepository.findById(id).orElseThrow(
+                () -> new ConversationNotFoundException("Conversation with id " + id + " not found"));
     }
 
     public List<ConversationResponseDTO> findByUserId(UUID userId) {
@@ -55,9 +57,7 @@ public class ConversationService {
 
     public List<MessageResponseDTO> getMessages(UUID conversationId, UUID userId) {
         User user = usersService.findById(userId);
-        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(
-                ()-> new ConversationNotFoundException("Conversation with this id does not exists: " + conversationId)
-        );
+        Conversation conversation = findConversationById(conversationId);
 
         if (!conversation.getParticipants().contains(user))
             throw new UnauthorizedException("You do not have permission to access this conversation");
@@ -65,5 +65,38 @@ public class ConversationService {
         return conversation.getMessages().stream().map(
                 message ->  MessageMapper.toResponseDTO(message, userId)
         ).toList();
+    }
+
+    public Map<User, MessageResponseDTO> prepareMessagesToSend(UUID chatId, UUID uuid, String content) {
+
+        Conversation conversation = findConversationById(chatId);
+        User sender = usersService.findById(uuid);
+
+        Message savedMessage = saveNewMessage(conversation, sender, content);
+
+        Map<User, MessageResponseDTO> personalizedMessages = new HashMap<>();
+
+        for (User user : conversation.getParticipants()) {
+
+            MessageResponseDTO personalizedMessageDTO = MessageMapper.toResponseDTO(savedMessage, user.getId());
+            personalizedMessages.put(user, personalizedMessageDTO);
+        }
+
+        return personalizedMessages;
+    }
+
+    private Message saveNewMessage(Conversation conversation, User sender, String content) {
+
+        Message message = Message.builder().
+                sender(sender)
+                .content(content)
+                .build();
+
+        conversation.getMessages().add(message);
+        message.setConversation(conversation);
+
+        conversationRepository.save(conversation);
+
+        return conversation.getMessages().getLast();
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,11 +33,13 @@ public class WebSocketController {
     public void sendMessage(
             @DestinationVariable UUID chatId,
             @Payload MessageDTO message,
-            @AuthenticationPrincipal UUID uuid) {
+            Principal principal) {
+
+        UUID userId = UUID.fromString(principal.getName());
 
         Map<User, MessageResponseDTO> personalizedMessages = chatService.prepareMessagesToSend(
                 chatId,
-                uuid,
+                userId,
                 message.getContent()
         );
 

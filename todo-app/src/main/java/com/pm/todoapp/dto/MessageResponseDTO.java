@@ -13,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponseDTO {
+    private UUID conversationId;
     private UUID senderId;
     private String context;
     private LocalDateTime sendAt;

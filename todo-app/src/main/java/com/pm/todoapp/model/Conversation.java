@@ -32,4 +32,8 @@ public class Conversation {
     @EqualsAndHashCode.Exclude
     private List<Message> messages = new ArrayList<>();
 
+    public void addMessage(Message message) {
+        messages.add(message);
+        message.setConversation(this);
+    }
 }

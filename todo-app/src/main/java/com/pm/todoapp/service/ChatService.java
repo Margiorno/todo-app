@@ -12,6 +12,7 @@ import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.ConversationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -67,6 +68,7 @@ public class ChatService {
         ).toList();
     }
 
+    @Transactional
     public Map<User, MessageResponseDTO> prepareMessagesToSend(UUID chatId, UUID uuid, String content) {
 
         Conversation conversation = findConversationById(chatId);
@@ -85,15 +87,15 @@ public class ChatService {
         return personalizedMessages;
     }
 
-    private Message saveNewMessage(Conversation conversation, User sender, String content) {
+    @Transactional
+    protected Message saveNewMessage(Conversation conversation, User sender, String content) {
 
         Message message = Message.builder().
                 sender(sender)
                 .content(content)
                 .build();
 
-        conversation.getMessages().add(message);
-        message.setConversation(conversation);
+        conversation.addMessage(message);
 
         conversationRepository.save(conversation);
 

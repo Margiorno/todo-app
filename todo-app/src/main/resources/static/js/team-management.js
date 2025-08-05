@@ -1,161 +1,141 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const invitationCodeModalElement = document.getElementById('invitationCodeModal');
-    const invitationCodeModal = new bootstrap.Modal(invitationCodeModalElement);
+    setupInviteCodeModal();
+    setupJoinTeam();
+    setupNotifications();
+    setupManageMembers();
+});
 
+function setupInviteCodeModal() {
+    const modalEl = document.getElementById('invitationCodeModal');
+    const modal = new bootstrap.Modal(modalEl);
     const generateBtn = document.getElementById('generateInviteCodeBtn');
     const codeDisplay = document.getElementById('invitationCodeDisplay');
     const copyBtn = document.getElementById('copyInviteCodeBtn');
     const errorMsg = document.getElementById('inviteError');
 
-    generateBtn.addEventListener('click', function () {
-        const teamId = this.getAttribute('data-team-id');
-
+    generateBtn.addEventListener('click', () => {
+        const teamId = generateBtn.getAttribute('data-team-id');
         codeDisplay.value = 'Generating...';
         errorMsg.classList.add('d-none');
-        invitationCodeModal.show();
+        modal.show();
 
-        fetch(`/teams/${teamId}/generate-invite-code`, {
-            method: 'POST',
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        fetch(`/teams/${teamId}/generate-invite-code`, { method: 'POST' })
+            .then(res => res.ok ? res.json() : Promise.reject('Network error'))
             .then(data => {
-                if (data && data.code) {
+                if (data?.code) {
                     codeDisplay.value = data.code;
                 } else {
-                    throw new Error('Invalid data format from server');
+                    throw new Error('Invalid server response');
                 }
             })
-            .catch(error => {
-                console.error('Error generating invitation code:', error);
+            .catch(err => {
+                console.error('Invite code error:', err);
                 codeDisplay.value = 'Error!';
                 errorMsg.classList.remove('d-none');
             });
     });
 
-    copyBtn.addEventListener('click', function () {
-        navigator.clipboard.writeText(codeDisplay.value).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-        });
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(codeDisplay.value)
+            .then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = originalText, 2000);
+            })
+            .catch(err => console.error('Copy failed:', err));
     });
-});
+}
 
-document.getElementById("joinTeamBtn").addEventListener("click", function() {
-    const code = document.getElementById("code").value;
+function setupJoinTeam() {
+    const joinBtn = document.getElementById("joinTeamBtn");
+    joinBtn.addEventListener("click", () => {
+        const code = document.getElementById("code").value;
 
-    fetch('/teams/join', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ code: code })
-    })
-        .then(response => {
-            if (response.ok) {
-                sessionStorage.setItem("teamJoinSuccessMessage", "Successfully joined team .");
-                window.location.reload();
-            } else {
-                return response.text().then(errorMessage => {
-                    sessionStorage.setItem("teamJoinErrorMessage", errorMessage);
-                    window.location.reload();
-                });
-            }
+        fetch('/teams/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
         })
-        .catch(error => {
-            console.error('Network or server error:', error);
-            sessionStorage.setItem("teamJoinErrorMessage", "Connection refused.");
-            window.location.reload();
-        });
-});
+            .then(res => {
+                if (res.ok) {
+                    sessionStorage.setItem("teamJoinSuccessMessage", "Successfully joined team.");
+                    location.reload();
+                } else {
+                    return res.text().then(msg => {
+                        sessionStorage.setItem("teamJoinErrorMessage", msg);
+                        location.reload();
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Join error:', err);
+                sessionStorage.setItem("teamJoinErrorMessage", "Connection refused.");
+                location.reload();
+            });
+    });
+}
 
+function setupNotifications() {
+    const container = document.getElementById("notification-container");
+    const success = sessionStorage.getItem("teamJoinSuccessMessage") || sessionStorage.getItem("teamManagementSuccessMessage");
+    const error = sessionStorage.getItem("teamJoinErrorMessage") || sessionStorage.getItem("teamManagementErrorMessage");
+
+    if (success) {
+        container.innerHTML = createAlert('success', 'Sukces!', success);
+        sessionStorage.removeItem("teamJoinSuccessMessage");
+        sessionStorage.removeItem("teamManagementSuccessMessage");
+    } else if (error) {
+        container.innerHTML = createAlert('danger', 'Error!', error);
+        sessionStorage.removeItem("teamJoinErrorMessage");
+        sessionStorage.removeItem("teamManagementErrorMessage");
+    }
+}
+
+function createAlert(type, strongText, message) {
+    return `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            <strong>${strongText}</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+}
+
+function setupManageMembers() {
+    const modal = document.getElementById('manageMembersModal');
+
+    if (!modal) return;
+
+    modal.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('remove-member-btn')) return;
+
+        e.preventDefault();
+        const btn = e.target;
+        const memberId = btn.dataset.memberId;
+        const teamId = btn.dataset.teamId;
+        const email = btn.closest('tr').querySelector('td:nth-child(2)').textContent;
+
+        if (confirm(`Are you sure you want to remove ${email} from the team?`)) {
+            removeMember(teamId, memberId);
+        }
+    });
+}
 
 function removeMember(teamId, memberId) {
     fetch(`/teams/${teamId}/delete-member?userId=${memberId}`, {
         method: 'POST'
     })
-        .then(response => {
-            if (response.ok) {
+        .then(res => {
+            if (res.ok) {
                 sessionStorage.setItem("teamManagementSuccessMessage", "Member removed successfully.");
-                window.location.reload();
             } else {
-                return response.text().then(errorMessage => {
-                    const message = errorMessage || "Could not remove the member. Please try again.";
-                    sessionStorage.setItem("teamManagementErrorMessage", message);
-                    window.location.reload();
+                return res.text().then(msg => {
+                    sessionStorage.setItem("teamManagementErrorMessage", msg || "Could not remove the member. Please try again.");
                 });
             }
         })
-        .catch(error => {
-            console.error('Network or server error:', error);
+        .catch(err => {
+            console.error('Remove error:', err);
             sessionStorage.setItem("teamManagementErrorMessage", "Connection refused. Could not remove member.");
-            window.location.reload();
-        });
+        })
+        .finally(() => location.reload());
 }
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", function() {
-
-    const notificationContainer = document.getElementById("notification-container");
-
-    const successMessage = sessionStorage.getItem("teamJoinSuccessMessage") || sessionStorage.getItem("teamManagementSuccessMessage");
-    const errorMessage = sessionStorage.getItem("teamJoinErrorMessage") || sessionStorage.getItem("teamManagementErrorMessage");
-
-    if (successMessage) {
-        notificationContainer.innerHTML = `
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>Sukces!</strong> ${successMessage}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-
-        sessionStorage.removeItem("teamJoinSuccessMessage");
-        sessionStorage.removeItem("teamManagementSuccessMessage");
-
-    } else if (errorMessage) {
-        notificationContainer.innerHTML = `
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Error!</strong> ${errorMessage}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        sessionStorage.removeItem("teamJoinErrorMessage");
-        sessionStorage.removeItem("teamManagementErrorMessage");
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const manageMembersModal = document.getElementById('manageMembersModal');
-
-    if (manageMembersModal) {
-        manageMembersModal.addEventListener('click', function (event) {
-
-            if (event.target.classList.contains('remove-member-btn')) {
-                event.preventDefault();
-
-                const button = event.target;
-                const memberId = button.dataset.memberId;
-                const teamId = button.dataset.teamId;
-
-                const memberEmail = button.closest('tr').querySelector('td:nth-child(2)').textContent;
-
-                if (confirm(`Are you sure you want to remove ${memberEmail} from the team?`)) {
-                    removeMember(teamId, memberId);
-                }
-            }
-        });
-    }
-});
-
-

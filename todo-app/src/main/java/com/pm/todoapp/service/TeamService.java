@@ -128,9 +128,6 @@ public class TeamService {
 
     public void deleteUserFromTeam(UUID teamId, UUID userId) {
 
-        System.out.println(teamId);
-        System.out.println(userId);
-
         Team team = findById(teamId);
         User user = usersService.findById(userId);
 

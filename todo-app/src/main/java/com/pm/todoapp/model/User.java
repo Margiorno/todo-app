@@ -38,5 +38,9 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<Task> tasks = new HashSet<>();
 
+    @ManyToMany(mappedBy = "participants")
+    @EqualsAndHashCode.Exclude
+    private Set<Conversation> conversations = new HashSet<>();
+
     //TODO FINISH USER
 }

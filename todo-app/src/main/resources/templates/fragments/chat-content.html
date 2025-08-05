@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="content" class="col-md-8 col-lg-10 main-content">
+    <div class="chat-area-wrapper">
+        <div class="chat-header" id="chat-header"></div>
+
+        <div class="chat-messages" id="chat-messages">
+
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="message-input" class="form-control" placeholder="Type a message...">
+            <button class="btn btn-primary" id="send-button"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+</div>
+
+</body>

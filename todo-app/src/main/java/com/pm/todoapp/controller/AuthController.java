@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/auth")
@@ -25,7 +24,6 @@ public class AuthController {
     }
 
 
-    //TODO token generation instead of simple id
     @GetMapping
     public String showAuthForm(Model model, @RequestParam(value = "form", defaultValue = "login") String form) {
         if (!model.containsAttribute("loginRequest")) {
@@ -86,4 +84,6 @@ public class AuthController {
 
         return "redirect:/auth";
     }
+
+
 }

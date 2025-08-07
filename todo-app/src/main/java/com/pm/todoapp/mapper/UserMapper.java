@@ -8,6 +8,7 @@ public class UserMapper {
         return UserResponseDTO.builder()
                 .id(user.getId().toString())
                 .email(user.getEmail())
+                .profilePicturePath(user.getProfilePicturePath())
                 .build();
     }
 }

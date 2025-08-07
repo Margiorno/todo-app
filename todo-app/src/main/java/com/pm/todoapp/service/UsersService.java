@@ -1,10 +1,15 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.exceptions.UserNotFoundException;
+import com.pm.todoapp.file.FileService;
+import com.pm.todoapp.file.FileType;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -12,10 +17,12 @@ import java.util.UUID;
 public class UsersService {
 
     private final UsersRepository usersRepository;
+    private final FileService fileService;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository) {
+    public UsersService(UsersRepository usersRepository, FileService fileService) {
         this.usersRepository = usersRepository;
+        this.fileService = fileService;
     }
 
     public User findById(UUID userId) {
@@ -36,5 +43,23 @@ public class UsersService {
 
     public boolean existByEmail(String email) {
         return usersRepository.existsByEmail(email);
+    }
+
+    @Transactional
+    public String updateProfilePicture(MultipartFile file, UUID userId) {
+
+        User user = findById(userId);
+        String oldPicturePath = user.getProfilePicturePath();
+
+        String newPicturePath = fileService.saveFile(file, FileType.PROFILE_PICTURE);
+
+        user.setProfilePicturePath(newPicturePath);
+        usersRepository.save(user);
+
+        if (oldPicturePath != null && !oldPicturePath.isEmpty() && !oldPicturePath.isBlank()) {
+            fileService.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
+        }
+
+        return newPicturePath;
     }
 }

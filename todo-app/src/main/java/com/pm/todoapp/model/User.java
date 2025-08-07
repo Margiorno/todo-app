@@ -25,6 +25,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    private String profilePicturePath;
+
+
+
     @ManyToMany
     @JoinTable(
             name = "user_team",
@@ -41,6 +45,7 @@ public class User {
     @ManyToMany(mappedBy = "participants")
     @EqualsAndHashCode.Exclude
     private Set<Conversation> conversations = new HashSet<>();
+
 
     //TODO FINISH USER
 }

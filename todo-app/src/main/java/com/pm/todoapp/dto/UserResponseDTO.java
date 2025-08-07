@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserResponseDTO {
     private String id;
     private String email;
+    private String profilePicturePath;
 }

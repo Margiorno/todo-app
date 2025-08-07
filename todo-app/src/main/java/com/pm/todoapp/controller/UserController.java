@@ -3,10 +3,7 @@ package com.pm.todoapp.controller;
 import com.pm.todoapp.service.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
@@ -23,12 +20,25 @@ public class UserController {
         this.usersService = usersService;
     }
 
-    @PostMapping("/profile-picture")
+    @PostMapping("/profile/avatar")
     public ResponseEntity<Map<String,String>> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UUID userId) {
 
         String filename = usersService.updateProfilePicture(file, userId);
 
         return ResponseEntity.ok(Collections.singletonMap("filename", filename));
+    }
+
+    @PatchMapping("/profile/update")
+    public ResponseEntity<Map<String, Object>> updateProfileField(@RequestBody Map<String, String> payload,
+                                                                  @AuthenticationPrincipal UUID userId) {
+        if (payload.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String field = payload.keySet().iterator().next();
+        String value = payload.get(field);
+
+        return ResponseEntity.ok(usersService.update(field, value, userId));
     }
 
 

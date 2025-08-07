@@ -119,7 +119,7 @@
             </div>
             <div class="edit-view hidden" id="edit-view-gender">
                 <strong>Gender:</strong>
-                <select id="input-gender" name="gender">
+                <label for="input-gender"></label><select id="input-gender" name="gender">
                     <option th:each="g : ${genders}" th:value="${g}" th:text="${g.name()}"></option>
                 </select>
                 <button type="button" class="save-button" data-field="gender">Save</button>
@@ -142,8 +142,7 @@
             const editView = document.getElementById(`edit-view-${field}`);
 
             if (showEdit) {
-                const displayValue = document.getElementById(`display-value-${field}`).textContent;
-                document.getElementById(`input-${field}`).value = displayValue;
+                document.getElementById(`input-${field}`).value = document.getElementById(`display-value-${field}`).textContent;
                 displayView.classList.add('hidden');
                 editView.classList.remove('hidden');
             } else {
@@ -179,7 +178,7 @@
                 statusSpan.textContent = 'Saving...';
 
                 try {
-                    const response = await fetch('/users/profile/detail', {
+                    const response = await fetch('/users/profile/update', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ [field]: newValue })
@@ -221,7 +220,7 @@
             status.textContent = 'Uploading...';
 
             try {
-                const response = await fetch('/users/profile-picture', { method: 'POST', body: formData });
+                const response = await fetch('/users/profile/avatar', { method: 'POST', body: formData });
                 if (!response.ok) {
                     throw new Error(await response.text() || 'Upload failed');
                 }

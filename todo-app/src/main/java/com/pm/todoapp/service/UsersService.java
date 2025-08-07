@@ -1,10 +1,12 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.exceptions.InvalidFieldException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
 import com.pm.todoapp.mapper.UserMapper;
+import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -66,5 +71,45 @@ public class UsersService {
         }
 
         return newPicturePath;
+    }
+
+    public Map<String, Object> update(String field, String value, UUID userId) {
+        User user = findRawById(userId);
+
+        Object updatedValue;
+
+        switch (field) {
+            case "firstName" -> updatedValue = updateFirstName(user, value);
+            case "lastName" -> updatedValue = updateLastName(user, value);
+            case "dateOfBirth" -> updatedValue = updateDateOfBirth(user, LocalDate.parse(value));
+            case "gender" -> updatedValue = updateGender(user, Gender.valueOf(value));
+            case "email" -> updatedValue = updateEmail(user, value);
+            default -> throw new InvalidFieldException("Unsupported field: " + field);
+        }
+
+        return Collections.singletonMap(field, updatedValue);
+    }
+
+
+    private String updateEmail(User user, String value) {
+        user.setEmail(value);
+        return usersRepository.save(user).getEmail();
+    }
+
+    private String updateFirstName(User user, String value) {
+        user.setFirstName(value);
+        return usersRepository.save(user).getFirstName();
+    }
+    private String updateLastName(User user, String value) {
+        user.setLastName(value);
+        return usersRepository.save(user).getLastName();
+    }
+    private LocalDate updateDateOfBirth(User user, LocalDate parse) {
+        user.setDateOfBirth(parse);
+        return usersRepository.save(user).getDateOfBirth();
+    }
+    private Gender updateGender(User user, Gender gender) {
+        user.setGender(gender);
+        return usersRepository.save(user).getGender();
     }
 }

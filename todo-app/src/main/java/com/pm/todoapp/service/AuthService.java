@@ -30,9 +30,14 @@ public class AuthService {
             throw new EmailAlreadyExistsException("Account with this email already exists");
         }
 
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        User user = User.builder()
+                .firstName(registerRequest.getFirstName())
+                .lastName(registerRequest.getLastName())
+                .dateOfBirth(registerRequest.getDateOfBirth())
+                .gender(registerRequest.getGender())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .build();
 
         User savedUser = usersService.save(user);
         return jwtUtil.generateToken(savedUser.getId().toString());

@@ -13,4 +13,8 @@ public class UserResponseDTO {
     private String id;
     private String email;
     private String profilePicturePath;
+    private String firstName;
+    private String lastName;
+    private String dateOfBirth;
+    private String gender;
 }

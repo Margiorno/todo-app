@@ -1,9 +1,47 @@
 -- USERS --
-INSERT INTO users (id, email, password)
-SELECT '11111111-1111-1111-1111-111111111111', 'userAB@example.com', '$2a$10$.6mhuXodjotvfCoIMpWnGOE/Sz1.34zp5EY7nRH8brQW5CIg1vHjW'
+INSERT INTO users (
+    id,
+    email,
+    password,
+    first_name,
+    last_name,
+    date_of_birth,
+    gender
+)
+SELECT
+    '11111111-1111-1111-1111-111111111111',
+    'userAB@example.com',
+    '$2a$10$.6mhuXodjotvfCoIMpWnGOE/Sz1.34zp5EY7nRH8brQW5CIg1vHjW',
+    'Adam',
+    'Borek',
+    '1990-05-12',
+    'MALE'
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE id = '11111111-1111-1111-1111-111111111111'
 );
+
+INSERT INTO users (
+    id,
+    email,
+    password,
+    first_name,
+    last_name,
+    date_of_birth,
+    gender
+)
+SELECT
+    '11111111-1111-1111-1111-111111111112',
+    'userA@example.com',
+    '$2a$10$.6mhuXodjotvfCoIMpWnGOE/Sz1.34zp5EY7nRH8brQW5CIg1vHjW',
+    'Agnieszka',
+    'Nowak',
+    '1985-08-24',
+    'FEMALE'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE id = '11111111-1111-1111-1111-111111111112'
+);
+
+
 
 INSERT INTO users (id, email, password)
 SELECT '11111111-1111-1111-1111-111111111112', 'userA@example.com', '$2a$10$.6mhuXodjotvfCoIMpWnGOE/Sz1.34zp5EY7nRH8brQW5CIg1vHjW'

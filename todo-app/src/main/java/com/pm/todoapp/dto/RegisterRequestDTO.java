@@ -1,12 +1,16 @@
 package com.pm.todoapp.dto;
 
+import com.pm.todoapp.model.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 
 @Data
@@ -23,5 +27,15 @@ public class RegisterRequestDTO {
     @Size(min = 8)
     private String password;
 
-    //TODO expand this class
+    @NotBlank
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
+
+    @NotNull
+    private LocalDate dateOfBirth;
+
+    @NotNull
+    private Gender gender;
 }

@@ -2,15 +2,18 @@ package com.pm.todoapp.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -27,7 +30,14 @@ public class User {
 
     private String profilePicturePath;
 
+    private String firstName;
 
+    private String lastName;
+
+    private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @ManyToMany
     @JoinTable(
@@ -46,6 +56,4 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<Conversation> conversations = new HashSet<>();
 
-
-    //TODO FINISH USER
 }

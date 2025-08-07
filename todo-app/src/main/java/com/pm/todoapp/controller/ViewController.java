@@ -3,6 +3,7 @@ package com.pm.todoapp.controller;
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
@@ -141,6 +142,7 @@ public class ViewController {
         UserResponseDTO user = usersService.findById(userId);
 
         model.addAttribute("user", user);
+        model.addAttribute("genders", Gender.values());
         return "profile";
     }
 

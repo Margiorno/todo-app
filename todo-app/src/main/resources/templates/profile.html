@@ -1,8 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>User Profile</title>
+    <style>
+        body { font-family: sans-serif; }
+        .hidden { display: none; }
+        .detail-field { margin-bottom: 15px; padding: 10px; border: 1px solid #eee; border-radius: 5px; }
+        .detail-field strong { min-width: 120px; display: inline-block; }
+        .detail-field span, .detail-field input, .detail-field select { margin-right: 10px; }
+        .edit-button, .save-button, .cancel-button {
+            margin-left: 10px;
+            font-size: 0.9em;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        hr { margin: 25px 0; }
+    </style>
 </head>
 <body>
 
@@ -11,26 +25,16 @@
 <div th:if="${user}">
     <div>
         <h3>Current Profile Picture</h3>
-        <div id="picture-container" th:if="${user.profilePicturePath != null}">
-            <img id="profile-picture"
-                 th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath})}"
-                 alt="Profile Picture"
-                 width="150">
-        </div>
-        <div id="no-picture" th:unless="${user.profilePicturePath != null}">
-            <p>No profile picture available.</p>
+        <div id="picture-container">
+            <div th:if="${user.profilePicturePath != null}">
+                <img id="profile-picture" th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath})}" alt="Profile Picture" width="150">
+            </div>
+            <div th:if="${user.profilePicturePath == null}">
+                <p>No profile picture available.</p>
+            </div>
         </div>
     </div>
-
     <hr>
-
-    <div>
-        <p><strong>User ID:</strong> <span th:text="${user.id}">12345-abcde</span></p>
-        <p><strong>Email:</strong> <span th:text="${user.email}">user@example.com</span></p>
-    </div>
-
-    <hr>
-
     <div>
         <h3>Change Profile Picture</h3>
         <form id="picture-form" enctype="multipart/form-data">
@@ -38,70 +42,204 @@
                 <label for="file">Choose a new file:</label>
                 <input type="file" id="file" name="file" required>
             </p>
-            <p>
-                <button type="submit">Update Picture</button>
-            </p>
+            <p><button type="submit">Update Picture</button></p>
         </form>
         <p id="upload-status"></p>
     </div>
 
+    <hr>
+
+    <div>
+        <h3>User Details</h3>
+
+        <div class="detail-field">
+            <div class="display-view" id="display-view-email">
+                <strong>Email:</strong>
+                <span id="display-value-email" th:text="${user.email}"></span>
+                <button type="button" class="edit-button" data-field="email">Edit</button>
+            </div>
+            <div class="edit-view hidden" id="edit-view-email">
+                <strong>Email:</strong>
+                <input type="email" id="input-email" name="email">
+                <button type="button" class="save-button" data-field="email">Save</button>
+                <button type="button" class="cancel-button" data-field="email">Cancel</button>
+                <span class="update-status" id="status-email"></span>
+            </div>
+        </div>
+        <div class="detail-field">
+            <div class="display-view" id="display-view-firstName">
+                <strong>First Name:</strong>
+                <span id="display-value-firstName" th:text="${user.firstName}"></span>
+                <button type="button" class="edit-button" data-field="firstName">Edit</button>
+            </div>
+            <div class="edit-view hidden" id="edit-view-firstName">
+                <strong>First Name:</strong>
+                <input type="text" id="input-firstName" name="firstName">
+                <button type="button" class="save-button" data-field="firstName">Save</button>
+                <button type="button" class="cancel-button" data-field="firstName">Cancel</button>
+                <span class="update-status" id="status-firstName"></span>
+            </div>
+        </div>
+
+        <div class="detail-field">
+            <div class="display-view" id="display-view-lastName">
+                <strong>Last Name:</strong>
+                <span id="display-value-lastName" th:text="${user.lastName}"></span>
+                <button type="button" class="edit-button" data-field="lastName">Edit</button>
+            </div>
+            <div class="edit-view hidden" id="edit-view-lastName">
+                <strong>Last Name:</strong>
+                <input type="text" id="input-lastName" name="lastName">
+                <button type="button" class="save-button" data-field="lastName">Save</button>
+                <button type="button" class="cancel-button" data-field="lastName">Cancel</button>
+                <span class="update-status" id="status-lastName"></span>
+            </div>
+        </div>
+
+        <div class="detail-field">
+            <div class="display-view" id="display-view-dateOfBirth">
+                <strong>Date of Birth:</strong>
+                <span id="display-value-dateOfBirth" th:text="${user.dateOfBirth}"></span>
+                <button type="button" class="edit-button" data-field="dateOfBirth">Edit</button>
+            </div>
+            <div class="edit-view hidden" id="edit-view-dateOfBirth">
+                <strong>Date of Birth:</strong>
+                <input type="date" id="input-dateOfBirth" name="dateOfBirth">
+                <button type="button" class="save-button" data-field="dateOfBirth">Save</button>
+                <button type="button" class="cancel-button" data-field="dateOfBirth">Cancel</button>
+                <span class="update-status" id="status-dateOfBirth"></span>
+            </div>
+        </div>
+
+        <div class="detail-field">
+            <div class="display-view" id="display-view-gender">
+                <strong>Gender:</strong>
+                <span id="display-value-gender" th:text="${user.gender}"></span>
+                <button type="button" class="edit-button" data-field="gender">Edit</button>
+            </div>
+            <div class="edit-view hidden" id="edit-view-gender">
+                <strong>Gender:</strong>
+                <select id="input-gender" name="gender">
+                    <option th:each="g : ${genders}" th:value="${g}" th:text="${g.name()}"></option>
+                </select>
+                <button type="button" class="save-button" data-field="gender">Save</button>
+                <button type="button" class="cancel-button" data-field="gender">Cancel</button>
+                <span class="update-status" id="status-gender"></span>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div th:unless="${user}">
-    <p>Unable to load user data.</p>
-</div>
-
+<div th:unless="${user}"><p>Unable to load user data.</p></div>
 <br>
 <a href="/">Back</a>
 
 <script>
-    document.getElementById('picture-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
+    document.addEventListener('DOMContentLoaded', function() {
 
-        const fileInput = document.getElementById('file');
-        const status = document.getElementById('upload-status');
-        const picture = document.getElementById('profile-picture');
+        function toggleEditView(field, showEdit) {
+            const displayView = document.getElementById(`display-view-${field}`);
+            const editView = document.getElementById(`edit-view-${field}`);
 
-        if (!fileInput.files.length) {
-            status.textContent = 'Please select a file.';
-            return;
+            if (showEdit) {
+                const displayValue = document.getElementById(`display-value-${field}`).textContent;
+                document.getElementById(`input-${field}`).value = displayValue;
+                displayView.classList.add('hidden');
+                editView.classList.remove('hidden');
+            } else {
+                displayView.classList.remove('hidden');
+                editView.classList.add('hidden');
+            }
         }
 
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
+        document.querySelector('body').addEventListener('click', async function(e) {
 
-        try {
-            const response = await fetch('/users/profile-picture', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Upload failed');
+            if (e.target.matches('.edit-button')) {
+                const field = e.target.dataset.field;
+                toggleEditView(field, true);
             }
 
-            const result = await response.json();
-            const newImageUrl = `/files/profile-pictures/${result.filename}`;
+            if (e.target.matches('.cancel-button')) {
+                const field = e.target.dataset.field;
+                document.getElementById(`status-${field}`).textContent = '';
+                toggleEditView(field, false);
+            }
 
-            if (picture) {
-                picture.src = newImageUrl + '?t=' + new Date().getTime();
-            } else {
-                // If image didn't exist before
-                const container = document.getElementById('picture-container');
+            if (e.target.matches('.save-button')) {
+                const field = e.target.dataset.field;
+                const input = document.getElementById(`input-${field}`);
+                const statusSpan = document.getElementById(`status-${field}`);
+                const newValue = input.value;
+
+                if (!newValue) {
+                    statusSpan.textContent = "Value cannot be empty.";
+                    return;
+                }
+
+                statusSpan.textContent = 'Saving...';
+
+                try {
+                    const response = await fetch('/users/profile/detail', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ [field]: newValue })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || `Could not update the field.`);
+                    }
+
+                    const updatedData = await response.json();
+
+                    document.getElementById(`display-value-${field}`).textContent = updatedData[field];
+                    statusSpan.textContent = 'Saved!';
+
+                    setTimeout(() => {
+                        statusSpan.textContent = '';
+                        toggleEditView(field, false);
+                    }, 1500);
+
+                } catch (error) {
+                    statusSpan.textContent = `Error: ${error.message}`;
+                }
+            }
+        });
+
+        document.getElementById('picture-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('file');
+            const status = document.getElementById('upload-status');
+            const pictureContainer = document.getElementById('picture-container');
+
+            if (!fileInput.files.length) {
+                status.textContent = 'Please select a file.';
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            status.textContent = 'Uploading...';
+
+            try {
+                const response = await fetch('/users/profile-picture', { method: 'POST', body: formData });
+                if (!response.ok) {
+                    throw new Error(await response.text() || 'Upload failed');
+                }
+                const result = await response.json();
+                const newImageUrl = `/files/profile-pictures/${result.filename}`;
+
+                pictureContainer.innerHTML = '';
                 const img = document.createElement('img');
                 img.id = 'profile-picture';
-                img.src = newImageUrl;
+                img.src = newImageUrl + '?t=' + new Date().getTime();
                 img.alt = 'Profile Picture';
                 img.width = 150;
-                container.appendChild(img);
-                document.getElementById('no-picture')?.remove();
+                pictureContainer.appendChild(img);
+                status.textContent = 'Profile picture updated!';
+            } catch (error) {
+                status.textContent = 'Error uploading picture: ' + error.message;
             }
-
-            status.textContent = 'Profile picture updated!';
-        } catch (error) {
-            status.textContent = 'Error uploading picture.';
-            console.error(error);
-        }
+        });
     });
 </script>
 

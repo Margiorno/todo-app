@@ -56,7 +56,7 @@ public class TeamService {
 
     public List<TeamResponseDTO> findAllByUserId(UUID userId) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Iterable<Team> teams = teamRepository.findByMembersContaining(user);
 
         return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
@@ -64,7 +64,7 @@ public class TeamService {
 
     public void createTeam(String teamName, UUID userId) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
 
         Team team = new Team();
         team.setName(teamName);
@@ -98,7 +98,7 @@ public class TeamService {
 
     public void join(String code, UUID userId) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Invite invite = inviteRepository.findByCode(code).orElseThrow(
                 ()->new InvalidInviteException("There is no invitation with this code")
         );
@@ -129,7 +129,7 @@ public class TeamService {
     public void deleteUserFromTeam(UUID teamId, UUID userId) {
 
         Team team = findById(teamId);
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
 
         team.getMembers().remove(user);
         user.getTeams().remove(team);

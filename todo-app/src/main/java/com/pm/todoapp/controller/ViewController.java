@@ -3,10 +3,12 @@ package com.pm.todoapp.controller;
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
+import com.pm.todoapp.service.UsersService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,11 +28,13 @@ public class ViewController {
 
     private final TaskService taskService;
     private final TeamService teamService;
+    private final UsersService usersService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService) {
         this.taskService = taskService;
         this.teamService = teamService;
+        this.usersService = usersService;
     }
 
     @Data
@@ -130,6 +134,16 @@ public class ViewController {
     public String showChatView(Model model) {
 
         return "chat";
+    }
+
+    @GetMapping("/profile")
+    public String showProfilePage(@AuthenticationPrincipal UUID userId, Model model) {
+
+        UserResponseDTO user = usersService.findById(userId);
+
+        model.addAttribute("user", user);
+        model.addAttribute("genders", Gender.values());
+        return "profile";
     }
 
 

@@ -57,15 +57,48 @@
                     <!-- Register Form -->
                     <div th:if="${param.form != null and param.form[0] == 'register'}">
                         <h2 class="h4 mb-4 text-center">Create a new account</h2>
-                        <form action="/auth/register" th:action="@{/auth/register}" th:object="${registerRequest}" method="post">
+                        <form id="register-form" action="/auth/register" th:action="@{/auth/register}" th:object="${registerRequest}" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="reg-firstname" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="reg-firstname" th:field="*{firstName}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="reg-lastname" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="reg-lastname" th:field="*{lastName}" required>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="reg-email" class="form-label">Email address</label>
                                 <input type="email" class="form-control" id="reg-email" th:field="*{email}" placeholder="name@example.com" required>
                             </div>
+
                             <div class="mb-3">
                                 <label for="reg-password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="reg-password" th:field="*{password}" required minlength="8" placeholder="Minimum 8 characters">
                             </div>
+
+                            <div class="mb-3">
+                                <label for="reg-confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="reg-confirm-password" name="confirmPassword" required minlength="8">
+                                <div id="password-match-error" class="password-error">Passwords do not match.</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="reg-dob" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="reg-dob" th:field="*{dateOfBirth}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="reg-gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="reg-gender" th:field="*{gender}" required>
+                                        <option value="" disabled selected>Select...</option>
+                                        <option th:each="g : ${genders}" th:value="${g}" th:text="${g.name()}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
                         </form>
                     </div>

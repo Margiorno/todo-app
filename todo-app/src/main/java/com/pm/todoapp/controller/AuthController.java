@@ -2,6 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.LoginRequestDTO;
 import com.pm.todoapp.dto.RegisterRequestDTO;
+import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,8 @@ public class AuthController {
         }
 
         model.addAttribute("form", form);
+        model.addAttribute("genders", Gender.values());
+
         return "auth-form";
     }
 

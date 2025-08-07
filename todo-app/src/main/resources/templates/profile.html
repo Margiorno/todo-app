@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+
+<h1>User Profile</h1>
+
+<div th:if="${user}">
+    <div>
+        <h3>Current Profile Picture</h3>
+        <div id="picture-container" th:if="${user.profilePicturePath != null}">
+            <img id="profile-picture"
+                 th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath})}"
+                 alt="Profile Picture"
+                 width="150">
+        </div>
+        <div id="no-picture" th:unless="${user.profilePicturePath != null}">
+            <p>No profile picture available.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <div>
+        <p><strong>User ID:</strong> <span th:text="${user.id}">12345-abcde</span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}">user@example.com</span></p>
+    </div>
+
+    <hr>
+
+    <div>
+        <h3>Change Profile Picture</h3>
+        <form id="picture-form" enctype="multipart/form-data">
+            <p>
+                <label for="file">Choose a new file:</label>
+                <input type="file" id="file" name="file" required>
+            </p>
+            <p>
+                <button type="submit">Update Picture</button>
+            </p>
+        </form>
+        <p id="upload-status"></p>
+    </div>
+
+</div>
+
+<div th:unless="${user}">
+    <p>Unable to load user data.</p>
+</div>
+
+<br>
+<a href="/">Back</a>
+
+<script>
+    document.getElementById('picture-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('file');
+        const status = document.getElementById('upload-status');
+        const picture = document.getElementById('profile-picture');
+
+        if (!fileInput.files.length) {
+            status.textContent = 'Please select a file.';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/users/profile-picture', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const result = await response.json();
+            const newImageUrl = `/files/profile-pictures/${result.filename}`;
+
+            if (picture) {
+                picture.src = newImageUrl + '?t=' + new Date().getTime();
+            } else {
+                // If image didn't exist before
+                const container = document.getElementById('picture-container');
+                const img = document.createElement('img');
+                img.id = 'profile-picture';
+                img.src = newImageUrl;
+                img.alt = 'Profile Picture';
+                img.width = 150;
+                container.appendChild(img);
+                document.getElementById('no-picture')?.remove();
+            }
+
+            status.textContent = 'Profile picture updated!';
+        } catch (error) {
+            status.textContent = 'Error uploading picture.';
+            console.error(error);
+        }
+    });
+</script>
+
+</body>
+</html>

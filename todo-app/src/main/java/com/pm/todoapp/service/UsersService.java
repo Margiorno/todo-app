@@ -1,14 +1,15 @@
 package com.pm.todoapp.service;
 
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
+import com.pm.todoapp.mapper.UserMapper;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
@@ -25,10 +26,14 @@ public class UsersService {
         this.fileService = fileService;
     }
 
-    public User findById(UUID userId) {
+    public User findRawById(UUID userId) {
         return usersRepository.findById(userId).orElseThrow(
                 ()->new UserNotFoundException("User with this id does not exist: " + userId.toString())
         );
+    }
+
+    public UserResponseDTO findById(UUID userId) {
+        return UserMapper.toUserResponseDTO(findRawById(userId));
     }
 
     public User save(User user) {
@@ -48,7 +53,7 @@ public class UsersService {
     @Transactional
     public String updateProfilePicture(MultipartFile file, UUID userId) {
 
-        User user = findById(userId);
+        User user = findRawById(userId);
         String oldPicturePath = user.getProfilePicturePath();
 
         String newPicturePath = fileService.saveFile(file, FileType.PROFILE_PICTURE);

@@ -2,8 +2,9 @@ package com.pm.todoapp.file;
 
 import lombok.*;
 
+@Getter
 public enum FileType {
-    PROFILE_PICTURE("image/", "/profile_picture");
+    PROFILE_PICTURE("image/", "profile_picture");
 
     private final String type;
     private final String path;
@@ -13,11 +14,4 @@ public enum FileType {
         this.path = path;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public String getPath() {
-        return path;
-    }
 }

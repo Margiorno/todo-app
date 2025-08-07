@@ -39,7 +39,7 @@ public class TaskService {
 
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
         if (teamId != null) {
@@ -53,7 +53,7 @@ public class TaskService {
 
     public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId, UUID userId, UUID teamId) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
 
         Task fromDb = taskRepository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId))
@@ -79,7 +79,7 @@ public class TaskService {
 
     // FINDING
     public List<TaskResponseDTO> findByUserId(UUID userId) {
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
 
         Iterable<Task> tasks = taskRepository.findByAssigneesContaining(user);
         return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
@@ -94,7 +94,7 @@ public class TaskService {
 
     public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, TaskFetchScope taskFetchScope) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
 
         Iterable<Task> tasks = switch (teamId){
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
@@ -112,7 +112,7 @@ public class TaskService {
 
     public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
 
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Team team = teamService.findById(teamId);
 
         Iterable<Task> tasks;
@@ -143,7 +143,7 @@ public class TaskService {
                 if (userId == null) {
                     throw new UserRequiredException("User ID is required when fetching user-specific tasks.");
                 }
-                user = usersService.findById(userId);
+                user = usersService.findRawById(userId);
 
                 if (teamId != null) {
                     team = teamService.findById(teamId);

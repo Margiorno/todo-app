@@ -35,7 +35,7 @@ public class ChatService {
     }
 
     public List<ConversationResponseDTO> findByUserId(UUID userId) {
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Iterable<Conversation> conversations = conversationRepository.findByParticipantsContains(user);
 
         return StreamSupport.stream(conversations.spliterator(), false)
@@ -57,7 +57,7 @@ public class ChatService {
     }
 
     public List<MessageResponseDTO> getMessages(UUID conversationId, UUID userId) {
-        User user = usersService.findById(userId);
+        User user = usersService.findRawById(userId);
         Conversation conversation = findConversationById(conversationId);
 
         if (!conversation.getParticipants().contains(user))
@@ -72,7 +72,7 @@ public class ChatService {
     public Map<User, MessageResponseDTO> prepareMessagesToSend(UUID chatId, UUID uuid, String content) {
 
         Conversation conversation = findConversationById(chatId);
-        User sender = usersService.findById(uuid);
+        User sender = usersService.findRawById(uuid);
 
         Message savedMessage = saveNewMessage(conversation, sender, content);
 

@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Service
 public class FileService {
@@ -49,10 +50,16 @@ public class FileService {
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String uniqueFilename = UUID.randomUUID().toString() + extension;
 
+
+
+            System.out.println("Root file storage location: " + rootLocation.toAbsolutePath());
+
             Path targetDirectory = this.rootLocation.resolve(fileType.getPath());
             Files.createDirectories(targetDirectory);
 
             Path destinationFile = targetDirectory.resolve(uniqueFilename).normalize().toAbsolutePath();
+
+            System.out.println("Saving file to: " + destinationFile);
 
             try (InputStream newInputStream = file.getInputStream()) {
                 Files.copy(newInputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);

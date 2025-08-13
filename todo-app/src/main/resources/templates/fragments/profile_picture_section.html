@@ -25,6 +25,24 @@
                 <input type="file" id="file" name="file" class="d-none" accept="image/*">
                 <p id="upload-status" class="mt-2"></p>
             </div>
+            <div th:if="${!isOwner}" class="d-grid gap-2" id="friend-action-container">
+
+                <button th:if="${!areFriends}"
+                        type="button"
+                        id="add-friend-btn"
+                        th:attr="data-profile-id=${user.id}"
+                        class="btn btn-success w-100">
+                    Add Friend
+                </button>
+
+                <form th:if="${areFriends}" th:action="@{/friends/remove}" method="post">
+                    <input type="hidden" name="friendId" th:value="${user.id}" />
+                    <button type="submit" class="btn btn-danger w-100">Remove Friend</button>
+                </form>
+
+                <!--"Request Sent" etc-->
+
+            </div>
         </div>
     </div>
 </div>

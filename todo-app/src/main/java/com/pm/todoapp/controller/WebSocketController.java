@@ -1,6 +1,6 @@
 package com.pm.todoapp.controller;
 
-import com.pm.todoapp.dto.FriendInviteDTO;
+import com.pm.todoapp.dto.FriendRequestDTO;
 import com.pm.todoapp.dto.MessageDTO;
 import com.pm.todoapp.dto.MessageResponseDTO;
 import com.pm.todoapp.model.User;
@@ -61,7 +61,7 @@ public class WebSocketController {
 
         UUID senderId = UUID.fromString(principal.getName());
 
-        FriendInviteDTO invitation = usersService.prepareFriendInvitation(senderId, receiverId);
+        FriendRequestDTO invitation = usersService.prepareFriendInvitation(senderId, receiverId);
 
         messagingTemplate.convertAndSendToUser(
                 invitation.getReceiverId().toString(),

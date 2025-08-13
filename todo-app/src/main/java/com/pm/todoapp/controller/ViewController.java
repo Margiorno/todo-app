@@ -145,6 +145,7 @@ public class ViewController {
         UserResponseDTO profile = usersService.findById(profileId);
 
         model.addAttribute("isOwner", profileId.equals(userId));
+        model.addAttribute("areFriends", usersService.areFriends(userId, profileId));
         model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
         return "profile";

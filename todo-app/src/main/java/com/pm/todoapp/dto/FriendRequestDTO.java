@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendInviteDTO {
+public class FriendRequestDTO {
 
     public enum Status{
         PENDING, ACCEPTED, DECLINED

@@ -1,10 +1,9 @@
 package com.pm.todoapp.service;
 
-import com.pm.todoapp.dto.FriendInviteDTO;
+import com.pm.todoapp.dto.FriendRequestDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.InvalidFieldException;
 import com.pm.todoapp.exceptions.InvalidFriendInviteException;
-import com.pm.todoapp.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
@@ -117,7 +116,7 @@ public class UsersService {
     }
 
 
-    public FriendInviteDTO prepareFriendInvitation(UUID senderId, UUID receiverId) {
+    public FriendRequestDTO prepareFriendInvitation(UUID senderId, UUID receiverId) {
 
         if (usersRepository.existsByIdAndFriendsId(senderId,receiverId))
             throw new InvalidFriendInviteException("Users are already friends");
@@ -126,10 +125,18 @@ public class UsersService {
         findRawById(receiverId);
         findRawById(senderId);
 
-        return FriendInviteDTO.builder()
+        return FriendRequestDTO.builder()
                 .senderId(senderId)
                 .receiverId(receiverId)
-                .status(FriendInviteDTO.Status.PENDING)
+                .status(FriendRequestDTO.Status.PENDING)
                 .build();
+    }
+
+    public boolean areFriends(UUID userId, UUID profileId) {
+        //Users validation
+        findRawById(userId);
+        findRawById(profileId);
+
+        return usersRepository.existsByIdAndFriendsId(userId,profileId);
     }
 }

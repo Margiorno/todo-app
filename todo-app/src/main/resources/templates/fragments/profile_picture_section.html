@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div>
+            <div th:if="${isOwner}">
                 <hr>
                 <label for="file" class="btn btn-primary">Change profile picture</label>
                 <input type="file" id="file" name="file" class="d-none" accept="image/*">

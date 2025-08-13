@@ -136,14 +136,24 @@ public class ViewController {
         return "chat";
     }
 
-    @GetMapping("/profile")
-    public String showProfilePage(@AuthenticationPrincipal UUID userId, Model model) {
+    @GetMapping("/profile/{profileId}")
+    public String showProfilePage(
+            @PathVariable UUID profileId,
+            @AuthenticationPrincipal UUID userId,
+            Model model) {
 
-        UserResponseDTO user = usersService.findById(userId);
+        UserResponseDTO profile = usersService.findById(profileId);
 
-        model.addAttribute("user", user);
+        model.addAttribute("isOwner", profileId.equals(userId));
+        model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
         return "profile";
+    }
+
+    @GetMapping("/profile")
+    public String redirectToMyProfile(@AuthenticationPrincipal UUID userId) {
+
+        return "redirect:/profile/" + userId.toString();
     }
 
 

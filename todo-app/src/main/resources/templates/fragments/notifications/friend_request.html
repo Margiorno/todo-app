@@ -8,8 +8,8 @@
             <strong th:text="${notification.senderName}">Sender Name</strong> wants to be your friend.
         </div>
         <div>
-            <button class="btn btn-success btn-sm accept-request" th:attr="data-request-id=${notification.id}">Accept</button>
-            <button class="btn btn-danger btn-sm decline-request" th:attr="data-request-id=${notification.id}">Decline</button>
+            <button class="btn btn-success btn-sm accept-request" th:data-request-id="${notification.requestId}">Accept</button>
+            <button class="btn btn-danger btn-sm decline-request" th:data-request-id="${notification.requestId}">Decline</button>
         </div>
     </div>
 </div>

@@ -1,6 +1,7 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.FriendRequestDTO;
+import com.pm.todoapp.dto.NotificationDTO;
 import com.pm.todoapp.dto.ProfileStatusDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.InvalidFieldException;
@@ -15,6 +16,7 @@ import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.FriendsRequestRepository;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,13 +33,16 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final FileService fileService;
     private final FriendsRequestRepository friendsRequestRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository, FileService fileService, FriendsRequestRepository friendsRequestRepository) {
+    public UsersService(UsersRepository usersRepository, FileService fileService, FriendsRequestRepository friendsRequestRepository, @Lazy NotificationService notificationService) {
         this.usersRepository = usersRepository;
         this.fileService = fileService;
         this.friendsRequestRepository = friendsRequestRepository;
+        this.notificationService = notificationService;
     }
+
 
     public User findRawById(UUID userId) {
         return usersRepository.findById(userId).orElseThrow(
@@ -185,6 +190,16 @@ public class UsersService {
         currentUser.addFriend(sender);
         usersRepository.save(sender);
         usersRepository.save(currentUser);
+
+        String notificationMessage = currentUser.getFirstName() + " " + currentUser.getLastName() + " accepted your friend request.";
+        NotificationDTO notification = notificationService.createNotification(
+                sender,
+                currentUser,
+                NotificationType.FRIEND_REQUEST_ACCEPTED,
+                notificationMessage
+        );
+
+        notificationService.sendNotification(notification, sender.getId());
     }
 
     @Transactional

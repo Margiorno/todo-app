@@ -23,7 +23,6 @@ public class FriendRequestController {
             @AuthenticationPrincipal UUID currentUserId) {
 
         usersService.acceptFriendRequest(requestId, currentUserId);
-
         return ResponseEntity.ok().build();
     }
 
@@ -33,7 +32,6 @@ public class FriendRequestController {
             @AuthenticationPrincipal UUID currentUserId) {
 
         usersService.declineFriendRequest(requestId, currentUserId);
-
         return ResponseEntity.ok().build();
     }
 
@@ -43,7 +41,6 @@ public class FriendRequestController {
             @AuthenticationPrincipal UUID currentUserId) {
 
         usersService.cancelFriendRequest(requestId, currentUserId);
-
         return ResponseEntity.ok().build();
     }
 

@@ -19,28 +19,52 @@
                 </div>
             </div>
 
-            <div th:if="${isOwner}">
-                <hr>
-                <label for="file" class="btn btn-primary">Change profile picture</label>
-                <input type="file" id="file" name="file" class="d-none" accept="image/*">
-                <p id="upload-status" class="mt-2"></p>
-            </div>
-            <div th:if="${!isOwner}" class="d-grid gap-2" id="friend-action-container">
+            <div class="d-grid gap-2 mt-3" th:switch="${status}">
 
-                <button th:if="${!areFriends}"
-                        type="button"
-                        id="add-friend-btn"
-                        th:attr="data-profile-id=${user.id}"
-                        class="btn btn-success w-100">
-                    Add Friend
-                </button>
+                <div th:case="${T(com.pm.todoapp.model.ProfileStatus).OWNER}">
+                    <hr>
+                    <label for="file" class="btn btn-primary">Change profile picture</label>
+                    <input type="file" id="file" name="file" class="d-none" accept="image/*">
+                    <p id="upload-status" class="mt-2"></p>
+                </div>
 
-                <form th:if="${areFriends}" th:action="@{/friends/remove}" method="post">
+                <form th:case="${T(com.pm.todoapp.model.ProfileStatus).FRIEND}" th:action="@{/friends/remove}" method="post">
                     <input type="hidden" name="friendId" th:value="${user.id}" />
                     <button type="submit" class="btn btn-danger w-100">Remove Friend</button>
                 </form>
 
-                <!--"Request Sent" etc-->
+                <div th:case="${T(com.pm.todoapp.model.ProfileStatus).INVITATION_SENT}">
+                    <form th:action="@{/friends/cancel-invitation}" method="post">
+                        <div class="text-muted mb-2">
+                            <small>Friend request send</small>
+                        </div>
+                        <input type="hidden" name="friendId" th:value="${user.id}" />
+                        <button type="button" class="btn btn-secondary" id="cancel-invitation--btn">Cancel</button>
+                    </form>
+                </div>
+
+                <div th:case="${T(com.pm.todoapp.model.ProfileStatus).INVITATION_RECEIVED}">
+                    <div class="text-muted mb-2">
+                        <small>Friend request received</small>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2" id="invitation-action-container">
+                        <button type="button" class="btn btn-success" id="accept-invitation-btn">
+                            Accept
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="decline-invitation-btn">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+
+                <div th:case="*">
+                    <button type="button"
+                            id="add-friend-btn"
+                            th:attr="data-profile-id=${user.id}"
+                            class="btn btn-success w-100">
+                        Add Friend
+                    </button>
+                </div>
 
             </div>
         </div>

@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface FriendsRequestRepository extends CrudRepository<FriendRequest, UUID> {
-
+    boolean existsBySenderAndReceiver(User sender, User receiver);
 }

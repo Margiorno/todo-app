@@ -5,6 +5,7 @@ import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
+import com.pm.todoapp.model.ProfileStatus;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
@@ -146,6 +147,9 @@ public class ViewController {
 
         model.addAttribute("isOwner", profileId.equals(userId));
         model.addAttribute("areFriends", usersService.areFriends(userId, profileId));
+        model.addAttribute("statuses", ProfileStatus.values());
+        ProfileStatus status = usersService.determineFriendshipStatus(userId, profileId);
+        model.addAttribute("status", status);
         model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
         return "profile";

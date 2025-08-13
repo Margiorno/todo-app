@@ -61,15 +61,10 @@ public class WebSocketController {
             @DestinationVariable UUID receiverId,
             Principal principal) {
 
-        System.out.println("sending friend invitation");
-
         UUID senderId = UUID.fromString(principal.getName());
 
         FriendRequestDTO invitation = usersService.saveFriendRequest(senderId, receiverId);
         NotificationDTO notification = notificationService.createNotification(invitation);
-
-        System.out.println(invitation);
-        System.out.println(notification);
 
         messagingTemplate.convertAndSendToUser(
                 invitation.getReceiverId().toString(),

@@ -9,10 +9,7 @@ import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
 import com.pm.todoapp.mapper.FriendRequestMapper;
 import com.pm.todoapp.mapper.UserMapper;
-import com.pm.todoapp.model.FriendRequest;
-import com.pm.todoapp.model.FriendRequestStatus;
-import com.pm.todoapp.model.Gender;
-import com.pm.todoapp.model.User;
+import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.FriendsRequestRepository;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,5 +143,23 @@ public class UsersService {
         findRawById(profileId);
 
         return usersRepository.existsByIdAndFriendsId(userId,profileId);
+    }
+
+    public ProfileStatus determineFriendshipStatus(UUID userId, UUID profileId) {
+
+        if (userId.equals(profileId))
+            return ProfileStatus.OWNER;
+        if (areFriends(userId, profileId))
+            return ProfileStatus.FRIEND;
+
+        User user = findRawById(userId);
+        User profile = findRawById(profileId);
+
+        if (friendsRequestRepository.existsBySenderAndReceiver(user, profile))
+            return ProfileStatus.INVITATION_SENT;
+        if (friendsRequestRepository.existsBySenderAndReceiver(profile, user))
+            return ProfileStatus.INVITATION_RECEIVED;
+        else
+            return ProfileStatus.NOT_FRIENDS;
     }
 }

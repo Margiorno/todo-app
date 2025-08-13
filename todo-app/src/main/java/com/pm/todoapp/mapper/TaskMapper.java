@@ -2,13 +2,9 @@ package com.pm.todoapp.mapper;
 
 import com.pm.todoapp.dto.TaskRequestDTO;
 import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
 import com.pm.todoapp.model.Task;
 import com.pm.todoapp.model.User;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;

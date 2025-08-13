@@ -157,5 +157,11 @@ public class ViewController {
         return "redirect:/profile/" + userId.toString();
     }
 
+    @GetMapping("/notifications")
+    public String showNotifications(@AuthenticationPrincipal UUID userId) {
+
+        return "notifications";
+    }
+
 
 }

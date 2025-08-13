@@ -7,9 +7,13 @@ import com.pm.todoapp.exceptions.InvalidFriendInviteException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
+import com.pm.todoapp.mapper.FriendRequestMapper;
 import com.pm.todoapp.mapper.UserMapper;
+import com.pm.todoapp.model.FriendRequest;
+import com.pm.todoapp.model.FriendRequestStatus;
 import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.User;
+import com.pm.todoapp.repository.FriendsRequestRepository;
 import com.pm.todoapp.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -26,11 +31,13 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final FileService fileService;
+    private final FriendsRequestRepository friendsRequestRepository;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository, FileService fileService) {
+    public UsersService(UsersRepository usersRepository, FileService fileService, FriendsRequestRepository friendsRequestRepository) {
         this.usersRepository = usersRepository;
         this.fileService = fileService;
+        this.friendsRequestRepository = friendsRequestRepository;
     }
 
     public User findRawById(UUID userId) {
@@ -115,21 +122,22 @@ public class UsersService {
         return usersRepository.save(user).getGender();
     }
 
-
-    public FriendRequestDTO prepareFriendInvitation(UUID senderId, UUID receiverId) {
+    public FriendRequestDTO saveFriendRequest(UUID senderId, UUID receiverId) {
 
         if (usersRepository.existsByIdAndFriendsId(senderId,receiverId))
             throw new InvalidFriendInviteException("Users are already friends");
 
-        //Users validation
-        findRawById(receiverId);
-        findRawById(senderId);
+        User sender = findRawById(senderId);
+        User receiver = findRawById(receiverId);
 
-        return FriendRequestDTO.builder()
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .status(FriendRequestDTO.Status.PENDING)
+        FriendRequest friendRequest = FriendRequest.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .status(FriendRequestStatus.PENDING)
+                .sentAt(LocalDateTime.now())
                 .build();
+
+        return FriendRequestMapper.toDTO(friendsRequestRepository.save(friendRequest));
     }
 
     public boolean areFriends(UUID userId, UUID profileId) {

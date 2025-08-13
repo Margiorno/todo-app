@@ -2,9 +2,6 @@ package com.pm.todoapp.dto;
 
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
-import com.pm.todoapp.model.Team;
-import com.pm.todoapp.model.User;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

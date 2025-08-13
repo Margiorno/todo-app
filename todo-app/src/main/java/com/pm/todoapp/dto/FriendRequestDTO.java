@@ -1,5 +1,6 @@
 package com.pm.todoapp.dto;
 
+import com.pm.todoapp.model.FriendRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,16 +10,11 @@ import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class FriendRequestDTO {
-
-    public enum Status{
-        PENDING, ACCEPTED, DECLINED
-    }
-
+    private UUID id;
     private UUID senderId;
     private UUID receiverId;
-
-    private Status status;
+    private FriendRequestStatus status;
 }

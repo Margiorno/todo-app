@@ -11,7 +11,7 @@ import com.pm.todoapp.mapper.UserMapper;
 import com.pm.todoapp.model.Team;
 import com.pm.todoapp.model.Invite;
 import com.pm.todoapp.model.User;
-import com.pm.todoapp.repository.InviteRepository;
+import com.pm.todoapp.repository.TeamInviteRepository;
 import com.pm.todoapp.repository.TeamRepository;
 import com.pm.todoapp.repository.UsersRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,10 +28,10 @@ import java.util.stream.StreamSupport;
 public class TeamService {
     private final TeamRepository teamRepository;
     private final UsersService usersService;
-    private final InviteRepository inviteRepository;
+    private final TeamInviteRepository inviteRepository;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, UsersService usersService, InviteRepository inviteRepository, UsersRepository usersRepository) {
+    public TeamService(TeamRepository teamRepository, UsersService usersService, TeamInviteRepository inviteRepository, UsersRepository usersRepository) {
         this.teamRepository = teamRepository;
         this.usersService = usersService;
         this.inviteRepository = inviteRepository;

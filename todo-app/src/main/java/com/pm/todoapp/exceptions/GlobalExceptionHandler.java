@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            InvalidInviteException.class
+            InvalidTeamInviteException.class
     })
     public ResponseEntity<String> handleBadRequestException(RuntimeException ex) {
 

@@ -1,16 +1,16 @@
 package com.pm.todoapp.controller;
 
+import com.pm.todoapp.dto.FriendInviteDTO;
 import com.pm.todoapp.dto.MessageDTO;
 import com.pm.todoapp.dto.MessageResponseDTO;
-import com.pm.todoapp.model.Conversation;
 import com.pm.todoapp.model.User;
 import com.pm.todoapp.service.ChatService;
+import com.pm.todoapp.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -22,11 +22,13 @@ public class WebSocketController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UsersService usersService;
 
     @Autowired
-    public WebSocketController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
+    public WebSocketController(ChatService chatService, SimpMessagingTemplate messagingTemplate, UsersService usersService) {
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
+        this.usersService = usersService;
     }
 
     @MessageMapping("/chat/{chatId}/sendMessage")
@@ -51,4 +53,22 @@ public class WebSocketController {
             );
         });
     }
+
+    @MessageMapping("/user/{userId}/invite")
+    public void sendFriendInvitation(
+            @DestinationVariable UUID receiverId,
+            Principal principal) {
+
+        UUID senderId = UUID.fromString(principal.getName());
+
+        FriendInviteDTO invitation = usersService.prepareFriendInvitation(senderId, receiverId);
+
+        messagingTemplate.convertAndSendToUser(
+                invitation.getReceiverId().toString(),
+                "/queue/notification",
+                invitation
+        );
+    }
+
+
 }

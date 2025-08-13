@@ -56,4 +56,14 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<Conversation> conversations = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<User> friends = new HashSet<>();
+
 }

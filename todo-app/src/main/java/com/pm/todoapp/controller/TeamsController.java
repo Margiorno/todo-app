@@ -1,6 +1,6 @@
 package com.pm.todoapp.controller;
 
-import com.pm.todoapp.dto.InviteResponseDTO;
+import com.pm.todoapp.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.dto.JoinTeamRequestDTO;
 import com.pm.todoapp.service.TeamService;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +32,16 @@ public class TeamsController {
     }
 
     @PostMapping("{teamId}/generate-invite-code")
-    public ResponseEntity<InviteResponseDTO> generateInviteCode(@PathVariable UUID teamId) {
+    public ResponseEntity<TeamInviteResponseDTO> generateInviteCode(@PathVariable UUID teamId) {
 
-        InviteResponseDTO code = teamService.generateInviteCode(teamId);
+        TeamInviteResponseDTO code = teamService.generateInviteCode(teamId);
 
         return ResponseEntity.ok(code);
     }
 
     //TODO team task with deleted member (find solution)
     @PostMapping("{teamId}/delete-member")
-    public ResponseEntity<InviteResponseDTO> deleteUser(
+    public ResponseEntity<TeamInviteResponseDTO> deleteUser(
             @PathVariable UUID teamId,
             @RequestParam UUID userId
     ) {

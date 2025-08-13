@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InviteResponseDTO {
+public class TeamInviteResponseDTO {
     private String code;
 }

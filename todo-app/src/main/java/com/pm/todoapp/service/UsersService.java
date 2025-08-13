@@ -1,7 +1,10 @@
 package com.pm.todoapp.service;
 
+import com.pm.todoapp.dto.FriendInviteDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.InvalidFieldException;
+import com.pm.todoapp.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
@@ -111,5 +114,22 @@ public class UsersService {
     private Gender updateGender(User user, Gender gender) {
         user.setGender(gender);
         return usersRepository.save(user).getGender();
+    }
+
+
+    public FriendInviteDTO prepareFriendInvitation(UUID senderId, UUID receiverId) {
+
+        if (usersRepository.existsByIdAndFriendsId(senderId,receiverId))
+            throw new InvalidFriendInviteException("Users are already friends");
+
+        //Users validation
+        findRawById(receiverId);
+        findRawById(senderId);
+
+        return FriendInviteDTO.builder()
+                .senderId(senderId)
+                .receiverId(receiverId)
+                .status(FriendInviteDTO.Status.PENDING)
+                .build();
     }
 }

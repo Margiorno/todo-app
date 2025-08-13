@@ -115,7 +115,7 @@ public class ViewController {
     private void populateCommonModelAttributes(Model model, UUID userId, UUID teamId, TaskFetchScope scope) {
         if (teamId != null) {
             model.addAttribute("selectedTeamId", teamId.toString());
-            model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
+            model.addAttribute("selectedTeamName", teamService.findRawById(teamId).getName());
         }
 
         List<UserResponseDTO> teamMembers = (teamId != null)

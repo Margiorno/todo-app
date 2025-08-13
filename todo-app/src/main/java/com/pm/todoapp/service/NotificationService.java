@@ -30,7 +30,6 @@ public class NotificationService {
         FriendRequestNotification notification = FriendRequestNotification.builder()
                 .receiver(receiver)
                 .sender(sender)
-                .status(FriendRequestStatus.PENDING)
                 .type(NotificationType.FRIEND_REQUEST)
                 .message("Friend request from: %s %s".formatted(sender.getFirstName(), sender.getLastName()))
                 .build();

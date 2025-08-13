@@ -28,7 +28,4 @@ public class FriendRequest {
     private User receiver;
 
     private LocalDateTime sentAt = LocalDateTime.now();
-
-    @Enumerated(EnumType.STRING)
-    private FriendRequestStatus status = FriendRequestStatus.PENDING;
 }

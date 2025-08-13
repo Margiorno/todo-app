@@ -13,7 +13,6 @@ public class FriendRequestMapper {
                 .id(friendRequest.getId())
                 .senderId(friendRequest.getSender().getId())
                 .receiverId(friendRequest.getReceiver().getId())
-                .status(friendRequest.getStatus())
                 .build();
     }
 

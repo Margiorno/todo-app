@@ -17,7 +17,4 @@ public class FriendRequestNotification extends Notification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
-
-    @NonNull
-    private FriendRequestStatus status;
 }

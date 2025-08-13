@@ -66,4 +66,14 @@ public class User {
     @ToString.Exclude
     private Set<User> friends = new HashSet<>();
 
+    public void addFriend(User friend) {
+        this.friends.add(friend);
+        friend.getFriends().add(this);
+    }
+
+    public void removeFriend(User friend) {
+        this.friends.remove(friend);
+        friend.getFriends().remove(this);
+    }
+
 }

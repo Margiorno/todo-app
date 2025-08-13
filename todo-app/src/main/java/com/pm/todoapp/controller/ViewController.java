@@ -1,5 +1,6 @@
 package com.pm.todoapp.controller;
 
+import com.pm.todoapp.dto.ProfileStatusDTO;
 import com.pm.todoapp.dto.TaskFetchScope;
 import com.pm.todoapp.dto.TaskResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
@@ -7,6 +8,7 @@ import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.ProfileStatus;
 import com.pm.todoapp.model.Status;
+import com.pm.todoapp.repository.FriendsRequestRepository;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
@@ -30,12 +32,14 @@ public class ViewController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final UsersService usersService;
+    private final FriendsRequestRepository friendsRequestRepository;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendsRequestRepository friendsRequestRepository) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
+        this.friendsRequestRepository = friendsRequestRepository;
     }
 
     @Data
@@ -144,12 +148,9 @@ public class ViewController {
             Model model) {
 
         UserResponseDTO profile = usersService.findById(profileId);
+        ProfileStatusDTO status = usersService.determineFriendshipStatus(userId, profileId);
 
-        model.addAttribute("isOwner", profileId.equals(userId));
-        model.addAttribute("areFriends", usersService.areFriends(userId, profileId));
-        model.addAttribute("statuses", ProfileStatus.values());
-        ProfileStatus status = usersService.determineFriendshipStatus(userId, profileId);
-        model.addAttribute("status", status);
+        model.addAttribute("profileStatusInfo", status);
         model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
         return "profile";

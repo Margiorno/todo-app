@@ -1,9 +1,11 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.FriendRequestDTO;
+import com.pm.todoapp.dto.ProfileStatusDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.InvalidFieldException;
 import com.pm.todoapp.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.exceptions.UnauthorizedException;
 import com.pm.todoapp.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.FileService;
 import com.pm.todoapp.file.FileType;
@@ -130,7 +132,6 @@ public class UsersService {
         FriendRequest friendRequest = FriendRequest.builder()
                 .sender(sender)
                 .receiver(receiver)
-                .status(FriendRequestStatus.PENDING)
                 .sentAt(LocalDateTime.now())
                 .build();
 
@@ -145,21 +146,87 @@ public class UsersService {
         return usersRepository.existsByIdAndFriendsId(userId,profileId);
     }
 
-    public ProfileStatus determineFriendshipStatus(UUID userId, UUID profileId) {
+    public ProfileStatusDTO determineFriendshipStatus(UUID userId, UUID profileId) {
 
         if (userId.equals(profileId))
-            return ProfileStatus.OWNER;
+            return new ProfileStatusDTO(ProfileStatus.OWNER, null);
         if (areFriends(userId, profileId))
-            return ProfileStatus.FRIEND;
+            return new ProfileStatusDTO(ProfileStatus.FRIEND, null);
 
         User user = findRawById(userId);
         User profile = findRawById(profileId);
 
         if (friendsRequestRepository.existsBySenderAndReceiver(user, profile))
-            return ProfileStatus.INVITATION_SENT;
+
+            return new ProfileStatusDTO(
+                    ProfileStatus.INVITATION_SENT,
+                    findRawRequestBySenderAndReceiver(userId, profileId).getId());
         if (friendsRequestRepository.existsBySenderAndReceiver(profile, user))
-            return ProfileStatus.INVITATION_RECEIVED;
+            return new ProfileStatusDTO(
+                    ProfileStatus.INVITATION_RECEIVED,
+                    findRawRequestBySenderAndReceiver(profileId, userId).getId());
         else
-            return ProfileStatus.NOT_FRIENDS;
+            return new ProfileStatusDTO(ProfileStatus.NOT_FRIENDS, null);
+    }
+
+    @Transactional
+    public void acceptFriendRequest(UUID requestId, UUID currentUserId) {
+
+        FriendRequest request = findRawFriendRequest(requestId);
+
+        if (!request.getReceiver().getId().equals(currentUserId)) {
+            throw new UnauthorizedException("You must be the receiver to accept a friend request");
+        }
+
+        friendsRequestRepository.delete(request);
+
+        User currentUser = findRawById(currentUserId);
+        User sender = request.getSender();
+        currentUser.addFriend(sender);
+        usersRepository.save(sender);
+        usersRepository.save(currentUser);
+    }
+
+    @Transactional
+    public void declineFriendRequest(UUID requestId, UUID currentUserId) {
+        FriendRequest request = findRawFriendRequest(requestId);
+        if (!request.getReceiver().getId().equals(currentUserId)) {
+            throw new UnauthorizedException("You must be the receiver to accept a friend request");
+        }
+        friendsRequestRepository.delete(request);
+    }
+
+    @Transactional
+    public void cancelFriendRequest(UUID requestId, UUID currentUserId) {
+        FriendRequest request = findRawFriendRequest(requestId);
+        if (!request.getSender().getId().equals(currentUserId)) {
+            throw new UnauthorizedException("You must be the sender to cancel a friend request");
+        }
+        friendsRequestRepository.delete(request);
+    }
+
+    private FriendRequest findRawFriendRequest(UUID requestId) {
+        return friendsRequestRepository.findById(requestId).orElseThrow(
+                () -> new InvalidFriendInviteException("Friend request not found")
+        );
+    }
+
+    public FriendRequest findRawRequestBySenderAndReceiver(UUID senderId, UUID receiverId) {
+        User sender = findRawById(senderId);
+        User receiver = findRawById(receiverId);
+
+        return friendsRequestRepository.findBySenderAndReceiver(sender, receiver).orElse(null);
+    }
+
+    public void remove(UUID currentUserId, UUID userId) {
+        User currentUser = findRawById(currentUserId);
+        User unfriend = findRawById(userId);
+
+        if (!areFriends(currentUserId, userId))
+            throw new InvalidFriendInviteException("You cannot remove this user from friends, because you are not friends");
+
+        currentUser.removeFriend(unfriend);
+        usersRepository.save(currentUser);
+        usersRepository.save(unfriend);
     }
 }

@@ -21,11 +21,12 @@
             <div class="profile-container">
                 <div class="row">
 
+
                     <!-- PROFILE PICTURE SECTION SECTION -->
-                    <div th:replace="~{fragments/profile_picture_section :: section}"></div>
+                    <div th:replace="~{fragments/profile/profile_picture_section :: section}"></div>
 
                     <!-- USER DETAILS SECTION -->
-                    <div th:replace="~{fragments/user_details_section :: section}"></div>
+                    <div th:replace="~{fragments/profile/user_details_section :: section}"></div>
 
                 </div>
                 <div class="text-center mt-3">
@@ -37,7 +38,7 @@
 </div>
 
 <!-- PHOTO CROP -->
-<div th:replace="~{fragments/modals/photo_crop_modal :: modal}"></div>
+<div th:replace="~{fragments/profile/modals/photo_crop_modal :: modal}"></div>
 
 <div th:unless="${user}"><p>Unable to load user data.</p></div>
 
@@ -48,7 +49,7 @@
 
 <script src="/js/profile-edit.js"></script>
 <script src="/js/profile-picture.js"></script>
-<script th:if="${!isOwner}" th:src="@{/js/friend-request.js}"></script>
+<script th:if="${status != T(com.pm.todoapp.model.ProfileStatus).OWNER}" th:src="@{/js/friend-actions.js}"></script>
 
 </body>
 </html>

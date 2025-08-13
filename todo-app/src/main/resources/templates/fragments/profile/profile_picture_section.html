@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="section" class="col-lg-4">
+    <div class="card mb-4 h-100">
+        <div class="card-body text-center d-flex flex-column">
+            <h3>Profile picture</h3>
+
+            <div id="picture-container" class="flex-grow-1 d-flex align-items-center justify-content-center">
+                <div>
+                    <div th:if="${user.profilePicturePath != null}">
+                        <img id="profile-picture" th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath})}" alt="Profile Picture">
+                    </div>
+                    <div th:if="${user.profilePicturePath == null}">
+                        <div id="profile-picture-placeholder">No picture</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFILE PICTURE SECTION SECTION -->
+            <div th:replace="~{fragments/profile/profile-actions.html :: buttons}"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

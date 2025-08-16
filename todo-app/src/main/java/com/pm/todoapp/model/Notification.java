@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +28,18 @@ public class Notification {
 
     @Column(nullable = false)
     private String message;
+
+    private LocalDateTime createdAt;
+
+    private boolean isRead;
+
+    @PrePersist
+    protected void prePersist() {
+        createdAt = LocalDateTime.now();
+        isRead = false;
+    }
+
+
 }
 
 

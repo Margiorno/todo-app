@@ -10,18 +10,25 @@ function getCookie(name) {
 
 function createFriendRequestElement(notification) {
     const card = document.createElement('div');
-    card.id = `notification-${notification.id}`;
-    card.className = 'card mb-2';
+    card.id = `notification-${notification.id}`; // Tutaj id powiadomienia jest OK, bo to ID elementu DOM
+    card.className = 'card mb-3 shadow-sm unread';
+
+    const actionsHtml = !notification.resolved ? `
+        <div class="d-flex justify-content-end mt-3 notification-actions">
+            <button class="btn btn-success btn-sm me-2 accept-request" data-request-id="${notification.requestId}">Accept</button>
+            <button class="btn btn-danger btn-sm decline-request" data-request-id="${notification.requestId}">Decline</button>
+        </div>` : '';
 
     card.innerHTML = `
-        <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-                <span>${notification.message || 'You have a new friend request.'}</span>
-            </div>
-            <div>
-                <button class="btn btn-success btn-sm accept-request" data-request-id="${notification.id}">Accept</button>
-                <button class="btn btn-danger btn-sm decline-request" data-request-id="${notification.id}">Decline</button>
-            </div>
+        <div class="card-header bg-primary text-white">
+            Friend Request
+        </div>
+        <div class="card-body">
+            <p class="card-text">${notification.message || 'You have a new friend request.'}</p>
+            ${actionsHtml}
+        </div>
+        <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
+            Received: <span>${notification.notificationTime || ''}</span>
         </div>
     `;
     return card;
@@ -30,8 +37,18 @@ function createFriendRequestElement(notification) {
 function createDefaultElement(notification) {
     const card = document.createElement('div');
     card.id = `notification-${notification.id}`;
-    card.className = 'card mb-2';
-    card.innerHTML = `<div class="card-body">${notification.message || 'You have a new notification.'}</div>`;
+    card.className = 'card mb-3 shadow-sm unread';
+    card.innerHTML = `
+        <div class="card-header bg-secondary text-white">
+            Notification
+        </div>
+        <div class="card-body">
+            <p class="card-text">${notification.message || 'You have a new notification.'}</p>
+        </div>
+        <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
+            Received: <span>${notification.notificationTime || ''}</span>
+        </div>
+    `;
     return card;
 }
 
@@ -61,7 +78,6 @@ function prependNotification(notification) {
 
 function handleRequestAction(requestId, action) {
     if (!requestId || !action) {
-        alert("Client error: Missing request ID.");
         return;
     }
 
@@ -97,8 +113,8 @@ function connect() {
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
 
-    stompClient.connect({}, function () {
-        stompClient.subscribe('/user/queue/notification', function (message) {
+    stompClient.connect({}, function() {
+        stompClient.subscribe('/user/queue/notification', function(message) {
             const notification = JSON.parse(message.body);
             prependNotification(notification);
         });

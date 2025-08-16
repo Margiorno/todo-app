@@ -1,14 +1,12 @@
 package com.pm.todoapp.controller;
 
-import com.pm.todoapp.dto.ProfileStatusDTO;
-import com.pm.todoapp.dto.TaskFetchScope;
-import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.dto.*;
 import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.ProfileStatus;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.repository.FriendsRequestRepository;
+import com.pm.todoapp.service.NotificationService;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -33,13 +32,15 @@ public class ViewController {
     private final TeamService teamService;
     private final UsersService usersService;
     private final FriendsRequestRepository friendsRequestRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendsRequestRepository friendsRequestRepository) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendsRequestRepository friendsRequestRepository, NotificationService notificationService) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
         this.friendsRequestRepository = friendsRequestRepository;
+        this.notificationService = notificationService;
     }
 
     @Data
@@ -150,6 +151,10 @@ public class ViewController {
         UserResponseDTO profile = usersService.findById(profileId);
         ProfileStatusDTO status = usersService.determineFriendshipStatus(userId, profileId);
 
+        System.out.println("profileId: " +profileId);
+        System.out.println("userId: " +userId);
+        System.out.println("status: " +status);
+
         model.addAttribute("profileStatusInfo", status);
         model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
@@ -163,7 +168,13 @@ public class ViewController {
     }
 
     @GetMapping("/notifications")
-    public String showNotifications(@AuthenticationPrincipal UUID userId) {
+    public String showNotifications(
+            @AuthenticationPrincipal UUID userId,
+            Model model) {
+
+        List<NotificationDTO> notifications = notificationService.getAllNotificationsByUserId(userId);
+
+        model.addAttribute("notifications", notifications);
 
         return "notifications";
     }

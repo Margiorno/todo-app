@@ -12,4 +12,6 @@ import java.util.UUID;
 @SuperBuilder
 public class FriendRequestNotificationDTO extends NotificationDTO {
     private UUID senderId;
+    private boolean resolved;
+    private UUID requestId;
 }

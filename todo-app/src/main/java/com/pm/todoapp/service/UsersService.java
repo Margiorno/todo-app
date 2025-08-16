@@ -177,6 +177,8 @@ public class UsersService {
     @Transactional
     public void acceptFriendRequest(UUID requestId, UUID currentUserId) {
 
+        System.out.println("requestId akceptowany: " + requestId);
+
         FriendRequest request = findRawFriendRequest(requestId);
 
         if (!request.getReceiver().getId().equals(currentUserId)) {

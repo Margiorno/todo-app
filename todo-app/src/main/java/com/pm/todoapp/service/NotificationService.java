@@ -3,16 +3,20 @@ package com.pm.todoapp.service;
 import com.pm.todoapp.dto.FriendRequestDTO;
 import com.pm.todoapp.dto.FriendRequestNotificationDTO;
 import com.pm.todoapp.dto.NotificationDTO;
+import com.pm.todoapp.exceptions.NotificationNotFoundException;
+import com.pm.todoapp.exceptions.UnauthorizedException;
 import com.pm.todoapp.mapper.NotificationMapper;
 import com.pm.todoapp.model.*;
 import com.pm.todoapp.repository.NotificationRepository;
-import org.hibernate.internal.build.AllowNonPortable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.StreamSupport;
 
 @Service
 public class NotificationService {
@@ -27,6 +31,16 @@ public class NotificationService {
         this.messagingTemplate = messagingTemplate;
     }
 
+    public Notification findRawById(UUID id) {
+        return notificationRepository.findById(id)
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+    }
+
+    public FriendRequestNotification findRawFriendRequestNotificationById(UUID id) {
+        return notificationRepository.findFriendRequestNotificationById(id)
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+    }
+
     @Transactional
     public NotificationDTO createNotification(FriendRequestDTO invitation) {
 
@@ -34,22 +48,19 @@ public class NotificationService {
         User receiver = usersService.findRawById(invitation.getReceiverId());
         String message = "Friend request from: %s %s".formatted(sender.getFirstName(), sender.getLastName());
 
+        System.out.println("requestId stworzony: " + invitation.getId());
+
         FriendRequestNotification notificationEntity = FriendRequestNotification.builder()
+                .requestId(invitation.getId())
                 .receiver(receiver)
                 .sender(sender)
                 .type(NotificationType.FRIEND_REQUEST)
                 .message(message)
                 .build();
-        notificationRepository.save(notificationEntity);
 
         FriendRequestNotification saved = notificationRepository.save(notificationEntity);
 
-        return FriendRequestNotificationDTO.builder()
-                .id(invitation.getId())
-                .type(NotificationType.FRIEND_REQUEST)
-                .message(message)
-                .senderId(sender.getId())
-                .build();
+        return NotificationMapper.toDTO(saved);
     }
 
     public NotificationDTO createNotification(User receiver, User currentUser, NotificationType notificationType, String notificationMessage) {
@@ -71,5 +82,44 @@ public class NotificationService {
                 "/queue/notification",
                 notification
         );
+    }
+
+    public List<NotificationDTO> getAllNotificationsByUserId(UUID userId) {
+
+        User user = usersService.findRawById(userId);
+        Iterable<Notification> notifications = notificationRepository.findAllByReceiver(user);
+
+        notifications.forEach(notification -> {
+            if (notification instanceof FriendRequestNotification) {
+                System.out.println("requestId pobrany: " + ((FriendRequestNotification) notification).getRequestId());
+            }
+        });
+
+        return StreamSupport.stream(notifications.spliterator(), false)
+                .sorted(Comparator.comparing(Notification::getCreatedAt))
+                .map(NotificationMapper::toDTO)
+                .toList();
+    }
+
+    public void readNotification(UUID id, UUID userId) {
+        Notification notification = findRawById(id);
+
+        if (!notification.getReceiver().getId().equals(userId))
+            throw new UnauthorizedException("You are not authorized to read this notification");
+
+        notification.setRead(true);
+        notificationRepository.save(notification);
+    }
+
+    public void resolveFriendRequest(UUID id, UUID userId) {
+        FriendRequestNotification friendRequestNotification = findRawFriendRequestNotificationById(id);
+
+        if (!friendRequestNotification.getReceiver().getId().equals(userId))
+            throw new UnauthorizedException("You are not authorized to read this notification");
+
+        friendRequestNotification.setRead(true);
+        friendRequestNotification.setResolved(true);
+
+        notificationRepository.save(friendRequestNotification);
     }
 }

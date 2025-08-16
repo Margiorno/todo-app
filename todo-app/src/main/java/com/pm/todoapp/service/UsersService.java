@@ -177,9 +177,8 @@ public class UsersService {
     @Transactional
     public void acceptFriendRequest(UUID requestId, UUID currentUserId) {
 
-        System.out.println("requestId akceptowany: " + requestId);
-
         FriendRequest request = findRawFriendRequest(requestId);
+        resolveFriendRequest(requestId);
 
         if (!request.getReceiver().getId().equals(currentUserId)) {
             throw new UnauthorizedException("You must be the receiver to accept a friend request");
@@ -207,6 +206,7 @@ public class UsersService {
     @Transactional
     public void declineFriendRequest(UUID requestId, UUID currentUserId) {
         FriendRequest request = findRawFriendRequest(requestId);
+        resolveFriendRequest(requestId);
         if (!request.getReceiver().getId().equals(currentUserId)) {
             throw new UnauthorizedException("You must be the receiver to accept a friend request");
         }
@@ -216,6 +216,7 @@ public class UsersService {
     @Transactional
     public void cancelFriendRequest(UUID requestId, UUID currentUserId) {
         FriendRequest request = findRawFriendRequest(requestId);
+        deleteFriendRequest(requestId);
         if (!request.getSender().getId().equals(currentUserId)) {
             throw new UnauthorizedException("You must be the sender to cancel a friend request");
         }
@@ -245,5 +246,13 @@ public class UsersService {
         currentUser.removeFriend(unfriend);
         usersRepository.save(currentUser);
         usersRepository.save(unfriend);
+    }
+
+    private void resolveFriendRequest(UUID requestId) {
+        notificationService.resolveNotification(requestId);
+    }
+
+    private void deleteFriendRequest(UUID requestId) {
+        notificationService.deleteNotification(requestId);
     }
 }

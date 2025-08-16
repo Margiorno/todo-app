@@ -14,4 +14,5 @@ import java.util.UUID;
 public interface NotificationRepository extends CrudRepository<Notification, UUID> {
     Iterable<Notification> findAllByReceiver(User user);
     Optional<FriendRequestNotification> findFriendRequestNotificationById(UUID id);
+    Optional<FriendRequestNotification> findNotificationByRequestId(UUID id);
 }

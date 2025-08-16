@@ -30,4 +30,6 @@ public class NotificationController {
         notificationService.readNotification(id, userId);
         return ResponseEntity.ok().build();
     }
+
+
 }

@@ -111,15 +111,21 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void resolveFriendRequest(UUID id, UUID userId) {
-        FriendRequestNotification friendRequestNotification = findRawFriendRequestNotificationById(id);
+    public void resolveNotification(UUID requestId) {
+        FriendRequestNotification friendRequestNotification = getFriendRequestNotification(requestId);
 
-        if (!friendRequestNotification.getReceiver().getId().equals(userId))
-            throw new UnauthorizedException("You are not authorized to read this notification");
-
-        friendRequestNotification.setRead(true);
         friendRequestNotification.setResolved(true);
-
         notificationRepository.save(friendRequestNotification);
+    }
+
+    public void deleteNotification(UUID requestId) {
+        FriendRequestNotification friendRequestNotification = getFriendRequestNotification(requestId);
+        notificationRepository.delete(friendRequestNotification);
+    }
+
+    private FriendRequestNotification getFriendRequestNotification(UUID requestId) {
+        return notificationRepository
+                .findNotificationByRequestId(requestId)
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
     }
 }

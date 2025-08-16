@@ -1,4 +1,8 @@
-.notification-unresolved {
-    background-color: #f0f8ff;
-    border: 1px solid #bde0fe;
+.card.resolved {
+    opacity: 0.65;
+    background-color: #f8f9fa;
+}
+
+.card.resolved .notification-actions {
+    display: none;
 }

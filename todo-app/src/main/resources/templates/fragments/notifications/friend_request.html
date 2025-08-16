@@ -4,12 +4,14 @@
 
 <div th:fragment="card(notification)" th:id="'notification-' + ${notification.id}"
      class="card mb-3 shadow-sm"
-     th:classappend="${!notification.isRead} ? 'unread'">
+     th:classappend="(${!notification.isRead} ? 'unread ' : '') + (${notification.resolved} ? 'resolved' : '')">
+
     <div class="card-header bg-primary text-white">
         Friend Request
     </div>
     <div class="card-body">
         <p class="card-text" th:text="${notification.message}">[Notification Message]</p>
+
         <div th:if="${!notification.resolved}" class="d-flex justify-content-end mt-3 notification-actions">
             <button class="btn btn-success btn-sm me-2 accept-request"
                     th:data-request-id="${notification.requestId}">
@@ -20,6 +22,11 @@
                 Decline
             </button>
         </div>
+
+        <div th:if="${notification.resolved}" class="mt-3 text-muted resolved-status">
+            <small>This request has been resolved.</small>
+        </div>
+
     </div>
     <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
         Received: <span th:text="${notification.notificationTime}">[Date]</span>

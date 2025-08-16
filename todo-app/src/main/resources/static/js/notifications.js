@@ -10,14 +10,24 @@ function getCookie(name) {
 
 function createFriendRequestElement(notification) {
     const card = document.createElement('div');
-    card.id = `notification-${notification.id}`; // Tutaj id powiadomienia jest OK, bo to ID elementu DOM
+    card.id = `notification-${notification.id}`;
     card.className = 'card mb-3 shadow-sm unread';
+
+    if (notification.resolved) {
+        card.classList.add('resolved');
+    }
 
     const actionsHtml = !notification.resolved ? `
         <div class="d-flex justify-content-end mt-3 notification-actions">
             <button class="btn btn-success btn-sm me-2 accept-request" data-request-id="${notification.requestId}">Accept</button>
             <button class="btn btn-danger btn-sm decline-request" data-request-id="${notification.requestId}">Decline</button>
         </div>` : '';
+
+    const resolvedStatusHtml = notification.resolved ? `
+        <div class="mt-3 text-muted resolved-status">
+            <small>This request has been resolved.</small>
+        </div>` : '';
+
 
     card.innerHTML = `
         <div class="card-header bg-primary text-white">
@@ -26,6 +36,7 @@ function createFriendRequestElement(notification) {
         <div class="card-body">
             <p class="card-text">${notification.message || 'You have a new friend request.'}</p>
             ${actionsHtml}
+            ${resolvedStatusHtml}
         </div>
         <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
             Received: <span>${notification.notificationTime || ''}</span>
@@ -76,10 +87,14 @@ function prependNotification(notification) {
     }
 }
 
-function handleRequestAction(requestId, action) {
+function handleRequestAction(button, action) {
+    const requestId = button.dataset.requestId;
     if (!requestId || !action) {
         return;
     }
+
+    const notificationCard = button.closest('.card');
+    if (!notificationCard) return;
 
     const url = `/friend-requests/${requestId}/${action}`;
 
@@ -90,17 +105,32 @@ function handleRequestAction(requestId, action) {
         }
     })
         .then(response => {
-            return response.text().then(() => {
-                if (response.ok) {
-                    const elementToRemove = document.getElementById(`notification-${requestId}`);
-                    if (elementToRemove) {
-                        elementToRemove.remove();
-                    }
+            if (response.ok) {
+                const actionsContainer = notificationCard.querySelector('.notification-actions');
+                if (actionsContainer) {
+                    actionsContainer.remove();
                 }
-            });
+
+                notificationCard.classList.add('resolved');
+
+                const cardBody = notificationCard.querySelector('.card-body');
+                if (cardBody) {
+                    const statusDiv = document.createElement('div');
+                    statusDiv.className = 'mt-3 text-muted resolved-status';
+
+                    let statusMessage = 'Request accepted.';
+                    if (action === 'decline') {
+                        statusMessage = 'Request declined.';
+                    }
+                    statusDiv.innerHTML = `<small>${statusMessage}</small>`;
+                    cardBody.appendChild(statusDiv);
+                }
+            } else {
+                console.error('Failed to process the request.');
+            }
         })
         .catch(error => {
-            console.error(error);
+            console.error('Error:', error);
         });
 }
 
@@ -126,9 +156,9 @@ document.getElementById('notification-list').addEventListener('click', function(
     const declineButton = event.target.closest('.decline-request');
 
     if (acceptButton) {
-        handleRequestAction(acceptButton.dataset.requestId, 'accept');
+        handleRequestAction(acceptButton, 'accept');
     } else if (declineButton) {
-        handleRequestAction(declineButton.dataset.requestId, 'decline');
+        handleRequestAction(declineButton, 'decline');
     }
 });
 

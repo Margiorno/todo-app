@@ -10,8 +10,8 @@ public class MessageMapper {
     public static MessageResponseDTO toResponseDTO(Message message, UserResponseDTO userResponseDTO) {
         return MessageResponseDTO.builder()
                 .conversationId(message.getConversation().getId())
-                .senderId(message.getSender().getId())
-                .context(message.getContent())
+                .sender(UserMapper.toUserResponseDTO(message.getSender()))
+                .content(message.getContent())
                 .sendAt(message.getSentAt())
                 .sentByCurrentUser(message.getSender().getId().equals(UUID.fromString(userResponseDTO.getId())))
                 .build();

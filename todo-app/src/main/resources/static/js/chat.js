@@ -25,7 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const { messageInput, sendButton } = this.elements;
             sendButton.addEventListener('click', () => this.sendMessage());
             messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') this.sendMessage();
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
             });
         }
 
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         onMessageReceived(message) {
             const { conversationId } = message;
-            if (conversationId === this.currentConversationId) {
+            if (String(conversationId) === String(this.currentConversationId)) {
                 this.appendMessage(message);
             } else {
                 const target = document.querySelector(`a[data-conversation-id="${conversationId}"]`);
@@ -66,16 +69,56 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage(message) {
             const { chatMessages } = this.elements;
             chatMessages.querySelector('.no-messages')?.remove();
-            const msg = document.createElement('div');
-            msg.className = `message ${message.sentByCurrentUser ? 'sent' : 'received'}`;
-            msg.textContent = message.context;
-            chatMessages.appendChild(msg);
+
+            const messageContainer = document.createElement('div');
+            messageContainer.className = `message ${message.sentByCurrentUser ? 'sent' : 'received'}`;
+
+            const filename = message.sender?.profilePicturePath || 'default-avatar.jpg';
+
+            const avatarImg = document.createElement('img');
+            avatarImg.className = 'message-avatar';
+            avatarImg.src = `/files/profile-pictures/${filename}`;
+            avatarImg.alt = 'Profile Picture';
+
+            let avatarContainer;
+
+            if (!message.sentByCurrentUser && message.sender) {
+                avatarContainer = document.createElement('a');
+                avatarContainer.href = `/profile/${message.sender.id}`;
+                avatarContainer.appendChild(avatarImg);
+            } else {
+                avatarContainer = avatarImg;
+            }
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const senderName = document.createElement('div');
+            senderName.className = 'message-sender-name';
+
+            if (!message.sentByCurrentUser && message.sender) {
+                senderName.textContent = `${message.sender.firstName} ${message.sender.lastName}`;
+            }
+
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+            messageText.textContent = message.content;
+
+            if (!message.sentByCurrentUser) {
+                messageContent.appendChild(senderName);
+            }
+            messageContent.appendChild(messageText);
+
+            messageContainer.appendChild(avatarContainer);
+            messageContainer.appendChild(messageContent);
+
+            chatMessages.appendChild(messageContainer);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         async fetchMessages(conversationId) {
             const { chatMessages } = this.elements;
-            chatMessages.innerHTML = '<div>Loading messages...</div>';
+            chatMessages.innerHTML = '<div class="text-center text-muted p-3">Loading messages...</div>';
             this.currentConversationId = conversationId;
             try {
                 const res = await fetch(`/chat/${conversationId}/messages`, { credentials: 'include' });
@@ -114,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             conversationList.innerHTML = '';
             if (!conversations || conversations.length === 0) {
                 chatHeader.textContent = 'No conversations found.';
+                this.elements.chatMessages.innerHTML = '<div class="text-center text-muted no-messages">Create a new conversation to start chatting.</div>';
                 return;
             }
 
@@ -138,15 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetId = sessionStorage.getItem('openConversationId');
             sessionStorage.removeItem('openConversationId');
 
-            let linkToClick = null;
-
-            if (targetId) {
-                linkToClick = conversationList.querySelector(`a[data-conversation-id="${targetId}"]`);
-            }
-
-            if (!linkToClick) {
-                linkToClick = conversationList.querySelector('a.nav-link');
-            }
+            let linkToClick = targetId
+                ? conversationList.querySelector(`a[data-conversation-id="${targetId}"]`)
+                : conversationList.querySelector('a.nav-link');
 
             if (linkToClick) {
                 linkToClick.click();

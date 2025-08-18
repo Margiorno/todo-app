@@ -26,23 +26,8 @@ body {
     overflow-y: auto;
     background-color: #ffffff;
     border-right: 1px solid #dee2e6;
-    padding-top: 1.5rem;
     display: flex;
     flex-direction: column;
-}
-
-.menu-heading {
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #6c757d;
-    padding: .5rem 1rem;
-    margin-top: 1rem;
-}
-
-.main-content {
-    height: 100%;
-    padding: 0;
 }
 
 .menu-column .nav-link {
@@ -60,7 +45,19 @@ body {
 .menu-column .nav-link:hover {
     background-color: #0d6efd;
     color: #ffffff;
-    text-decoration: none;
+}
+
+.menu-column .nav-link.has-new-message {
+    font-weight: bold;
+    background-color: #e9ecef;
+}
+.menu-column .nav-link.has-new-message:hover {
+    background-color: #0d6efd;
+}
+
+.main-content {
+    height: 100%;
+    padding: 0;
 }
 
 .chat-area-wrapper {
@@ -84,36 +81,70 @@ body {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
+    gap: 15px;
 }
 
 .message {
+    display: flex;
+    align-items: flex-start;
     max-width: 70%;
-    padding: 10px 15px;
-    border-radius: 18px;
-    margin-bottom: 10px;
-    line-height: 1.4;
-}
-
-.message.sent {
-    background-color: #0d6efd;
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
+    gap: 10px;
 }
 
 .message.received {
+    align-self: flex-start;
+}
+
+.message.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.received .message-content {
     background-color: #e9ecef;
     color: #212529;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
 }
+
+.message.sent .message-content {
+    background-color: #0d6efd;
+    color: white;
+    border-top-right-radius: 4px;
+}
+
+.message-sender-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.message-text {
+    word-wrap: break-word;
+}
+
 
 .chat-input-area {
     display: flex;
     padding: 1rem 1.5rem;
     border-top: 1px solid #dee2e6;
     background-color: #f8f9fa;
-    flex-shrink: 0; /* Zapobiega kurczeniu się */
+    flex-shrink: 0;
     gap: 10px;
 }
 
@@ -123,43 +154,4 @@ body {
 
 .chat-input-area .btn {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-#selectedFriendsShelf {
-    padding: 8px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.selected-friend-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    background-color: #0d6efd;
-    color: white;
-    border-radius: 12px;
-    font-size: 0.9em;
-    font-weight: 500;
-}
-
-.remove-friend-btn {
-    margin-left: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    opacity: 0.7;
-}
-
-.remove-friend-btn:hover {
-    opacity: 1;
 }

@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sendButton: document.getElementById('send-button')
     };
 
+
+
     class Chat {
         constructor(elements) {
             this.stompClient = null;

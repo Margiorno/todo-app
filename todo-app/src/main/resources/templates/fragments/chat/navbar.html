@@ -4,19 +4,43 @@
 <body>
 
 <div th:fragment="navbar" class="col-md-4 col-lg-2 menu-column">
+
     <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
         <h4 class="mb-0">Conversations</h4>
-        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newMessageModal" aria-label="Send new message">
-            <i class="bi bi-send"></i>
-        </button>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newConversationModal" aria-label="Create new conversation">
-            <i class="bi bi-plus-lg"></i>
-        </button>
+
+        <div class="d-flex gap-2">
+
+            <button type="button" class="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                    style="width: 36px; height: 36px;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newMessageModal"
+                    aria-label="Open chat"
+                    data-bs-placement="bottom"
+                    data-bs-title="Open chat">
+                <i class="bi bi-send"></i>
+            </button>
+
+            <button type="button" class="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                    style="width: 36px; height: 36px;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newConversationModal"
+                    aria-label="New conversation"
+                    data-bs-placement="bottom"
+                    data-bs-title="New conversation">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="nav flex-column" id="conversation-list">
-
+    <div class="input-group mb-3">
+        <span class="input-group-text bg-light border-end-0">
+            <i class="bi bi-search"></i>
+        </span>
+        <input type="search" class="form-control bg-light border-start-0" placeholder="Search conversations" aria-label="Search conversations">
     </div>
+
+    <div class="nav flex-column" id="conversation-list"></div>
+
 </div>
 
 </body>

@@ -5,7 +5,6 @@ import com.pm.todoapp.dto.MessageResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.exceptions.ConversationNotFoundException;
 import com.pm.todoapp.exceptions.UnauthorizedException;
-import com.pm.todoapp.mapper.ConversationMapper;
 import com.pm.todoapp.mapper.MessageMapper;
 import com.pm.todoapp.mapper.UserMapper;
 import com.pm.todoapp.model.Conversation;
@@ -55,14 +54,14 @@ public class ChatService {
 
                     return last2.compareTo(last1);
                 })
-                .map(ConversationMapper::toResponseDTO)
+                .map(conversation -> toResponseDTO(conversation, userId))
                 .toList();
     }
 
-    public ConversationResponseDTO findOrCreatePrivateConversation(UUID user1Id, UUID user2Id){
+    public ConversationResponseDTO findOrCreatePrivateConversation(UUID currentUser, UUID otherUser){
 
-        User user1 = usersService.findRawById(user1Id);
-        User user2 = usersService.findRawById(user2Id);
+        User user1 = usersService.findRawById(currentUser);
+        User user2 = usersService.findRawById(otherUser);
 
         Conversation conversation = conversationRepository.findPrivateConversationBetweenUsers(user1, user2)
                 .orElseGet(() -> {
@@ -73,7 +72,7 @@ public class ChatService {
                     return conversationRepository.save(newConversation);
                 });
 
-        return ConversationMapper.toResponseDTO(conversation);
+        return toResponseDTO(conversation, currentUser);
     }
 
     public List<MessageResponseDTO> getMessages(UUID conversationId, UUID userId) {
@@ -122,14 +121,18 @@ public class ChatService {
         return conversation.getMessages().getLast();
     }
 
-    public List<UserResponseDTO> getUsers(UUID chatId, UUID userId) {
+    private ConversationResponseDTO toResponseDTO(Conversation conversation, UUID currentUserId) {
 
-        Conversation conversation = findRawConversationById(chatId);
-        Set<User> users = conversation.getParticipants();
-
-        if (!users.contains(usersService.findRawById(userId)))
-            throw new UnauthorizedException("You do not have permission to access this conversation");
-
-        return users.stream().map(UserMapper::toUserResponseDTO).toList();
+        return ConversationResponseDTO.builder()
+                .id(conversation.getId())
+                .type(conversation.getConversationType())
+                .title(switch (conversation.getConversationType()){
+                    case PRIVATE -> conversation.getParticipants().stream().filter(
+                                    participant -> !participant.getId().equals(currentUserId))
+                            .findFirst()
+                            .map(user -> user.getFirstName() + " " + user.getLastName())
+                            .orElse("unknown user");
+                    case GROUP_CHAT -> conversation.getTitle();
+                }).build();
     }
 }

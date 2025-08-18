@@ -47,30 +47,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const updateSelectedShelf = () => {
             if (!selectedShelfEl) return;
-
             selectedShelfEl.innerHTML = '';
             const selectedFriends = Array.from(friendsListEl.querySelectorAll('input[type="checkbox"]:checked'));
-
             if (selectedFriends.length > 0) {
                 selectedShelfEl.style.display = 'flex';
             } else {
                 selectedShelfEl.style.display = 'none';
             }
-
             selectedFriends.forEach(checkbox => {
                 const friendId = checkbox.value;
                 const friendItem = checkbox.closest('.list-group-item');
                 const friendName = friendItem.querySelector('.friend-name').textContent;
-
                 const pill = document.createElement('div');
                 pill.className = 'selected-friend-pill';
                 pill.textContent = friendName;
-
                 const removeBtn = document.createElement('span');
                 removeBtn.className = 'remove-friend-btn';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.dataset.friendId = friendId;
-
                 removeBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -80,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateSelectedShelf();
                     }
                 });
-
                 pill.appendChild(removeBtn);
                 selectedShelfEl.appendChild(pill);
             });
@@ -95,12 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             noResultsEl.textContent = 'No friends found.';
             noResultsEl.style.display = 'none';
-
             friends.forEach(friend => {
                 const friendItem = createFriendListItem(friend, config.inputType);
                 friendsListEl.appendChild(friendItem);
             });
-
             if (config.inputType === 'checkbox') {
                 friendsListEl.addEventListener('change', (e) => {
                     if (e.target.type === 'checkbox') {
@@ -177,6 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`/chat/get-chat/${friendId}`, { credentials: 'include' });
             if (!response.ok) throw new Error('Server could not find or create the conversation.');
+            const conversation = await response.json();
+            sessionStorage.setItem('openConversationId', conversation.id);
             modalInstance.hide();
             window.location.reload();
         } catch (error) {
@@ -206,6 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ conversationName, participantIds: selectedFriends })
             });
             if (response.ok) {
+                const conversation = await response.json();
+                sessionStorage.setItem('openConversationId', conversation.id);
                 modalInstance.hide();
                 window.location.reload();
             } else {

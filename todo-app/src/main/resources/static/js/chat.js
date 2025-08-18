@@ -7,14 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
         sendButton: document.getElementById('send-button')
     };
 
-
-
     class Chat {
         constructor(elements) {
             this.stompClient = null;
             this.currentConversationId = null;
             this.elements = elements;
-
             this.init();
         }
 
@@ -26,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setupEventListeners() {
             const { messageInput, sendButton } = this.elements;
-
             sendButton.addEventListener('click', () => this.sendMessage());
             messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.sendMessage();
@@ -36,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         connectWebSocket() {
             const socket = new SockJS('/ws');
             this.stompClient = Stomp.over(socket);
-
             this.stompClient.connect({}, (frame) => {
                 console.log('Connected: ' + frame);
                 this.stompClient.subscribe('/user/queue/messages', (msg) => {
@@ -70,23 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appendMessage(message) {
             const { chatMessages } = this.elements;
-
             chatMessages.querySelector('.no-messages')?.remove();
-
             const msg = document.createElement('div');
             msg.className = `message ${message.sentByCurrentUser ? 'sent' : 'received'}`;
             msg.textContent = message.context;
-
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         async fetchMessages(conversationId) {
             const { chatMessages } = this.elements;
-
             chatMessages.innerHTML = '<div>Loading messages...</div>';
             this.currentConversationId = conversationId;
-
             try {
                 const res = await fetch(`/chat/${conversationId}/messages`, { credentials: 'include' });
                 if (!res.ok) throw new Error(`Network error: ${res.status}`);
@@ -100,14 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayMessages(messages) {
             const { chatMessages } = this.elements;
-
             chatMessages.innerHTML = '';
-
             if (!messages?.length) {
                 chatMessages.innerHTML = '<div class="text-center text-muted no-messages">No messages yet.</div>';
                 return;
             }
-
             messages.forEach(msg => this.appendMessage(msg));
         }
 
@@ -124,21 +111,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayConversations(conversations) {
             const { conversationList, chatHeader } = this.elements;
-
             conversationList.innerHTML = '';
-
-            if (!conversations.length) {
+            if (!conversations || conversations.length === 0) {
                 chatHeader.textContent = 'No conversations found.';
                 return;
             }
 
-            conversations.forEach((conv, i) => {
+            conversations.forEach(conv => {
                 const a = document.createElement('a');
                 a.href = '#';
                 a.className = 'nav-link';
                 a.dataset.conversationId = conv.id;
-                a.textContent = `${conv.title}`;
-
+                a.textContent = conv.title;
                 a.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.querySelectorAll('#conversation-list .nav-link').forEach(link => {
@@ -148,12 +132,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     chatHeader.textContent = a.textContent;
                     this.fetchMessages(conv.id);
                 });
-
                 conversationList.appendChild(a);
-                if (i === 0) a.click();
             });
+
+            const targetId = sessionStorage.getItem('openConversationId');
+            sessionStorage.removeItem('openConversationId');
+
+            let linkToClick = null;
+
+            if (targetId) {
+                linkToClick = conversationList.querySelector(`a[data-conversation-id="${targetId}"]`);
+            }
+
+            if (!linkToClick) {
+                linkToClick = conversationList.querySelector('a.nav-link');
+            }
+
+            if (linkToClick) {
+                linkToClick.click();
+            }
         }
     }
 
-    new Chat(elements);
+    window.chatApp = new Chat(elements);
 });

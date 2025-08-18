@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -121,6 +122,25 @@ public class ChatService {
         return conversation.getMessages().getLast();
     }
 
+    public ConversationResponseDTO newConversation(String conversationName, Set<UUID> participantIds, UUID userId) {
+
+        User user = usersService.findRawById(userId);
+
+        Set<User> participants = participantIds.stream()
+                .map(usersService::findRawById)
+                .collect(Collectors.toSet());
+
+        participants.add(user);
+
+        Conversation conversation = Conversation.builder()
+                .conversationType(ConversationType.GROUP_CHAT)
+                .title(conversationName)
+                .participants(participants)
+                .build();
+
+        return toResponseDTO(conversationRepository.save(conversation), userId);
+    }
+
     private ConversationResponseDTO toResponseDTO(Conversation conversation, UUID currentUserId) {
 
         return ConversationResponseDTO.builder()
@@ -135,4 +155,6 @@ public class ChatService {
                     case GROUP_CHAT -> conversation.getTitle();
                 }).build();
     }
+
+
 }

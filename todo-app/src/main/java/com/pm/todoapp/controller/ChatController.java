@@ -55,4 +55,14 @@ public class ChatController {
                 conversationRequestDTO.getParticipantIds(),
                 userId));
     }
+
+    @GetMapping("get-chat/{userId}")
+    public ResponseEntity<ConversationResponseDTO> getChat(
+            @AuthenticationPrincipal UUID loggedInUserId,
+            @PathVariable UUID userId
+    ){
+
+        return ResponseEntity.ok(chatService.findOrCreatePrivateConversation(loggedInUserId, userId));
+
+    }
 }

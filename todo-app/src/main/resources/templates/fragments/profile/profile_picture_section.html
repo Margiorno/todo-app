@@ -10,16 +10,16 @@
 
             <div id="picture-container" class="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div>
-                    <div th:if="${user.profilePicturePath != null}">
-                        <img id="profile-picture" th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath})}" alt="Profile Picture">
+                    <div>
+                        <img id="profile-picture"
+                             th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath != null ? user.profilePicturePath : 'default.png'})}"
+                             alt="Profile Picture">
                     </div>
-                    <div th:if="${user.profilePicturePath == null}">
-                        <div id="profile-picture-placeholder">No picture</div>
-                    </div>
+
                 </div>
             </div>
 
-            <!-- PROFILE PICTURE SECTION SECTION -->
+            <!-- PROFILE PICTURE SECTION -->
             <div th:replace="~{fragments/profile/profile-actions.html :: buttons}"></div>
         </div>
     </div>

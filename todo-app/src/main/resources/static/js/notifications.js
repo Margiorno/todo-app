@@ -28,13 +28,29 @@ function createFriendRequestElement(notification) {
             <small>This request has been resolved.</small>
         </div>` : '';
 
+    const sender = notification.sender || {};
+    const profilePicture = sender.profilePicturePath || 'default-avatar.jpg';
+    const senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim();
 
     card.innerHTML = `
         <div class="card-header bg-primary text-white">
             Friend Request
         </div>
         <div class="card-body">
-            <p class="card-text">${notification.message || 'You have a new friend request.'}</p>
+            <div class="d-flex align-items-center">
+                <a href="/profile/${sender.id}">
+                    <img src="/files/profile-pictures/${profilePicture}"
+                         alt="Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                </a>
+                <div>
+                    <p class="card-text mb-0">
+                        <a href="/profile/${sender.id}" class="fw-bold text-dark text-decoration-none">
+                            ${senderName}
+                        </a>
+                        <span> ${notification.message}</span>
+                    </p>
+                </div>
+            </div>
             ${actionsHtml}
             ${resolvedStatusHtml}
         </div>

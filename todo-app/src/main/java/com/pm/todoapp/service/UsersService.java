@@ -144,7 +144,6 @@ public class UsersService {
     }
 
     public boolean areFriends(UUID userId, UUID profileId) {
-        //Users validation
         findRawById(userId);
         findRawById(profileId);
 

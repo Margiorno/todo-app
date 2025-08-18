@@ -1,7 +1,6 @@
 package com.pm.todoapp.service;
 
 import com.pm.todoapp.dto.FriendRequestDTO;
-import com.pm.todoapp.dto.FriendRequestNotificationDTO;
 import com.pm.todoapp.dto.NotificationDTO;
 import com.pm.todoapp.exceptions.NotificationNotFoundException;
 import com.pm.todoapp.exceptions.UnauthorizedException;
@@ -46,9 +45,7 @@ public class NotificationService {
 
         User sender = usersService.findRawById(invitation.getSenderId());
         User receiver = usersService.findRawById(invitation.getReceiverId());
-        String message = "Friend request from: %s %s".formatted(sender.getFirstName(), sender.getLastName());
-
-        System.out.println("requestId stworzony: " + invitation.getId());
+        String message = "has sent you a friend request";
 
         FriendRequestNotification notificationEntity = FriendRequestNotification.builder()
                 .requestId(invitation.getId())
@@ -89,12 +86,6 @@ public class NotificationService {
         User user = usersService.findRawById(userId);
         Iterable<Notification> notifications = notificationRepository.findAllByReceiver(user);
 
-        notifications.forEach(notification -> {
-            if (notification instanceof FriendRequestNotification) {
-                System.out.println("requestId pobrany: " + ((FriendRequestNotification) notification).getRequestId());
-            }
-        });
-
         return StreamSupport.stream(notifications.spliterator(), false)
                 .sorted(Comparator.comparing(Notification::getCreatedAt))
                 .map(NotificationMapper::toDTO)
@@ -127,5 +118,10 @@ public class NotificationService {
         return notificationRepository
                 .findNotificationByRequestId(requestId)
                 .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+    }
+
+    @Transactional
+    public void markAllReadByUserId(UUID userId) {
+        notificationRepository.markAllReadByUserId(userId);
     }
 }

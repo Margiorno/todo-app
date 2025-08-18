@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/files")
 public class FileController {
 
-
     private final FileService fileService;
 
     public FileController(FileService fileService) {
@@ -28,11 +27,9 @@ public class FileController {
 
         Resource file = fileService.loadFileAsResource(filename, FileType.PROFILE_PICTURE);
 
-
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("image/png"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; ...")
                 .body(file);
     }
-
 }

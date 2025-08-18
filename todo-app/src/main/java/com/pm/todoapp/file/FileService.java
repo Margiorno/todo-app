@@ -75,13 +75,22 @@ public class FileService {
     public Resource loadFileAsResource(String filename, FileType fileType) {
         try {
             Path file = rootLocation.resolve(fileType.getPath()).resolve(filename).normalize();
+
+            if (!file.startsWith(rootLocation.resolve(fileType.getPath()))) {
+                throw new StorageFileNotFoundException("Invalid file path: " + filename);
+            }
+
             Resource resource = new UrlResource(file.toUri());
 
-            if (resource.exists() && resource.isReadable()) {
+            if (resource.exists() && resource.isReadable())
                 return resource;
-            } else {
-                throw new StorageFileNotFoundException("Could not read file: " + filename);
+
+            if (fileType == FileType.PROFILE_PICTURE) {
+                return loadDefaultProfilePicture();
             }
+
+            throw new StorageFileNotFoundException("Could not read file: " + filename);
+
         } catch (MalformedURLException e) {
             throw new StorageFileNotFoundException("Could not read file: " + filename);
         }
@@ -94,5 +103,18 @@ public class FileService {
         } catch (IOException e) {
             throw new StorageException("Failed to delete file: " + filename);
         }
+    }
+
+
+
+    private Resource loadDefaultProfilePicture() throws MalformedURLException {
+        Path defaultFile = rootLocation.resolve(FileType.PROFILE_PICTURE.getPath()).resolve("default.jpg").normalize();
+        Resource defaultResource = new UrlResource(defaultFile.toUri());
+
+        if (defaultResource.exists() && defaultResource.isReadable()) {
+            return defaultResource;
+        }
+
+        throw new StorageFileNotFoundException("Could not read profile picture");
     }
 }

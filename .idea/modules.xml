@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/task-manager.iml" filepath="$PROJECT_DIR$/task-manager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/todo-app/todo-app.iml" filepath="$PROJECT_DIR$/todo-app/todo-app.iml" />
     </modules>
   </component>
 </project>

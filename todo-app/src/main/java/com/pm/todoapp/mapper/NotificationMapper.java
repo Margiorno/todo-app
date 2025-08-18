@@ -19,7 +19,7 @@ public class NotificationMapper {
                     .type(frn.getType())
                     .notificationTime(frn.getCreatedAt().format(FORMATTER))
                     .isRead(frn.isRead())
-                    .senderId(frn.getSender().getId())
+                    .sender(UserMapper.toUserResponseDTO(frn.getSender()))
                     .resolved(frn.isResolved())
                     .requestId(frn.getRequestId())
                     .build();

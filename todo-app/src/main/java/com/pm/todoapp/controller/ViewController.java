@@ -3,7 +3,6 @@ package com.pm.todoapp.controller;
 import com.pm.todoapp.dto.*;
 import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.ProfileStatus;
 import com.pm.todoapp.model.Status;
 import com.pm.todoapp.repository.FriendsRequestRepository;
 import com.pm.todoapp.service.NotificationService;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -151,10 +149,6 @@ public class ViewController {
         UserResponseDTO profile = usersService.findById(profileId);
         ProfileStatusDTO status = usersService.determineFriendshipStatus(userId, profileId);
 
-        System.out.println("profileId: " +profileId);
-        System.out.println("userId: " +userId);
-        System.out.println("status: " +status);
-
         model.addAttribute("profileStatusInfo", status);
         model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
@@ -173,6 +167,7 @@ public class ViewController {
             Model model) {
 
         List<NotificationDTO> notifications = notificationService.getAllNotificationsByUserId(userId);
+        notificationService.markAllReadByUserId(userId);
 
         model.addAttribute("notifications", notifications);
 

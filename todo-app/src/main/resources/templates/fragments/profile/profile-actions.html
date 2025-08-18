@@ -6,12 +6,7 @@
 </head>
 <body>
 
-
-
 <div th:fragment="buttons" class="d-grid gap-2 mt-3" th:switch="${profileStatusInfo.status}">
-
-    <p>Status value: [[${profileStatusInfo.status}]]</p>
-    <p>Status class: [[${profileStatusInfo.status.getClass().getName()}]]</p>
 
     <div th:case="${T(com.pm.todoapp.model.ProfileStatus).OWNER}">
         <hr>

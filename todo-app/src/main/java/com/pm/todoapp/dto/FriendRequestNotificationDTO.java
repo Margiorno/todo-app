@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @SuperBuilder
 public class FriendRequestNotificationDTO extends NotificationDTO {
-    private UUID senderId;
+    private UserResponseDTO sender;
     private boolean resolved;
     private UUID requestId;
 }

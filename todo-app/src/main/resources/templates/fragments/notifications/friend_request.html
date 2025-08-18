@@ -10,7 +10,28 @@
         Friend Request
     </div>
     <div class="card-body">
-        <p class="card-text" th:text="${notification.message}">[Notification Message]</p>
+
+
+        <div class="d-flex align-items-center">
+
+            <a th:href="@{/profile/{id}(id=${notification.sender.id})}">
+                <img th:src="@{/files/profile-pictures/{filename}(filename=${notification.sender.profilePicturePath ?: 'default-avatar.jpg'})}"
+                     alt="Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+            </a>
+
+            <div>
+                <p class="card-text mb-0">
+                    <a th:href="@{/profile/{id}(id=${notification.sender.id})}"
+                       class="fw-bold text-dark text-decoration-none"
+                       th:text="${notification.sender.firstName + ' ' + notification.sender.lastName}">
+                        [Sender Name]
+                    </a>
+                    <span th:text="' ' + ${notification.message}">[Notification Message]</span>
+                </p>
+            </div>
+        </div>
+
+
 
         <div th:if="${!notification.resolved}" class="d-flex justify-content-end mt-3 notification-actions">
             <button class="btn btn-success btn-sm me-2 accept-request"

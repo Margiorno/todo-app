@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.href = '#';
                 a.className = 'nav-link';
                 a.dataset.conversationId = conv.id;
-                a.textContent = `Conversation ${conv.id.slice(0, 8)}`;
+                a.textContent = `${conv.title}`;
 
                 a.addEventListener('click', (e) => {
                     e.preventDefault();

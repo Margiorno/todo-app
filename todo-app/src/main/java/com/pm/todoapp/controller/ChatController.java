@@ -2,6 +2,7 @@ package com.pm.todoapp.controller;
 
 import com.pm.todoapp.dto.ConversationResponseDTO;
 import com.pm.todoapp.dto.MessageResponseDTO;
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

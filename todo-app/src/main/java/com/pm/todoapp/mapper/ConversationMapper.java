@@ -7,6 +7,8 @@ public class ConversationMapper {
     public static ConversationResponseDTO toResponseDTO(Conversation conversation) {
         return ConversationResponseDTO.builder()
                 .id(conversation.getId())
+                .type(conversation.getConversationType())
+                .title(conversation.getTitle())
                 .build();
     }
 }

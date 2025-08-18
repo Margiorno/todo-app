@@ -15,7 +15,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-email">
                         <span id="display-value-email" th:text="${user.email}"></span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="email">Edit</button>
+                        <button th:if="${status == T(com.pm.todoapp.model.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="email">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-email">
                         <input type="email" id="input-email" class="form-control">
@@ -33,7 +33,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-firstName">
                         <span id="display-value-firstName" th:text="${user.firstName}"></span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="firstName">Edit</button>
+                        <button th:if="${status == T(com.pm.todoapp.model.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="firstName">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-firstName">
                         <input type="text" id="input-firstName" class="form-control">
@@ -51,7 +51,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-lastName">
                         <span id="display-value-lastName" th:text="${user.lastName}"></span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="lastName">Edit</button>
+                        <button th:if="${status == T(com.pm.todoapp.model.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="lastName">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-lastName">
                         <input type="text" id="input-lastName" class="form-control">
@@ -69,7 +69,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-dateOfBirth">
                         <span id="display-value-dateOfBirth" th:text="${user.dateOfBirth}"></span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="dateOfBirth">Edit</button>
+                        <button th:if="${status == T(com.pm.todoapp.model.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="dateOfBirth">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-dateOfBirth">
                         <input type="date" id="input-dateOfBirth" class="form-control">
@@ -87,7 +87,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-gender">
                         <span id="display-value-gender" th:text="${user.gender}"></span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="gender">Edit</button>
+                        <button th:if="${status == T(com.pm.todoapp.model.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="gender">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-gender">
                         <select id="input-gender" name="gender" class="form-select">

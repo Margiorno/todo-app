@@ -1,0 +1,8 @@
+.card.resolved {
+    opacity: 0.65;
+    background-color: #f8f9fa;
+}
+
+.card.resolved .notification-actions {
+    display: none;
+}

@@ -1,5 +1,9 @@
 package com.pm.todoapp.controller;
 
+import com.pm.todoapp.dto.FriendRequestDTO;
+import com.pm.todoapp.dto.FriendRequestNotificationDTO;
+import com.pm.todoapp.dto.JoinTeamRequestDTO;
+import com.pm.todoapp.model.FriendRequest;
 import com.pm.todoapp.service.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,6 +44,4 @@ public class UserController {
 
         return ResponseEntity.ok(usersService.update(field, value, userId));
     }
-
-
 }

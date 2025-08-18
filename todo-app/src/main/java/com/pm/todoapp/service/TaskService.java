@@ -43,7 +43,7 @@ public class TaskService {
         Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
         if (teamId != null) {
-            Team team = teamService.findById(teamId);
+            Team team = teamService.findRawById(teamId);
             task.setTeam(team);
         }
 
@@ -99,7 +99,7 @@ public class TaskService {
         Iterable<Task> tasks = switch (teamId){
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
             default -> {
-                Team team = teamService.findById(teamId);
+                Team team = teamService.findRawById(teamId);
                 yield switch (taskFetchScope){
                     case TEAM_TASKS -> taskRepository.findByTeamAndTaskDate(team, centerDate);
                     case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
@@ -113,7 +113,7 @@ public class TaskService {
     public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
 
         User user = usersService.findRawById(userId);
-        Team team = teamService.findById(teamId);
+        Team team = teamService.findRawById(teamId);
 
         Iterable<Task> tasks;
 
@@ -146,7 +146,7 @@ public class TaskService {
                 user = usersService.findRawById(userId);
 
                 if (teamId != null) {
-                    team = teamService.findById(teamId);
+                    team = teamService.findRawById(teamId);
                 }
                 break;
 
@@ -154,7 +154,7 @@ public class TaskService {
                 if (teamId == null) {
                     throw new TeamRequiredException("Team ID is required when fetching tasks for an entire team.");
                 }
-                team = teamService.findById(teamId);
+                team = teamService.findRawById(teamId);
                 break;
         }
 

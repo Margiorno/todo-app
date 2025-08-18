@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface InviteRepository extends CrudRepository<Invite, UUID> {
+public interface TeamInviteRepository extends CrudRepository<Invite, UUID> {
     boolean existsByCode(String code);
     Optional<Invite> findByCode(String code);
     void deleteByCode(String code);

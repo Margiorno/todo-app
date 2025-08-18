@@ -1,9 +1,9 @@
 package com.pm.todoapp.service;
 
-import com.pm.todoapp.dto.InviteResponseDTO;
+import com.pm.todoapp.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.dto.TeamResponseDTO;
 import com.pm.todoapp.dto.UserResponseDTO;
-import com.pm.todoapp.exceptions.InvalidInviteException;
+import com.pm.todoapp.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.exceptions.TeamNotFoundException;
 import com.pm.todoapp.mapper.InviteMapper;
 import com.pm.todoapp.mapper.TeamMapper;
@@ -11,7 +11,7 @@ import com.pm.todoapp.mapper.UserMapper;
 import com.pm.todoapp.model.Team;
 import com.pm.todoapp.model.Invite;
 import com.pm.todoapp.model.User;
-import com.pm.todoapp.repository.InviteRepository;
+import com.pm.todoapp.repository.TeamInviteRepository;
 import com.pm.todoapp.repository.TeamRepository;
 import com.pm.todoapp.repository.UsersRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,17 +28,16 @@ import java.util.stream.StreamSupport;
 public class TeamService {
     private final TeamRepository teamRepository;
     private final UsersService usersService;
-    private final InviteRepository inviteRepository;
+    private final TeamInviteRepository inviteRepository;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, UsersService usersService, InviteRepository inviteRepository, UsersRepository usersRepository) {
+    public TeamService(TeamRepository teamRepository, UsersService usersService, TeamInviteRepository inviteRepository, UsersRepository usersRepository) {
         this.teamRepository = teamRepository;
         this.usersService = usersService;
         this.inviteRepository = inviteRepository;
     }
 
-    // needed in task service
-    public Team findById(UUID teamId) {
+    public Team findRawById(UUID teamId) {
 
         if (teamId == null) {
             throw new TeamNotFoundException("Team not found");
@@ -76,13 +75,13 @@ public class TeamService {
     }
 
     public List<UserResponseDTO> findUsersByTeamId(UUID teamId) {
-        Team team = findById(teamId);
+        Team team = findRawById(teamId);
 
         return team.getMembers().stream().map(UserMapper::toUserResponseDTO).toList();
     }
 
-    public InviteResponseDTO generateInviteCode(UUID teamId) {
-        Team team = findById(teamId);
+    public TeamInviteResponseDTO generateInviteCode(UUID teamId) {
+        Team team = findRawById(teamId);
 
         Invite invite = new Invite();
         invite.setTeam(team);
@@ -100,12 +99,12 @@ public class TeamService {
 
         User user = usersService.findRawById(userId);
         Invite invite = inviteRepository.findByCode(code).orElseThrow(
-                ()->new InvalidInviteException("There is no invitation with this code")
+                ()->new InvalidTeamInviteException("There is no invitation with this code")
         );
         Team team = invite.getTeam();
 
         if (team.getMembers().contains(user))
-            throw new InvalidInviteException("You are already in a member of this team");
+            throw new InvalidTeamInviteException("You are already in a member of this team");
 
         team.getMembers().add(user);
         user.getTeams().add(team);
@@ -128,7 +127,7 @@ public class TeamService {
 
     public void deleteUserFromTeam(UUID teamId, UUID userId) {
 
-        Team team = findById(teamId);
+        Team team = findRawById(teamId);
         User user = usersService.findRawById(userId);
 
         team.getMembers().remove(user);

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="card(notification)" th:id="'notification-' + ${notification.id}"
+     class="card mb-3 shadow-sm"
+     th:classappend="${!notification.isRead} ? 'unread'">
+    <div class="card-header bg-secondary text-white">
+        Notification
+    </div>
+    <div class="card-body">
+        <p class="card-text" th:text="${notification.message}">[Notification Message]</p>
+    </div>
+    <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
+        Received: <span th:text="${notification.notificationTime}">[Date]</span>
+    </div>
+</div>
+
+</body>
+</html>

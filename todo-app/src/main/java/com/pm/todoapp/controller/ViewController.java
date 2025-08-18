@@ -1,11 +1,11 @@
 package com.pm.todoapp.controller;
 
-import com.pm.todoapp.dto.TaskFetchScope;
-import com.pm.todoapp.dto.TaskResponseDTO;
-import com.pm.todoapp.dto.UserResponseDTO;
+import com.pm.todoapp.dto.*;
 import com.pm.todoapp.model.Gender;
 import com.pm.todoapp.model.Priority;
 import com.pm.todoapp.model.Status;
+import com.pm.todoapp.repository.FriendsRequestRepository;
+import com.pm.todoapp.service.NotificationService;
 import com.pm.todoapp.service.TaskService;
 import com.pm.todoapp.service.TeamService;
 import com.pm.todoapp.service.UsersService;
@@ -29,12 +29,16 @@ public class ViewController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final UsersService usersService;
+    private final FriendsRequestRepository friendsRequestRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendsRequestRepository friendsRequestRepository, NotificationService notificationService) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
+        this.friendsRequestRepository = friendsRequestRepository;
+        this.notificationService = notificationService;
     }
 
     @Data
@@ -115,7 +119,7 @@ public class ViewController {
     private void populateCommonModelAttributes(Model model, UUID userId, UUID teamId, TaskFetchScope scope) {
         if (teamId != null) {
             model.addAttribute("selectedTeamId", teamId.toString());
-            model.addAttribute("selectedTeamName", teamService.findById(teamId).getName());
+            model.addAttribute("selectedTeamName", teamService.findRawById(teamId).getName());
         }
 
         List<UserResponseDTO> teamMembers = (teamId != null)
@@ -136,14 +140,38 @@ public class ViewController {
         return "chat";
     }
 
-    @GetMapping("/profile")
-    public String showProfilePage(@AuthenticationPrincipal UUID userId, Model model) {
+    @GetMapping("/profile/{profileId}")
+    public String showProfilePage(
+            @PathVariable UUID profileId,
+            @AuthenticationPrincipal UUID userId,
+            Model model) {
 
-        UserResponseDTO user = usersService.findById(userId);
+        UserResponseDTO profile = usersService.findById(profileId);
+        ProfileStatusDTO status = usersService.determineFriendshipStatus(userId, profileId);
 
-        model.addAttribute("user", user);
+        model.addAttribute("profileStatusInfo", status);
+        model.addAttribute("user", profile);
         model.addAttribute("genders", Gender.values());
         return "profile";
+    }
+
+    @GetMapping("/profile")
+    public String redirectToMyProfile(@AuthenticationPrincipal UUID userId) {
+
+        return "redirect:/profile/" + userId.toString();
+    }
+
+    @GetMapping("/notifications")
+    public String showNotifications(
+            @AuthenticationPrincipal UUID userId,
+            Model model) {
+
+        List<NotificationDTO> notifications = notificationService.getAllNotificationsByUserId(userId);
+        notificationService.markAllReadByUserId(userId);
+
+        model.addAttribute("notifications", notifications);
+
+        return "notifications";
     }
 
 

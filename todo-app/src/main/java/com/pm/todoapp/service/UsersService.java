@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -253,5 +254,11 @@ public class UsersService {
 
     private void deleteFriendRequest(UUID requestId) {
         notificationService.deleteNotification(requestId);
+    }
+
+    public List<UserResponseDTO> getFriends(UUID userId) {
+        User user = findRawById(userId);
+
+        return user.getFriends().stream().map(UserMapper::toUserResponseDTO).toList();
     }
 }

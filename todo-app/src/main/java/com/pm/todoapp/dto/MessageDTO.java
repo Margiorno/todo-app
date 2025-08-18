@@ -7,6 +7,6 @@ import java.util.UUID;
 @Data
 public class MessageDTO {
     private String content;
-    private UUID senderId;
+    private UserResponseDTO sender;
     private UUID conversationId;
 }

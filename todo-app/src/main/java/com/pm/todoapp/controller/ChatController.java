@@ -1,8 +1,11 @@
 package com.pm.todoapp.controller;
 
+import com.pm.todoapp.dto.ConversationRequestDTO;
 import com.pm.todoapp.dto.ConversationResponseDTO;
 import com.pm.todoapp.dto.MessageResponseDTO;
+import com.pm.todoapp.dto.UserResponseDTO;
 import com.pm.todoapp.service.ChatService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,5 +42,27 @@ public class ChatController {
         List<MessageResponseDTO> messages = chatService.getMessages(chatId, userId);
 
         return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/new")
+    public ResponseEntity<ConversationResponseDTO> create(
+            @AuthenticationPrincipal UUID userId,
+            @RequestBody @Valid ConversationRequestDTO conversationRequestDTO
+    ){
+
+        return ResponseEntity.ok(chatService.newConversation(
+                conversationRequestDTO.getConversationName(),
+                conversationRequestDTO.getParticipantIds(),
+                userId));
+    }
+
+    @GetMapping("get-chat/{userId}")
+    public ResponseEntity<ConversationResponseDTO> getChat(
+            @AuthenticationPrincipal UUID loggedInUserId,
+            @PathVariable UUID userId
+    ){
+
+        return ResponseEntity.ok(chatService.findOrCreatePrivateConversation(loggedInUserId, userId));
+
     }
 }

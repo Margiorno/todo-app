@@ -1,7 +1,0 @@
-package com.pm.todoapp.exceptions;
-
-public class EmailAlreadyExistsException extends RuntimeException {
-    public EmailAlreadyExistsException(String message) {
-        super(message);
-    }
-}

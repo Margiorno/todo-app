@@ -1,5 +1,6 @@
 package com.pm.todoapp.users.profile.service;
 
+import com.pm.todoapp.users.profile.dto.ProfileStatus;
 import com.pm.todoapp.users.profile.model.FriendRequest;
 import com.pm.todoapp.users.profile.model.Gender;
 import com.pm.todoapp.users.profile.model.User;

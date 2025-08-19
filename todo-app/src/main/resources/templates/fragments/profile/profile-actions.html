@@ -8,21 +8,21 @@
 
 <div th:fragment="buttons" class="d-grid gap-2 mt-3" th:switch="${profileStatusInfo.status}">
 
-    <div th:case="${T(com.pm.todoapp.model.ProfileStatus).OWNER}">
+    <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}">
         <hr>
         <label for="file" class="btn btn-primary">Change profile picture</label>
         <input type="file" id="file" name="file" class="d-none" accept="image/*">
         <p id="upload-status" class="mt-2"></p>
     </div>
 
-    <div th:case="${T(com.pm.todoapp.model.ProfileStatus).FRIEND}">
+    <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).FRIEND}">
         <button type="button" id="remove-friend-btn" class="btn btn-danger w-100"
                 th:attr="data-friend-id=${user.id}">
             Remove Friend
         </button>
     </div>
 
-    <div th:case="${T(com.pm.todoapp.model.ProfileStatus).INVITATION_SENT}">
+    <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).INVITATION_SENT}">
         <div class="text-muted mb-2">
             <small>Friend request send</small>
         </div>
@@ -32,7 +32,7 @@
         </button>
     </div>
 
-    <div th:case="${T(com.pm.todoapp.model.ProfileStatus).INVITATION_RECEIVED}">
+    <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).INVITATION_RECEIVED}">
         <div class="text-muted mb-2">
             <small>Friend request received</small>
         </div>

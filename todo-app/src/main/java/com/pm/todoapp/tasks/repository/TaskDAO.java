@@ -1,6 +1,7 @@
 package com.pm.todoapp.tasks.repository;
 
-import com.pm.todoapp.model.*;
+import com.pm.todoapp.tasks.model.Priority;
+import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.tasks.model.Task;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.users.profile.model.User;

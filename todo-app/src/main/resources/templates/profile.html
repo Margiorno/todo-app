@@ -49,7 +49,7 @@
 
 <script src="/js/profile-edit.js"></script>
 <script src="/js/profile-picture.js"></script>
-<script th:if="${status != T(com.pm.todoapp.model.ProfileStatus).OWNER}" th:src="@{/js/friend-actions.js}"></script>
+<script th:if="${status != T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" th:src="@{/js/friend-actions.js}"></script>
 
 </body>
 </html>

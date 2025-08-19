@@ -1,7 +1,5 @@
 package com.pm.todoapp.tasks.model;
 
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.users.profile.model.User;
 import jakarta.persistence.*;

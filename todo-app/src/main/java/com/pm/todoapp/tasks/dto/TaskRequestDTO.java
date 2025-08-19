@@ -1,7 +1,7 @@
 package com.pm.todoapp.tasks.dto;
 
-import com.pm.todoapp.model.Priority;
-import com.pm.todoapp.model.Status;
+import com.pm.todoapp.tasks.model.Priority;
+import com.pm.todoapp.tasks.model.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

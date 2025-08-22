@@ -2,8 +2,8 @@ package com.pm.todoapp.websocket;
 
 import com.pm.todoapp.chat.dto.MessageDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
-import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.chat.service.ChatService;
+import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.notifications.service.NotificationService;
 import com.pm.todoapp.users.profile.service.UsersService;

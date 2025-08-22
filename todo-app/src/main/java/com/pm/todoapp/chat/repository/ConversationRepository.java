@@ -1,7 +1,7 @@
 package com.pm.todoapp.chat.repository;
 
 import com.pm.todoapp.chat.model.Conversation;
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.core.user.model.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

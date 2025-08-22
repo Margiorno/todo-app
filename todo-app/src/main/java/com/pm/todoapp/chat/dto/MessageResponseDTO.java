@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MessageResponseDTO {
     private UUID conversationId;
-    private UserResponseDTO sender;
+    private SenderDTO sender;
     private String content;
     private LocalDateTime sendAt;
     private boolean sentByCurrentUser;

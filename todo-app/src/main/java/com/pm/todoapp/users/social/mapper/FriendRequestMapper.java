@@ -1,7 +1,7 @@
 package com.pm.todoapp.users.social.mapper;
 
 import com.pm.todoapp.users.social.dto.FriendRequestDTO;
-import com.pm.todoapp.users.profile.model.FriendRequest;
+import com.pm.todoapp.users.social.model.FriendRequest;
 
 
 public class FriendRequestMapper {

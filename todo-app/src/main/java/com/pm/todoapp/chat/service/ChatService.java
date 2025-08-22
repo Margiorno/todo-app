@@ -2,16 +2,20 @@ package com.pm.todoapp.chat.service;
 
 import com.pm.todoapp.chat.dto.ConversationResponseDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
+import com.pm.todoapp.chat.dto.SenderDTO;
+import com.pm.todoapp.chat.mapper.SenderMapper;
 import com.pm.todoapp.core.exceptions.ConversationNotFoundException;
 import com.pm.todoapp.core.exceptions.UnauthorizedException;
 import com.pm.todoapp.chat.mapper.MessageMapper;
-import com.pm.todoapp.users.profile.mapper.UserMapper;
+import com.pm.todoapp.core.user.dto.UserDTO;
+import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.core.user.port.UserProviderPort;
+import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.core.user.repository.UserRepository;
 import com.pm.todoapp.chat.model.Conversation;
 import com.pm.todoapp.chat.model.ConversationType;
 import com.pm.todoapp.chat.model.Message;
-import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.chat.repository.ConversationRepository;
-import com.pm.todoapp.users.profile.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +28,16 @@ import java.util.stream.StreamSupport;
 @Service
 public class ChatService {
     private final ConversationRepository conversationRepository;
-    private final UsersService usersService;
+    private final UserRepository userRepository;
+    private final UserValidationPort userValidationPort;
+    private final UserProviderPort userProviderPort;
 
     @Autowired
-    public ChatService(ConversationRepository conversationRepository, UsersService usersService) {
+    public ChatService(ConversationRepository conversationRepository, UserRepository userRepository, UserValidationPort userValidationPort, UserProviderPort userProviderPort) {
         this.conversationRepository = conversationRepository;
-        this.usersService = usersService;
+        this.userRepository = userRepository;
+        this.userValidationPort = userValidationPort;
+        this.userProviderPort = userProviderPort;
     }
 
     public Conversation findRawConversationById(UUID id){
@@ -38,7 +46,10 @@ public class ChatService {
     }
 
     public List<ConversationResponseDTO> findByUserId(UUID userId) {
-        User user = usersService.findRawById(userId);
+
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Iterable<Conversation> conversations = conversationRepository.findByParticipantsContains(user);
 
         return StreamSupport.stream(conversations.spliterator(), false)
@@ -61,8 +72,11 @@ public class ChatService {
 
     public ConversationResponseDTO findOrCreatePrivateConversation(UUID currentUser, UUID otherUser){
 
-        User user1 = usersService.findRawById(currentUser);
-        User user2 = usersService.findRawById(otherUser);
+        userValidationPort.ensureUserExistsById(currentUser);
+        userValidationPort.ensureUserExistsById(otherUser);
+
+        User user1 = userRepository.getReferenceById(currentUser);
+        User user2 = userRepository.getReferenceById(otherUser);
 
         Conversation conversation = conversationRepository.findPrivateConversationBetweenUsers(user1, user2)
                 .orElseGet(() -> {
@@ -77,31 +91,41 @@ public class ChatService {
     }
 
     public List<MessageResponseDTO> getMessages(UUID conversationId, UUID userId) {
-        User user = usersService.findRawById(userId);
+
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Conversation conversation = findRawConversationById(conversationId);
 
         if (!conversation.getParticipants().contains(user))
             throw new UnauthorizedException("You do not have permission to access this conversation");
 
         return conversation.getMessages().stream().map(
-                message ->  MessageMapper.toResponseDTO(message, UserMapper.toUserResponseDTO(user))
+                message ->  {
+                    SenderDTO senderDTO = SenderMapper.fromUserDtoToSenderDTO(
+                            userProviderPort.getUserById(message.getSender().getId()));
+
+                    return MessageMapper.toResponseDTO(message,senderDTO,userId);
+                }
         ).toList();
     }
 
     @Transactional
-    public Map<User, MessageResponseDTO> prepareMessagesToSend(UUID chatId, UUID uuid, String content) {
+    public Map<User, MessageResponseDTO> prepareMessagesToSend(UUID chatId, UUID userId, String content) {
+
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+        UserDTO userDTO = userProviderPort.getUserById(userId);
+        SenderDTO senderDTO = SenderMapper.fromUserDtoToSenderDTO(userDTO);
 
         Conversation conversation = findRawConversationById(chatId);
-        User sender = usersService.findRawById(uuid);
-
-        Message savedMessage = saveNewMessage(conversation, sender, content);
-
+        Message savedMessage = saveNewMessage(conversation, user, content);
         Map<User, MessageResponseDTO> personalizedMessages = new HashMap<>();
 
-        for (User user : conversation.getParticipants()) {
+        for (User participant : conversation.getParticipants()) {
 
-            MessageResponseDTO personalizedMessageDTO = MessageMapper.toResponseDTO(savedMessage, UserMapper.toUserResponseDTO(user));
-            personalizedMessages.put(user, personalizedMessageDTO);
+            MessageResponseDTO personalizedMessageDTO = MessageMapper.toResponseDTO(savedMessage, senderDTO, participant.getId());
+            personalizedMessages.put(participant, personalizedMessageDTO);
         }
 
         return personalizedMessages;
@@ -122,15 +146,17 @@ public class ChatService {
         return conversation.getMessages().getLast();
     }
 
-    public ConversationResponseDTO newConversation(String conversationName, Set<UUID> participantIds, UUID userId) {
+    public ConversationResponseDTO newConversation(String conversationName, Set<UUID> participantIds, UUID creatorId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(creatorId);
+        userValidationPort.ensureUsersExistsById(participantIds);
 
+        User creator = userRepository.getReferenceById(creatorId);
         Set<User> participants = participantIds.stream()
-                .map(usersService::findRawById)
+                .map(userRepository::getReferenceById)
                 .collect(Collectors.toSet());
 
-        participants.add(user);
+        participants.add(creator);
 
         Conversation conversation = Conversation.builder()
                 .conversationType(ConversationType.GROUP_CHAT)
@@ -138,22 +164,32 @@ public class ChatService {
                 .participants(participants)
                 .build();
 
-        return toResponseDTO(conversationRepository.save(conversation), userId);
+        return toResponseDTO(conversationRepository.save(conversation), creatorId);
     }
 
     private ConversationResponseDTO toResponseDTO(Conversation conversation, UUID currentUserId) {
 
+        Set<UUID> participantsIds = conversation.getParticipants()
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+
+        Set<UserDTO> participants = userProviderPort.getUsersByIds(participantsIds);
+
+        String title = switch (conversation.getConversationType()){
+            case PRIVATE -> participants.stream()
+                    .filter(participant -> !participant.getId().equals(currentUserId))
+                    .findFirst()
+                    .map(user -> user.getFirstName() + " " + user.getLastName())
+                    .orElse("unknown user");
+            case GROUP_CHAT -> conversation.getTitle();
+        };
+
         return ConversationResponseDTO.builder()
                 .id(conversation.getId())
                 .type(conversation.getConversationType())
-                .title(switch (conversation.getConversationType()){
-                    case PRIVATE -> conversation.getParticipants().stream().filter(
-                                    participant -> !participant.getId().equals(currentUserId))
-                            .findFirst()
-                            .map(user -> user.getFirstName() + " " + user.getLastName())
-                            .orElse("unknown user");
-                    case GROUP_CHAT -> conversation.getTitle();
-                }).build();
+                .title(title)
+                .build();
     }
 
 

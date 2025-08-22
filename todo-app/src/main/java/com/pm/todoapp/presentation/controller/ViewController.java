@@ -2,7 +2,7 @@ package com.pm.todoapp.presentation.controller;
 
 import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
-import com.pm.todoapp.users.profile.model.Gender;
+import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;

@@ -1,6 +1,7 @@
 package com.pm.todoapp.users.profile.model;
 
 import com.pm.todoapp.chat.model.Conversation;
+import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.tasks.model.Task;
 import com.pm.todoapp.teams.model.Team;
 import jakarta.persistence.*;
@@ -13,10 +14,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity(name = "UserProfile")
 @Table(name = "users")
 public class User {
 

@@ -1,8 +1,8 @@
 package com.pm.todoapp.users.profile.service;
 
 import com.pm.todoapp.users.profile.dto.ProfileStatus;
-import com.pm.todoapp.users.profile.model.FriendRequest;
-import com.pm.todoapp.users.profile.model.Gender;
+import com.pm.todoapp.users.social.model.FriendRequest;
+import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.social.dto.FriendRequestDTO;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
@@ -51,6 +51,11 @@ public class UsersService {
         this.notificationService = notificationService;
     }
 
+    public void ensureUserExistsById(UUID userId) {
+        if (!usersRepository.existsById(userId))
+            throw new UserNotFoundException("User with this id does not exist: " + userId.toString());
+
+    }
 
     public User findRawById(UUID userId) {
         return usersRepository.findById(userId).orElseThrow(

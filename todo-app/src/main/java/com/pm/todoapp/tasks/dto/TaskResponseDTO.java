@@ -20,7 +20,7 @@ public class TaskResponseDTO {
     private String priority;
     private String status;
     private TeamResponseDTO team;
-    private Set<UserResponseDTO> assignees;
+    private Set<TaskUserDTO> assignees;
     private String taskDate;
     private String startTime;
     private String endTime;

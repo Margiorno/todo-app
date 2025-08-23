@@ -1,5 +1,8 @@
 package com.pm.todoapp.tasks.service;
 
+import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.core.user.repository.UserRepository;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
@@ -15,7 +18,6 @@ import com.pm.todoapp.tasks.repository.TaskDAO;
 import com.pm.todoapp.tasks.repository.TaskRepository;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.service.TeamService;
-import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,21 +33,27 @@ import java.util.stream.StreamSupport;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskDAO taskDAO;
-
+    private final UserValidationPort userValidationPort;
     private final TeamService teamService;
-    private final UsersService usersService;
+    private final UserRepository userRepository;
+    private final TaskMapper taskMapper;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService, UsersService usersService) {
+    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService,
+                       UserValidationPort userValidationPort, UserRepository userRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
         this.taskDAO = taskDAO;
         this.teamService = teamService;
-        this.usersService = usersService;
+        this.userValidationPort = userValidationPort;
+        this.userRepository = userRepository;
+        this.taskMapper = taskMapper;
     }
 
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
         if (teamId != null) {
@@ -54,12 +62,13 @@ public class TaskService {
         }
 
         Task savedTask = taskRepository.save(task);
-        return TaskMapper.toResponseDTO(savedTask);
+        return taskMapper.toResponseDTO(savedTask);
     }
 
     public TaskResponseDTO update(TaskRequestDTO taskDto, UUID taskId, UUID userId, UUID teamId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
 
         Task fromDb = taskRepository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("Task with this id does not exists: %s".formatted(taskId))
@@ -79,28 +88,30 @@ public class TaskService {
         task.setTeam(fromDb.getTeam());
 
         Task savedTask = taskRepository.save(task);
-        return TaskMapper.toResponseDTO(savedTask);
+        return taskMapper.toResponseDTO(savedTask);
     }
 
 
-    // FINDING
     public List<TaskResponseDTO> findByUserId(UUID userId) {
-        User user = usersService.findRawById(userId);
+
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
 
         Iterable<Task> tasks = taskRepository.findByAssigneesContaining(user);
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+        return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
 
     public TaskResponseDTO findByTaskId(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(
                 ()->new TaskNotFoundException("Task with this id does not exists: %s".formatted(id)));
 
-        return TaskMapper.toResponseDTO(task);
+        return taskMapper.toResponseDTO(task);
     }
 
     public List<TaskResponseDTO> findByDate(LocalDate centerDate, UUID userId, UUID teamId, TaskFetchScope taskFetchScope) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
 
         Iterable<Task> tasks = switch (teamId){
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
@@ -113,12 +124,13 @@ public class TaskService {
             }
         };
 
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+        return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
 
     public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
         Team team = teamService.findRawById(teamId);
 
         Iterable<Task> tasks;
@@ -128,7 +140,7 @@ public class TaskService {
             case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeam(user, team);
         };
 
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+        return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
 
     public List<TaskResponseDTO> findByBasicFilters(
@@ -149,7 +161,8 @@ public class TaskService {
                 if (userId == null) {
                     throw new UserRequiredException("User ID is required when fetching user-specific tasks.");
                 }
-                user = usersService.findRawById(userId);
+                userValidationPort.ensureUserExistsById(userId);
+                user = userRepository.getReferenceById(userId);
 
                 if (teamId != null) {
                     team = teamService.findRawById(teamId);
@@ -166,7 +179,7 @@ public class TaskService {
 
         Iterable<Task> tasks = taskDAO.findByBasicFilters(priority, status, startDate, endDate, user, team);
 
-        return StreamSupport.stream(tasks.spliterator(), false).map(TaskMapper::toResponseDTO).toList();
+        return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
 
     public TaskRequestDTO findTaskRequestById(UUID id) {

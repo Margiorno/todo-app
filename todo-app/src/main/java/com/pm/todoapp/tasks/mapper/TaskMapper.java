@@ -1,17 +1,27 @@
 package com.pm.todoapp.tasks.mapper;
 
+import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.teams.mapper.TeamMapper;
-import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.model.Task;
-import com.pm.todoapp.users.profile.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Component
 public class TaskMapper {
+
+    private final TaskUserConverter taskUserConverter;
+
+    @Autowired
+    public TaskMapper(TaskUserConverter taskUserConverter) {
+        this.taskUserConverter = taskUserConverter;
+    }
+
     public static Task toEntity(TaskRequestDTO dto, Set<User> users) {
 
         return Task.builder()
@@ -33,13 +43,13 @@ public class TaskMapper {
         return task;
     }
 
-    public static TaskResponseDTO toResponseDTO(Task task) {
+    public TaskResponseDTO toResponseDTO(Task task) {
         return TaskResponseDTO.builder()
                 .id(task.getId().toString())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .priority(task.getPriority().name())
-                .assignees(task.getAssignees().stream().map(UserMapper::toUserResponseDTO)
+                .assignees(task.getAssignees().stream().map(taskUserConverter::toDTO)
                                 .collect(Collectors.toSet()))
                 .team(task.getTeam() == null ? null : TeamMapper.toResponseDTO(task.getTeam()))
                 .status(task.getStatus() != null ? task.getStatus().name() : null)

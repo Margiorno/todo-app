@@ -1,7 +1,8 @@
 package com.pm.todoapp.tasks.model;
 
+import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.teams.model.Team;
-import com.pm.todoapp.users.profile.model.User;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

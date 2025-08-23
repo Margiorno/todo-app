@@ -1,6 +1,6 @@
 package com.pm.todoapp.notifications.model;
 
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.core.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

@@ -29,4 +29,9 @@ public class FriendRequest {
     private User receiver;
 
     private LocalDateTime sentAt = LocalDateTime.now();
+
+    @PrePersist
+    protected void onCreate() {
+        sentAt = LocalDateTime.now();
+    }
 }

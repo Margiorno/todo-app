@@ -38,6 +38,13 @@ public class UserProviderAdapter implements UserProviderPort {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public String getUserName(UUID senderId) {
+
+        User user = usersService.findRawById(senderId);
+        return "%s %s".formatted(user.getFirstName(), user.getLastName());
+    }
+
     private static UserDTO mapToDTO(User user) {
         return UserDTO.builder().
                 id(user.getId())

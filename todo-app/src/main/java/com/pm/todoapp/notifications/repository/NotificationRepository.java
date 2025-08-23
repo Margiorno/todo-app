@@ -1,8 +1,8 @@
 package com.pm.todoapp.notifications.repository;
 
+import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
-import com.pm.todoapp.users.profile.model.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

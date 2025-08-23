@@ -1,13 +1,9 @@
-package com.pm.todoapp.websocket;
+package com.pm.todoapp.chat.controller;
 
 import com.pm.todoapp.chat.dto.MessageDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.service.ChatService;
 import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.notifications.dto.NotificationDTO;
-import com.pm.todoapp.notifications.service.NotificationService;
-import com.pm.todoapp.users.profile.service.UsersService;
-import com.pm.todoapp.users.social.dto.FriendRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,19 +18,15 @@ import java.util.UUID;
 
 // TODO DIVIDE TO CHAT AND NOTIFICATION
 @Controller
-public class WebSocketController {
+public class ChatWebSocketController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final UsersService usersService;
-    private final NotificationService notificationService;
 
     @Autowired
-    public WebSocketController(ChatService chatService, SimpMessagingTemplate messagingTemplate, UsersService usersService, NotificationService notificationService) {
+    public ChatWebSocketController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
-        this.usersService = usersService;
-        this.notificationService = notificationService;
     }
 
     @MessageMapping("/chat/{chatId}/sendMessage")
@@ -59,23 +51,4 @@ public class WebSocketController {
             );
         });
     }
-
-    @MessageMapping("/user/{receiverId}/invite")
-    public void sendFriendInvitation(
-            @DestinationVariable UUID receiverId,
-            Principal principal) {
-
-        UUID senderId = UUID.fromString(principal.getName());
-
-        FriendRequestDTO invitation = usersService.saveFriendRequest(senderId, receiverId);
-        NotificationDTO notification = notificationService.createNotification(invitation);
-
-        messagingTemplate.convertAndSendToUser(
-                invitation.getReceiverId().toString(),
-                "/queue/notification",
-                notification
-        );
-    }
-
-
 }

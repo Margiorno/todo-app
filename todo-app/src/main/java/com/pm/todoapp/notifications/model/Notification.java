@@ -1,6 +1,6 @@
 package com.pm.todoapp.notifications.model;
 
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.core.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "notification_type")
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -24,6 +23,7 @@ public class Notification {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType type;
 

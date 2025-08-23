@@ -3,7 +3,6 @@ package com.pm.todoapp.notifications.dto;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.pm.todoapp.notifications.model.NotificationType;
-import com.pm.todoapp.users.social.dto.FriendRequestNotificationDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

@@ -13,6 +13,7 @@ import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.service.TaskService;
 import com.pm.todoapp.teams.service.TeamService;
 import com.pm.todoapp.users.profile.service.UsersService;
+import com.pm.todoapp.users.social.service.FriendRequestService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,16 +34,16 @@ public class ViewController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final UsersService usersService;
-    private final FriendsRequestRepository friendsRequestRepository;
     private final NotificationService notificationService;
+    private final FriendRequestService friendRequestService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendsRequestRepository friendsRequestRepository, NotificationService notificationService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, NotificationService notificationService, FriendRequestService friendRequestService) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
-        this.friendsRequestRepository = friendsRequestRepository;
         this.notificationService = notificationService;
+        this.friendRequestService = friendRequestService;
     }
 
     @Data
@@ -151,7 +152,7 @@ public class ViewController {
             Model model) {
 
         UserResponseDTO profile = usersService.findById(profileId);
-        ProfileStatusDTO status = usersService.determineFriendshipStatus(userId, profileId);
+        ProfileStatusDTO status = friendRequestService.determineFriendshipStatus(userId, profileId);
 
         model.addAttribute("profileStatusInfo", status);
         model.addAttribute("user", profile);

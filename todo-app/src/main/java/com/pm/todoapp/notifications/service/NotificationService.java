@@ -1,19 +1,22 @@
 package com.pm.todoapp.notifications.service;
 
+import com.pm.todoapp.core.user.dto.UserDTO;
+import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.core.user.port.UserProviderPort;
+import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.notifications.dto.FriendRequestUserDTO;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
-import com.pm.todoapp.users.profile.model.User;
-import com.pm.todoapp.users.social.dto.FriendRequestDTO;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.core.exceptions.NotificationNotFoundException;
-import com.pm.todoapp.core.exceptions.UnauthorizedException;
 import com.pm.todoapp.notifications.mapper.NotificationMapper;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.model.NotificationType;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
-import com.pm.todoapp.users.profile.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -24,58 +27,19 @@ import java.util.stream.StreamSupport;
 @Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-    private final UsersService usersService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserValidationPort userValidationPort;
+    private final UserProviderPort userProviderPort;
+    private final UserRepository userRepository;
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository, UsersService usersService, SimpMessagingTemplate messagingTemplate) {
+    public NotificationService(NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate, UserValidationPort userValidationPort, UserProviderPort userProviderPort, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
-        this.usersService = usersService;
         this.messagingTemplate = messagingTemplate;
+        this.userValidationPort = userValidationPort;
+        this.userProviderPort = userProviderPort;
+        this.userRepository = userRepository;
     }
-
-    public Notification findRawById(UUID id) {
-        return notificationRepository.findById(id)
-                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
-    }
-
-    public FriendRequestNotification findRawFriendRequestNotificationById(UUID id) {
-        return notificationRepository.findFriendRequestNotificationById(id)
-                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
-    }
-
-    @Transactional
-    public NotificationDTO createNotification(FriendRequestDTO invitation) {
-
-        User sender = usersService.findRawById(invitation.getSenderId());
-        User receiver = usersService.findRawById(invitation.getReceiverId());
-        String message = "has sent you a friend request";
-
-        FriendRequestNotification notificationEntity = FriendRequestNotification.builder()
-                .requestId(invitation.getId())
-                .receiver(receiver)
-                .sender(sender)
-                .type(NotificationType.FRIEND_REQUEST)
-                .message(message)
-                .build();
-
-        FriendRequestNotification saved = notificationRepository.save(notificationEntity);
-
-        return NotificationMapper.toDTO(saved);
-    }
-
-    public NotificationDTO createNotification(User receiver, User currentUser, NotificationType notificationType, String notificationMessage) {
-        Notification notification = Notification.builder()
-                .receiver(receiver)
-                .type(notificationType)
-                .message(notificationMessage)
-                .build();
-
-        Notification saved = notificationRepository.save(notification);
-
-        return NotificationMapper.toDTO(saved);
-    }
-
 
     public void sendNotification(NotificationDTO notification, UUID receiverId) {
         messagingTemplate.convertAndSendToUser(
@@ -87,35 +51,34 @@ public class NotificationService {
 
     public List<NotificationDTO> getAllNotificationsByUserId(UUID userId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Iterable<Notification> notifications = notificationRepository.findAllByReceiver(user);
 
         return StreamSupport.stream(notifications.spliterator(), false)
                 .sorted(Comparator.comparing(Notification::getCreatedAt))
-                .map(NotificationMapper::toDTO)
+                .map(this::mapNotificationToDto)
                 .toList();
     }
 
-    public void readNotification(UUID id, UUID userId) {
-        Notification notification = findRawById(id);
+    private NotificationDTO mapNotificationToDto(Notification notification) {
+        if (notification instanceof FriendRequestNotification frn) {
+            UUID senderId = frn.getSender().getId();
+            userValidationPort.ensureUserExistsById(senderId);
+            UserDTO senderData = userProviderPort.getUserById(senderId);
 
-        if (!notification.getReceiver().getId().equals(userId))
-            throw new UnauthorizedException("You are not authorized to read this notification");
+            FriendRequestUserDTO senderDTO = FriendRequestUserDTO.builder()
+                    .id(senderData.getId().toString())
+                    .profilePicturePath(senderData.getProfilePicturePath())
+                    .firstName(senderData.getFirstName())
+                    .lastName(senderData.getLastName())
+                    .build();
 
-        notification.setRead(true);
-        notificationRepository.save(notification);
-    }
-
-    public void resolveNotification(UUID requestId) {
-        FriendRequestNotification friendRequestNotification = getFriendRequestNotification(requestId);
-
-        friendRequestNotification.setResolved(true);
-        notificationRepository.save(friendRequestNotification);
-    }
-
-    public void deleteNotification(UUID requestId) {
-        FriendRequestNotification friendRequestNotification = getFriendRequestNotification(requestId);
-        notificationRepository.delete(friendRequestNotification);
+            return NotificationMapper.toDTO(frn, senderDTO);
+        } else {
+            return NotificationMapper.toDTO(notification);
+        }
     }
 
     private FriendRequestNotification getFriendRequestNotification(UUID requestId) {
@@ -127,5 +90,68 @@ public class NotificationService {
     @Transactional
     public void markAllReadByUserId(UUID userId) {
         notificationRepository.markAllReadByUserId(userId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createAndSendFriendRequestNotification(UUID requestId, UUID senderId, UUID receiverId) {
+        userValidationPort.ensureUserExistsById(senderId);
+        userValidationPort.ensureUserExistsById(receiverId);
+
+        User sender = userRepository.getReferenceById(senderId);
+        User receiver = userRepository.getReferenceById(receiverId);
+
+        UserDTO senderData = userProviderPort.getUserById(senderId);
+        String message = "%s %s has sent you a friend request".formatted(senderData.getFirstName(), senderData.getLastName());
+
+        FriendRequestNotification notificationEntity = FriendRequestNotification.builder()
+                .requestId(requestId)
+                .receiver(receiver)
+                .sender(sender)
+                .type(NotificationType.FRIEND_REQUEST)
+                .message(message)
+                .build();
+
+        FriendRequestNotification saved = notificationRepository.save(notificationEntity);
+        FriendRequestUserDTO senderDTO = FriendRequestUserDTO.builder()
+                .id(senderData.getId().toString())
+                .profilePicturePath(senderData.getProfilePicturePath())
+                .firstName(senderData.getFirstName())
+                .lastName(senderData.getLastName())
+                .build();
+
+
+
+        NotificationDTO notificationDTO = NotificationMapper.toDTO(saved, senderDTO);
+        sendNotification(notificationDTO, receiverId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createFriendRequestAcceptedNotification(UUID acceptorId, UUID senderId) {
+
+        userValidationPort.ensureUserExistsById(senderId);
+        userValidationPort.ensureUserExistsById(acceptorId);
+
+        User sender = userRepository.getReferenceById(senderId);
+        UserDTO acceptorData = userProviderPort.getUserById(acceptorId);
+        String message = "%s %s accepted your friend request".formatted(acceptorData.getFirstName(), acceptorData.getLastName());
+
+        Notification notification = Notification.builder()
+                .receiver(sender)
+                .message(message)
+                .type(NotificationType.FRIEND_REQUEST_ACCEPTED)
+                .build();
+
+        Notification saved = notificationRepository.save(notification);
+        NotificationDTO notificationDTO = NotificationMapper.toDTO(saved);
+
+        sendNotification(notificationDTO, senderId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void resolveNotification(UUID requestId) {
+        FriendRequestNotification friendRequestNotification = getFriendRequestNotification(requestId);
+
+        friendRequestNotification.setResolved(true);
+        notificationRepository.save(friendRequestNotification);
     }
 }

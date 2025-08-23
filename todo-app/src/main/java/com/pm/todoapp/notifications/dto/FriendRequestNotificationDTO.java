@@ -1,7 +1,5 @@
-package com.pm.todoapp.users.social.dto;
+package com.pm.todoapp.notifications.dto;
 
-import com.pm.todoapp.notifications.dto.NotificationDTO;
-import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @SuperBuilder
 public class FriendRequestNotificationDTO extends NotificationDTO {
-    private UserResponseDTO sender;
+    private FriendRequestUserDTO sender;
     private boolean resolved;
     private UUID requestId;
 }

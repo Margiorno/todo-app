@@ -10,4 +10,6 @@ public interface UserProviderPort {
     UserDTO getUserById(UUID userId);
 
     Set<UserDTO> getUsersByIds(Set<UUID> participantsIds);
+
+    String getUserName(UUID senderId);
 }

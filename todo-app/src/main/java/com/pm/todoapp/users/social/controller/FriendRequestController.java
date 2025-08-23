@@ -1,6 +1,9 @@
 package com.pm.todoapp.users.social.controller;
 
+import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.users.profile.service.UsersService;
+import com.pm.todoapp.users.social.dto.FriendRequestDTO;
+import com.pm.todoapp.users.social.service.FriendRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -10,10 +13,21 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/friend-requests")
 public class FriendRequestController {
+    private final FriendRequestService friendRequestService;
     private final UsersService usersService;
 
-    public FriendRequestController(UsersService usersService) {
+    public FriendRequestController(FriendRequestService friendRequestService, UsersService usersService) {
+        this.friendRequestService = friendRequestService;
         this.usersService = usersService;
+    }
+
+    @PostMapping("/{receiverId}/invite")
+    public ResponseEntity<Void> sendFriendInvitation(
+            @PathVariable UUID receiverId,
+            @AuthenticationPrincipal UUID senderId) {
+
+        friendRequestService.newFriendRequest(senderId, receiverId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{requestId}/accept")
@@ -21,7 +35,7 @@ public class FriendRequestController {
             @PathVariable UUID requestId,
             @AuthenticationPrincipal UUID currentUserId) {
 
-        usersService.acceptFriendRequest(requestId, currentUserId);
+        friendRequestService.acceptFriendRequest(requestId, currentUserId);
         return ResponseEntity.ok().build();
     }
 
@@ -30,7 +44,7 @@ public class FriendRequestController {
             @PathVariable UUID requestId,
             @AuthenticationPrincipal UUID currentUserId) {
 
-        usersService.declineFriendRequest(requestId, currentUserId);
+        friendRequestService.declineFriendRequest(requestId, currentUserId);
         return ResponseEntity.ok().build();
     }
 
@@ -39,17 +53,17 @@ public class FriendRequestController {
             @PathVariable UUID requestId,
             @AuthenticationPrincipal UUID currentUserId) {
 
-        usersService.cancelFriendRequest(requestId, currentUserId);
+        friendRequestService.cancelFriendRequest(requestId, currentUserId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{userId}/remove")
-    public ResponseEntity<Void> removeFriendRequest(
+    public ResponseEntity<Void> removeFriend(
             @AuthenticationPrincipal UUID currentUserId,
             @PathVariable UUID userId
     ){
 
-        usersService.remove(currentUserId, userId);
+        usersService.removeFriend(currentUserId, userId);
         return ResponseEntity.ok().build();
     }
 }

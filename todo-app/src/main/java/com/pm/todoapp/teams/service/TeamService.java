@@ -1,5 +1,6 @@
 package com.pm.todoapp.teams.service;
 
+import com.pm.todoapp.core.user.dto.UserDTO;
 import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.core.user.port.UserProviderPort;
 import com.pm.todoapp.core.user.port.UserValidationPort;
@@ -11,41 +12,33 @@ import com.pm.todoapp.core.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.core.exceptions.TeamNotFoundException;
 import com.pm.todoapp.teams.mapper.InviteMapper;
 import com.pm.todoapp.teams.mapper.TeamMapper;
-import com.pm.todoapp.teams.mapper.TeamMemberConverter;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.model.Invite;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;
 import com.pm.todoapp.teams.repository.TeamRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 public class TeamService {
     private final TeamRepository teamRepository;
-    private final TeamInviteRepository inviteRepository;
-
     private final UserValidationPort userValidationPort;
-    private final UserProviderPort userProviderPort;
     private final UserRepository userRepository;
-    private final TeamMemberConverter teamMemberConverter;
+    private final UserProviderPort userProviderPort;
+    private final InviteCodeService inviteCodeService;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, TeamInviteRepository inviteRepository, UserValidationPort userValidationPort, UserProviderPort userProviderPort, UserRepository userRepository, TeamMemberConverter teamMemberConverter) {
+    public TeamService(TeamRepository teamRepository, UserValidationPort userValidationPort, UserRepository userRepository, UserProviderPort userProviderPort, InviteCodeService inviteCodeService) {
         this.teamRepository = teamRepository;
-        this.inviteRepository = inviteRepository;
         this.userValidationPort = userValidationPort;
-        this.userProviderPort = userProviderPort;
         this.userRepository = userRepository;
-        this.teamMemberConverter = teamMemberConverter;
+        this.userProviderPort = userProviderPort;
+        this.inviteCodeService = inviteCodeService;
     }
 
     public Team findRawById(UUID teamId) {
@@ -58,11 +51,6 @@ public class TeamService {
                 orElseThrow(()->new TeamNotFoundException("Team with this id does not exist: " + teamId));
     }
 
-    public List<TeamResponseDTO> findAll() {
-        Iterable<Team> teams = teamRepository.findAll();
-
-        return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
-    }
 
     public List<TeamResponseDTO> findAllByUserId(UUID userId) {
 
@@ -88,50 +76,26 @@ public class TeamService {
 
     public TeamInviteResponseDTO generateInviteCode(UUID teamId) {
         Team team = findRawById(teamId);
-
-        Invite invite = new Invite();
-        invite.setTeam(team);
-        invite.setCode(generateInvitationCode());
-        invite.setExpirationDate(LocalDateTime.now().plusMinutes(5));
-
-        Invite savedInvite = inviteRepository.save(invite);
-
-        return InviteMapper.toResponseDTO(savedInvite);
+        Invite invite = inviteCodeService.createAndSaveInvite(team);
+        return InviteMapper.toResponseDTO(invite);
     }
 
-
-
+    @Transactional
     public void join(String code, UUID userId) {
 
         userValidationPort.ensureUserExistsById(userId);
         User user = userRepository.getReferenceById(userId);
 
-        Invite invite = inviteRepository.findByCode(code).orElseThrow(
-                ()->new InvalidTeamInviteException("There is no invitation with this code")
-        );
-        Team team = invite.getTeam();
+        Team team = inviteCodeService.resolveInvitationCode(code);
 
         if (team.getMembers().contains(user))
             throw new InvalidTeamInviteException("You are already in a member of this team");
 
         team.getMembers().add(user);
         teamRepository.save(team);
-
-        inviteRepository.delete(invite);
     }
 
-    private String generateInvitationCode() {
-        String generatedCode;
-        do{
-            byte[] array = new byte[6];
-            new Random().nextBytes(array);
-            RandomStringUtils generator = RandomStringUtils.insecure();
-            generatedCode = generator.next(6, 'A', 'Z' + 1, false, false);
-        } while (inviteRepository.existsByCode(generatedCode));
-
-        return generatedCode;
-    }
-
+    @Transactional
     public void deleteUserFromTeam(UUID teamId, UUID userId) {
 
         Team team = findRawById(teamId);
@@ -148,18 +112,23 @@ public class TeamService {
                 throw new TeamNotFoundException("Team with this id does not exist: " + teamId);
     }
 
+    @Transactional(readOnly = true)
     public Set<TeamMemberDTO> findTeamMembers(UUID teamId) {
-        Team team = findRawById(teamId);
 
+        Team team = findRawById(teamId);
         Set<User> members = team.getMembers();
 
-        if (members.isEmpty()) {
-            //TODO
-        }
+        if (members.isEmpty())
+            return Collections.emptySet();
 
-         return  members.stream()
+        Set<UUID> memberIds = members.stream()
                 .map(User::getId)
-                .map(teamMemberConverter::toDTO)
+                .collect(Collectors.toSet());
+
+        Set<UserDTO> usersDTOs = userProviderPort.getUsersByIds(memberIds);
+
+        return usersDTOs.stream()
+                .map(userDto -> new TeamMemberDTO(userDto.getId(), userDto.getEmail()))
                 .collect(Collectors.toSet());
     }
 }

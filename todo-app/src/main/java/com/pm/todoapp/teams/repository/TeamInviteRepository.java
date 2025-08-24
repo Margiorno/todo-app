@@ -11,5 +11,4 @@ import java.util.UUID;
 public interface TeamInviteRepository extends CrudRepository<Invite, UUID> {
     boolean existsByCode(String code);
     Optional<Invite> findByCode(String code);
-    void deleteByCode(String code);
 }

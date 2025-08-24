@@ -1,20 +1,21 @@
 package com.pm.todoapp.teams.service;
 
+import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.core.user.port.UserProviderPort;
+import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.core.user.repository.UserRepository;
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
+import com.pm.todoapp.teams.dto.TeamMemberDTO;
 import com.pm.todoapp.teams.dto.TeamResponseDTO;
-import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.core.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.core.exceptions.TeamNotFoundException;
 import com.pm.todoapp.teams.mapper.InviteMapper;
 import com.pm.todoapp.teams.mapper.TeamMapper;
-import com.pm.todoapp.users.profile.mapper.UserMapper;
+import com.pm.todoapp.teams.mapper.TeamMemberConverter;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.model.Invite;
-import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;
 import com.pm.todoapp.teams.repository.TeamRepository;
-import com.pm.todoapp.users.profile.repository.UsersRepository;
-import com.pm.todoapp.users.profile.service.UsersService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,20 +23,29 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 public class TeamService {
     private final TeamRepository teamRepository;
-    private final UsersService usersService;
     private final TeamInviteRepository inviteRepository;
 
+    private final UserValidationPort userValidationPort;
+    private final UserProviderPort userProviderPort;
+    private final UserRepository userRepository;
+    private final TeamMemberConverter teamMemberConverter;
+
     @Autowired
-    public TeamService(TeamRepository teamRepository, UsersService usersService, TeamInviteRepository inviteRepository, UsersRepository usersRepository) {
+    public TeamService(TeamRepository teamRepository, TeamInviteRepository inviteRepository, UserValidationPort userValidationPort, UserProviderPort userProviderPort, UserRepository userRepository, TeamMemberConverter teamMemberConverter) {
         this.teamRepository = teamRepository;
-        this.usersService = usersService;
         this.inviteRepository = inviteRepository;
+        this.userValidationPort = userValidationPort;
+        this.userProviderPort = userProviderPort;
+        this.userRepository = userRepository;
+        this.teamMemberConverter = teamMemberConverter;
     }
 
     public Team findRawById(UUID teamId) {
@@ -56,7 +66,9 @@ public class TeamService {
 
     public List<TeamResponseDTO> findAllByUserId(UUID userId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Iterable<Team> teams = teamRepository.findByMembersContaining(user);
 
         return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
@@ -64,21 +76,14 @@ public class TeamService {
 
     public void createTeam(String teamName, UUID userId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
 
         Team team = new Team();
         team.setName(teamName);
         team.getMembers().add(user);
-        user.getTeams().add(team);
 
         teamRepository.save(team);
-        usersService.save(user);
-    }
-
-    public List<UserResponseDTO> findUsersByTeamId(UUID teamId) {
-        Team team = findRawById(teamId);
-
-        return team.getMembers().stream().map(UserMapper::toUserResponseDTO).toList();
     }
 
     public TeamInviteResponseDTO generateInviteCode(UUID teamId) {
@@ -98,7 +103,9 @@ public class TeamService {
 
     public void join(String code, UUID userId) {
 
-        User user = usersService.findRawById(userId);
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
+
         Invite invite = inviteRepository.findByCode(code).orElseThrow(
                 ()->new InvalidTeamInviteException("There is no invitation with this code")
         );
@@ -108,9 +115,8 @@ public class TeamService {
             throw new InvalidTeamInviteException("You are already in a member of this team");
 
         team.getMembers().add(user);
-        user.getTeams().add(team);
-
         teamRepository.save(team);
+
         inviteRepository.delete(invite);
     }
 
@@ -129,17 +135,31 @@ public class TeamService {
     public void deleteUserFromTeam(UUID teamId, UUID userId) {
 
         Team team = findRawById(teamId);
-        User user = usersService.findRawById(userId);
+
+        userValidationPort.ensureUserExistsById(userId);
+        User user = userRepository.getReferenceById(userId);
 
         team.getMembers().remove(user);
-        user.getTeams().remove(team);
-
         teamRepository.save(team);
-        usersService.save(user);
     }
 
     public void ensureTeamExistsById(UUID teamId) {
         if(!teamRepository.existsById(teamId))
                 throw new TeamNotFoundException("Team with this id does not exist: " + teamId);
+    }
+
+    public Set<TeamMemberDTO> findTeamMembers(UUID teamId) {
+        Team team = findRawById(teamId);
+
+        Set<User> members = team.getMembers();
+
+        if (members.isEmpty()) {
+            //TODO
+        }
+
+         return  members.stream()
+                .map(User::getId)
+                .map(teamMemberConverter::toDTO)
+                .collect(Collectors.toSet());
     }
 }

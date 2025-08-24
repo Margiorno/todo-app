@@ -4,6 +4,7 @@ import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
+import com.pm.todoapp.teams.dto.TeamMemberDTO;
 import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -127,9 +129,9 @@ public class ViewController {
             model.addAttribute("selectedTeamName", teamService.findRawById(teamId).getName());
         }
 
-        List<UserResponseDTO> teamMembers = (teamId != null)
-                ? teamService.findUsersByTeamId(teamId)
-                : Collections.emptyList();
+        Set<TeamMemberDTO> teamMembers = (teamId != null)
+                ? teamService.findTeamMembers(teamId)
+                : Collections.emptySet();
 
         model.addAttribute("allTeams", teamService.findAllByUserId(userId));
         model.addAttribute("priorities", Priority.values());

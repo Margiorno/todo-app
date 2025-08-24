@@ -43,19 +43,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_team",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "team_id")
-    )
-    @EqualsAndHashCode.Exclude
-    private Set<Team> teams = new HashSet<>();
-
-    @ManyToMany(mappedBy = "assignees")
-    @EqualsAndHashCode.Exclude
-    private Set<Task> tasks = new HashSet<>();
-
     @ManyToMany(mappedBy = "participants")
     @EqualsAndHashCode.Exclude
     private Set<Conversation> conversations = new HashSet<>();

@@ -1,39 +1,23 @@
 package com.pm.todoapp.users.profile.service;
 
-import com.pm.todoapp.users.profile.dto.ProfileStatus;
-import com.pm.todoapp.users.social.model.FriendRequest;
+import com.pm.todoapp.core.team.port.TeamValidationPort;
 import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.users.profile.model.User;
-import com.pm.todoapp.users.social.dto.FriendRequestDTO;
-import com.pm.todoapp.notifications.dto.NotificationDTO;
-import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.core.exceptions.InvalidFieldException;
 import com.pm.todoapp.core.exceptions.InvalidFriendInviteException;
-import com.pm.todoapp.core.exceptions.UnauthorizedException;
 import com.pm.todoapp.core.exceptions.UserNotFoundException;
 import com.pm.todoapp.file.service.FileService;
 import com.pm.todoapp.file.dto.FileType;
-import com.pm.todoapp.users.social.mapper.FriendRequestMapper;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
-import com.pm.todoapp.notifications.model.NotificationType;
-import com.pm.todoapp.notifications.service.NotificationService;
-import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-// TODO DIVIDE TO PROFILE AND SOCIAL(FRIEND REQUESTS)
+import java.util.*;
 
 @Service
 public class UsersService {
@@ -155,7 +139,7 @@ public class UsersService {
     }
 
     public List<UserResponseDTO> getFriends(UUID userId) {
-        User user =findRawById(userId);
+        User user = findRawById(userId);
 
         return user.getFriends().stream().map(UserMapper::toUserResponseDTO).toList();
     }

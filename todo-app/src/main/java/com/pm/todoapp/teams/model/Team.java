@@ -1,6 +1,6 @@
 package com.pm.todoapp.teams.model;
 
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.core.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -26,6 +26,11 @@ public class Team {
     @NotBlank
     private String name;
 
-    @ManyToMany(mappedBy = "teams")
+    @ManyToMany
+    @JoinTable(
+            name = "user_team",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<User> members = new HashSet<>();
 }

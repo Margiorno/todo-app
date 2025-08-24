@@ -1,7 +1,6 @@
 package com.pm.todoapp.tasks.dto;
 
 import com.pm.todoapp.teams.dto.TeamResponseDTO;
-import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class TaskResponseDTO {
     private String description;
     private String priority;
     private String status;
-    private TeamResponseDTO team;
+    private TaskTeamDTO team;
     private Set<TaskUserDTO> assignees;
     private String taskDate;
     private String startTime;

@@ -51,7 +51,7 @@ public class TaskMapper {
                 .priority(task.getPriority().name())
                 .assignees(task.getAssignees().stream().map(taskUserConverter::toDTO)
                                 .collect(Collectors.toSet()))
-                .team(task.getTeam() == null ? null : TeamMapper.toResponseDTO(task.getTeam()))
+                .team(task.getTeam() == null ? null : TaskTeamMapper.toDTO(task.getTeam()))
                 .status(task.getStatus() != null ? task.getStatus().name() : null)
                 .taskDate(task.getTaskDate() != null ? task.getTaskDate().toString() : null)
                 .startTime(task.getStartTime() != null ? task.getStartTime().toString() : null)

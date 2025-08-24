@@ -1,5 +1,8 @@
 package com.pm.todoapp.tasks.service;
 
+import com.pm.todoapp.core.team.model.Team;
+import com.pm.todoapp.core.team.port.TeamValidationPort;
+import com.pm.todoapp.core.team.repository.TeamRepository;
 import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.core.user.port.UserValidationPort;
 import com.pm.todoapp.core.user.repository.UserRepository;
@@ -16,9 +19,6 @@ import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.tasks.model.Task;
 import com.pm.todoapp.tasks.repository.TaskDAO;
 import com.pm.todoapp.tasks.repository.TaskRepository;
-import com.pm.todoapp.teams.model.Team;
-import com.pm.todoapp.teams.service.TeamService;
-import com.pm.todoapp.users.profile.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,19 +34,21 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskDAO taskDAO;
     private final UserValidationPort userValidationPort;
-    private final TeamService teamService;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
+    private final TeamRepository teamRepository;
+    private final TeamValidationPort teamValidationPort;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO, TeamService teamService,
-                       UserValidationPort userValidationPort, UserRepository userRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO,
+                       UserValidationPort userValidationPort, UserRepository userRepository, TaskMapper taskMapper, TeamRepository teamRepository, TeamValidationPort teamValidationPort) {
         this.taskRepository = taskRepository;
         this.taskDAO = taskDAO;
-        this.teamService = teamService;
         this.userValidationPort = userValidationPort;
         this.userRepository = userRepository;
         this.taskMapper = taskMapper;
+        this.teamRepository = teamRepository;
+        this.teamValidationPort = teamValidationPort;
     }
 
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
@@ -57,7 +59,8 @@ public class TaskService {
         Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
         if (teamId != null) {
-            Team team = teamService.findRawById(teamId);
+            teamValidationPort.ensureTeamExistsById(teamId);
+            Team team = teamRepository.getReferenceById(teamId);
             task.setTeam(team);
         }
 
@@ -116,7 +119,7 @@ public class TaskService {
         Iterable<Task> tasks = switch (teamId){
             case null -> taskRepository.findByAssigneesContainingAndTaskDate(user, centerDate);
             default -> {
-                Team team = teamService.findRawById(teamId);
+                Team team = teamRepository.getReferenceById(teamId);
                 yield switch (taskFetchScope){
                     case TEAM_TASKS -> taskRepository.findByTeamAndTaskDate(team, centerDate);
                     case USER_TASKS -> taskRepository.findByAssigneesContainingAndTeamAndTaskDate(user, team, centerDate);
@@ -130,8 +133,10 @@ public class TaskService {
     public List<TaskResponseDTO> findByTeam(UUID teamId, UUID userId, TaskFetchScope taskFetchScope) {
 
         userValidationPort.ensureUserExistsById(userId);
+        teamValidationPort.ensureTeamExistsById(teamId);
+
         User user = userRepository.getReferenceById(userId);
-        Team team = teamService.findRawById(teamId);
+        Team team = teamRepository.getReferenceById(teamId);
 
         Iterable<Task> tasks;
 
@@ -165,7 +170,8 @@ public class TaskService {
                 user = userRepository.getReferenceById(userId);
 
                 if (teamId != null) {
-                    team = teamService.findRawById(teamId);
+                    teamValidationPort.ensureTeamExistsById(teamId);
+                    team = teamRepository.getReferenceById(teamId);
                 }
                 break;
 
@@ -173,7 +179,8 @@ public class TaskService {
                 if (teamId == null) {
                     throw new TeamRequiredException("Team ID is required when fetching tasks for an entire team.");
                 }
-                team = teamService.findRawById(teamId);
+                teamValidationPort.ensureTeamExistsById(teamId);
+                team = teamRepository.getReferenceById(teamId);
                 break;
         }
 

@@ -1,6 +1,9 @@
-package com.pm.todoapp.core.user.model;
+package com.pm.todoapp.core.team.model;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +15,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "UserReference")
-@Table(name = "users")
-public class User {
+@Entity(name = "TeamReference")
+@Table(name = "teams")
+public class Team {
     @Id
     private UUID id;
 }
-
-
-

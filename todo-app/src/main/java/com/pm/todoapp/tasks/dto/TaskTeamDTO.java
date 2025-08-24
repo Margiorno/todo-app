@@ -1,23 +1,17 @@
-package com.pm.todoapp.core.user.model;
+package com.pm.todoapp.tasks.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "UserReference")
-@Table(name = "users")
-public class User {
-    @Id
+public class TaskTeamDTO {
     private UUID id;
 }
-
-
-

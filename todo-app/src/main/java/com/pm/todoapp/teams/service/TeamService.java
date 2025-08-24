@@ -137,4 +137,9 @@ public class TeamService {
         teamRepository.save(team);
         usersService.save(user);
     }
+
+    public void ensureTeamExistsById(UUID teamId) {
+        if(!teamRepository.existsById(teamId))
+                throw new TeamNotFoundException("Team with this id does not exist: " + teamId);
+    }
 }

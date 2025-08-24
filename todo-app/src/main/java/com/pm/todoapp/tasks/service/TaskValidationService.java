@@ -8,11 +8,13 @@ import com.pm.todoapp.core.user.model.User;
 import com.pm.todoapp.core.user.port.UserValidationPort;
 import com.pm.todoapp.core.user.repository.UserRepository;
 import com.pm.todoapp.tasks.model.Task;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class TaskValidationService {
 
@@ -20,13 +22,6 @@ public class TaskValidationService {
     private final UserValidationPort userValidationPort;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
-
-    public TaskValidationService(TeamValidationPort teamValidationPort, UserValidationPort userValidationPort, TeamRepository teamRepository, UserRepository userRepository) {
-        this.teamValidationPort = teamValidationPort;
-        this.userValidationPort = userValidationPort;
-        this.teamRepository = teamRepository;
-        this.userRepository = userRepository;
-    }
 
     public User getValidatedUser(UUID userId) {
         if (userId == null) {

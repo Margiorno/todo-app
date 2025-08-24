@@ -10,6 +10,7 @@ import com.pm.todoapp.core.exceptions.UserNotFoundException;
 import com.pm.todoapp.core.file.dto.FileType;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class UsersService {
 
     private final UsersRepository usersRepository;
     private final FileStoragePort fileStoragePort;
-
-    @Autowired
-    public UsersService(UsersRepository usersRepository, FileStoragePort fileStoragePort) {
-        this.usersRepository = usersRepository;
-        this.fileStoragePort = fileStoragePort;
-    }
 
     public void ensureUserExistsById(UUID userId) {
         if (!usersRepository.existsById(userId))

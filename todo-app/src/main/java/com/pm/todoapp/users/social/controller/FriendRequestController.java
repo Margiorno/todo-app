@@ -4,22 +4,19 @@ import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.users.profile.service.UsersService;
 import com.pm.todoapp.users.social.dto.FriendRequestDTO;
 import com.pm.todoapp.users.social.service.FriendRequestService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/friend-requests")
 public class FriendRequestController {
     private final FriendRequestService friendRequestService;
     private final UsersService usersService;
-
-    public FriendRequestController(FriendRequestService friendRequestService, UsersService usersService) {
-        this.friendRequestService = friendRequestService;
-        this.usersService = usersService;
-    }
 
     @PostMapping("/{receiverId}/invite")
     public ResponseEntity<Void> sendFriendInvitation(

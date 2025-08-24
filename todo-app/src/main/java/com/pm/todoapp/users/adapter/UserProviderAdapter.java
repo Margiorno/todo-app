@@ -4,19 +4,18 @@ import com.pm.todoapp.core.user.dto.UserDTO;
 import com.pm.todoapp.core.user.port.UserProviderPort;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Component
 public class UserProviderAdapter implements UserProviderPort {
     private final UsersService usersService;
 
-    public UserProviderAdapter(UsersService usersService) {
-        this.usersService = usersService;
-    }
 
     @Override
     public UserDTO getUserById(UUID userId) {

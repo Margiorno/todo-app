@@ -4,18 +4,15 @@ import com.pm.todoapp.core.user.event.FriendRequestAcceptedEvent;
 import com.pm.todoapp.core.user.event.FriendRequestResolvedEvent;
 import com.pm.todoapp.core.user.event.FriendRequestSentEvent;
 import com.pm.todoapp.notifications.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@RequiredArgsConstructor
 @Component
 public class UserNotificationsListener {
     private final NotificationService notificationService;
-
-    @Autowired
-    public UserNotificationsListener(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
 
     @TransactionalEventListener
     public void handleFriendRequestSent(FriendRequestSentEvent event) {

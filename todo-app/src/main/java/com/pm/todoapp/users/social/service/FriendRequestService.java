@@ -12,6 +12,7 @@ import com.pm.todoapp.users.profile.repository.UsersRepository;
 import com.pm.todoapp.users.profile.service.UsersService;
 import com.pm.todoapp.users.social.model.FriendRequest;
 import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -22,20 +23,13 @@ import java.util.UUID;
 // TODO DIVIDE TO PROFILE AND SOCIAL(FRIEND REQUESTS)
 
 @Service
+@RequiredArgsConstructor
 public class FriendRequestService {
 
     private final UsersRepository usersRepository;
     private final FriendsRequestRepository friendsRequestRepository;
     private final UsersService usersService;
     private final ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    public FriendRequestService(UsersRepository usersRepository, FriendsRequestRepository friendsRequestRepository, UsersService usersService, ApplicationEventPublisher eventPublisher) {
-        this.usersRepository = usersRepository;
-        this.friendsRequestRepository = friendsRequestRepository;
-        this.usersService = usersService;
-        this.eventPublisher = eventPublisher;
-    }
 
     @Transactional
     public void newFriendRequest(UUID senderId, UUID receiverId) {

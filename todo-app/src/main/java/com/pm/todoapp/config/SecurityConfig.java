@@ -23,12 +23,14 @@ import java.util.Base64;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
+    private final String jwtSecret;
     private final AuthEntryPoint authEntryPoint;
 
-    public SecurityConfig(AuthEntryPoint authEntryPoint) {
+    public SecurityConfig(
+            @Value("${jwt.secret}") String jwtSecret
+            , AuthEntryPoint authEntryPoint) {
+
+        this.jwtSecret = jwtSecret;
         this.authEntryPoint = authEntryPoint;
     }
 

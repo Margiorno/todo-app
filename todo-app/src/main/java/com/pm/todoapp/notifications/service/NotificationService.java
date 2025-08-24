@@ -14,6 +14,7 @@ import com.pm.todoapp.notifications.mapper.NotificationConverter;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
 import com.pm.todoapp.notifications.sender.NotificationSender;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
+@RequiredArgsConstructor
 @Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
@@ -33,23 +35,7 @@ public class NotificationService {
     private final NotificationFactory notificationFactory;
     private final NotificationSender notificationSender;
     private final NotificationConverter notificationConverter;
-
-    @Autowired
-    public NotificationService(NotificationRepository notificationRepository,
-                               UserValidationPort userValidationPort,
-                               UserRepository userRepository,
-                               NotificationFactory notificationFactory,
-                               NotificationSender notificationSender,
-                               NotificationConverter notificationConverter) {
-
-        this.notificationRepository = notificationRepository;
-        this.userValidationPort = userValidationPort;
-        this.userRepository = userRepository;
-        this.notificationFactory = notificationFactory;
-        this.notificationSender = notificationSender;
-        this.notificationConverter = notificationConverter;
-    }
-
+    
     public List<NotificationDTO> getAllNotificationsByUserId(UUID userId) {
 
         userValidationPort.ensureUserExistsById(userId);

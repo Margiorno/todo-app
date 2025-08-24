@@ -8,12 +8,14 @@ import com.pm.todoapp.notifications.dto.FriendRequestNotificationDTO;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Component
 public class NotificationConverter {
 
@@ -21,11 +23,6 @@ public class NotificationConverter {
     private final UserProviderPort userProviderPort;
     private final UserValidationPort userValidationPort;
 
-    @Autowired
-    public NotificationConverter(UserProviderPort userProviderPort, UserValidationPort userValidationPort) {
-        this.userProviderPort = userProviderPort;
-        this.userValidationPort = userValidationPort;
-    }
 
     public NotificationDTO toDTO(Notification notification) {
         if (notification instanceof FriendRequestNotification frn) {

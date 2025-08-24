@@ -16,6 +16,7 @@ import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.model.Invite;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;
 import com.pm.todoapp.teams.repository.TeamRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@RequiredArgsConstructor
 @Service
 public class TeamService {
     private final TeamRepository teamRepository;
@@ -31,15 +33,6 @@ public class TeamService {
     private final UserRepository userRepository;
     private final UserProviderPort userProviderPort;
     private final InviteCodeService inviteCodeService;
-
-    @Autowired
-    public TeamService(TeamRepository teamRepository, UserValidationPort userValidationPort, UserRepository userRepository, UserProviderPort userProviderPort, InviteCodeService inviteCodeService) {
-        this.teamRepository = teamRepository;
-        this.userValidationPort = userValidationPort;
-        this.userRepository = userRepository;
-        this.userProviderPort = userProviderPort;
-        this.inviteCodeService = inviteCodeService;
-    }
 
     public Team findRawById(UUID teamId) {
 

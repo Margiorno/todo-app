@@ -6,20 +6,17 @@ import com.pm.todoapp.core.user.port.UserProviderPort;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.model.NotificationType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Component
 public class NotificationFactory {
 
     private final UserProviderPort userProviderPort;
-
-    @Autowired
-    public NotificationFactory(UserProviderPort userProviderPort) {
-        this.userProviderPort = userProviderPort;
-    }
 
     public FriendRequestNotification createFriendRequestNotification(UUID requestId, User sender, User receiver) {
         UserDTO senderData = userProviderPort.getUserById(sender.getId());

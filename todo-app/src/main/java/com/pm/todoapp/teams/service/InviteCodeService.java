@@ -4,18 +4,16 @@ import com.pm.todoapp.core.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.teams.model.Invite;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @Service
 public class InviteCodeService {
     private final TeamInviteRepository teamInviteRepository;
-
-    public InviteCodeService(TeamInviteRepository teamInviteRepository) {
-        this.teamInviteRepository = teamInviteRepository;
-    }
 
     public Invite createAndSaveInvite(Team team) {
         Invite invite = new Invite();

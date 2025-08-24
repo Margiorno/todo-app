@@ -16,6 +16,7 @@ import com.pm.todoapp.chat.model.Conversation;
 import com.pm.todoapp.chat.model.ConversationType;
 import com.pm.todoapp.chat.model.Message;
 import com.pm.todoapp.chat.repository.ConversationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,20 +26,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@RequiredArgsConstructor
 @Service
 public class ChatService {
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final UserValidationPort userValidationPort;
     private final UserProviderPort userProviderPort;
-
-    @Autowired
-    public ChatService(ConversationRepository conversationRepository, UserRepository userRepository, UserValidationPort userValidationPort, UserProviderPort userProviderPort) {
-        this.conversationRepository = conversationRepository;
-        this.userRepository = userRepository;
-        this.userValidationPort = userValidationPort;
-        this.userProviderPort = userProviderPort;
-    }
 
     public Conversation findRawConversationById(UUID id){
         return conversationRepository.findById(id).orElseThrow(

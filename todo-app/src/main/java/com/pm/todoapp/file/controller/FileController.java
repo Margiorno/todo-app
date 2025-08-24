@@ -2,6 +2,7 @@ package com.pm.todoapp.file.controller;
 
 import com.pm.todoapp.file.service.FileService;
 import com.pm.todoapp.core.file.dto.FileType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,15 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/files")
 public class FileController {
 
     private final FileService fileService;
-
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
 
     @GetMapping("/profile-pictures/{filename}")
     public ResponseEntity<Resource> loadProfilePicture(@PathVariable String filename) {

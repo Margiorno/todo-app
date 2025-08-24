@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,16 +23,11 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
-
-    @Autowired
-    public JwtCookieAuthenticationFilter(JwtDecoder jwtDecoder) {
-        this.jwtDecoder = jwtDecoder;
-    }
-
-
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

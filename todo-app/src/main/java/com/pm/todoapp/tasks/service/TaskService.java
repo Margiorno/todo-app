@@ -17,6 +17,7 @@ import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.tasks.model.Task;
 import com.pm.todoapp.tasks.repository.TaskDAO;
 import com.pm.todoapp.tasks.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
+@RequiredArgsConstructor
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
@@ -32,16 +34,6 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final TaskValidationService taskAuthorizationService;
     private final TaskValidationService taskValidationService;
-
-    @Autowired
-    public TaskService(TaskRepository taskRepository, TaskDAO taskDAO,
-                       UserValidationPort userValidationPort, UserRepository userRepository, TaskMapper taskMapper, TeamRepository teamRepository, TeamValidationPort teamValidationPort, TaskValidationService taskAuthorizationService, TaskValidationService taskValidationService) {
-        this.taskRepository = taskRepository;
-        this.taskDAO = taskDAO;
-        this.taskMapper = taskMapper;
-        this.taskAuthorizationService = taskAuthorizationService;
-        this.taskValidationService = taskValidationService;
-    }
 
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
 

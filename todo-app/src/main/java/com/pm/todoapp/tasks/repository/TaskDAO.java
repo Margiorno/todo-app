@@ -11,6 +11,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,14 +19,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Repository
 public class TaskDAO {
     private final EntityManager entityManager;
-
-    @Autowired
-    public TaskDAO(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     public Iterable<Task> findByBasicFilters(
             Priority priority,

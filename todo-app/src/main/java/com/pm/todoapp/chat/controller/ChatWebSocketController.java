@@ -4,7 +4,7 @@ import com.pm.todoapp.chat.dto.MessageDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.service.ChatService;
 import com.pm.todoapp.core.user.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,18 +16,12 @@ import java.util.Map;
 import java.util.UUID;
 
 
-// TODO DIVIDE TO CHAT AND NOTIFICATION
+@RequiredArgsConstructor
 @Controller
 public class ChatWebSocketController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
-    public ChatWebSocketController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
-        this.chatService = chatService;
-        this.messagingTemplate = messagingTemplate;
-    }
 
     @MessageMapping("/chat/{chatId}/sendMessage")
     public void sendMessage(

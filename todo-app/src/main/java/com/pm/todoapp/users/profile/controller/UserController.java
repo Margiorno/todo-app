@@ -2,6 +2,7 @@ package com.pm.todoapp.users.profile.controller;
 
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.service.UsersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     private final UsersService usersService;
-
-    public UserController(UsersService usersService) {
-        this.usersService = usersService;
-    }
 
     @PostMapping("/profile/avatar")
     public ResponseEntity<Map<String,String>> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UUID userId) {

@@ -3,6 +3,7 @@ package com.pm.todoapp.teams.controller;
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.teams.dto.JoinTeamRequestDTO;
 import com.pm.todoapp.teams.service.TeamService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,15 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/teams")
 public class TeamsController {
 
     private final TeamService teamService;
-
-    public TeamsController(TeamService teamService) {
-        this.teamService = teamService;
-    }
 
     @PostMapping("/create")
     public String createTeam(

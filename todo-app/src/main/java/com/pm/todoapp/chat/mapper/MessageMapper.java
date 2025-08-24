@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public class MessageMapper {
     public static MessageResponseDTO toResponseDTO(Message message, SenderDTO senderDTO, UUID currentUserId) {
-
         return MessageResponseDTO.builder()
                 .conversationId(message.getConversation().getId())
                 .sender(senderDTO)

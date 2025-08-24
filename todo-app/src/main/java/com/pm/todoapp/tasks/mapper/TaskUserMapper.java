@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskUserConverter {
+public class TaskUserMapper {
 
     private final UserValidationPort userValidationPort;
     private final UserProviderPort userProviderPort;
 
     @Autowired
-    public TaskUserConverter(UserValidationPort userValidationPort, UserProviderPort userProviderPort) {
+    public TaskUserMapper(UserValidationPort userValidationPort, UserProviderPort userProviderPort) {
         this.userValidationPort = userValidationPort;
         this.userProviderPort = userProviderPort;
     }

@@ -1,7 +1,6 @@
 package com.pm.todoapp.tasks.mapper;
 
 import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.teams.mapper.TeamMapper;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.model.Task;
@@ -15,10 +14,10 @@ import java.util.stream.Collectors;
 @Component
 public class TaskMapper {
 
-    private final TaskUserConverter taskUserConverter;
+    private final TaskUserMapper taskUserConverter;
 
     @Autowired
-    public TaskMapper(TaskUserConverter taskUserConverter) {
+    public TaskMapper(TaskUserMapper taskUserConverter) {
         this.taskUserConverter = taskUserConverter;
     }
 
@@ -56,18 +55,6 @@ public class TaskMapper {
                 .taskDate(task.getTaskDate() != null ? task.getTaskDate().toString() : null)
                 .startTime(task.getStartTime() != null ? task.getStartTime().toString() : null)
                 .endTime(task.getEndTime() != null ? task.getEndTime().toString() : null)
-                .build();
-    }
-
-    public static TaskRequestDTO toRequestDto(Task task) {
-        return TaskRequestDTO.builder()
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .priority(task.getPriority())
-                .status(task.getStatus())
-                .taskDate(task.getTaskDate())
-                .startTime(task.getStartTime())
-                .endTime(task.getEndTime())
                 .build();
     }
 }

@@ -50,7 +50,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            TeamRequiredException.class,
             TaskAccessDeniedException.class,
     })
     public String handleBadRequestExceptions(RuntimeException ex, Model model) {

@@ -1,4 +1,4 @@
-package com.pm.todoapp.file.dto;
+package com.pm.todoapp.core.file.dto;
 
 import lombok.*;
 

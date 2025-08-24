@@ -1,7 +1,7 @@
 package com.pm.todoapp.file.controller;
 
 import com.pm.todoapp.file.service.FileService;
-import com.pm.todoapp.file.dto.FileType;
+import com.pm.todoapp.core.file.dto.FileType;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

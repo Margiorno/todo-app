@@ -3,7 +3,7 @@ package com.pm.todoapp.file.service;
 import com.pm.todoapp.core.exceptions.InvalidFileTypeException;
 import com.pm.todoapp.core.exceptions.StorageException;
 import com.pm.todoapp.core.exceptions.StorageFileNotFoundException;
-import com.pm.todoapp.file.dto.FileType;
+import com.pm.todoapp.core.file.dto.FileType;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;

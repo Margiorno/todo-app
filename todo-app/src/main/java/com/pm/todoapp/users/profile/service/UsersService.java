@@ -1,14 +1,13 @@
 package com.pm.todoapp.users.profile.service;
 
-import com.pm.todoapp.core.team.port.TeamValidationPort;
+import com.pm.todoapp.core.file.port.FileStoragePort;
 import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.core.exceptions.InvalidFieldException;
 import com.pm.todoapp.core.exceptions.InvalidFriendInviteException;
 import com.pm.todoapp.core.exceptions.UserNotFoundException;
-import com.pm.todoapp.file.service.FileService;
-import com.pm.todoapp.file.dto.FileType;
+import com.pm.todoapp.core.file.dto.FileType;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,12 @@ import java.util.*;
 public class UsersService {
 
     private final UsersRepository usersRepository;
-    private final FileService fileService;
+    private final FileStoragePort fileStoragePort;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository, FileService fileService) {
+    public UsersService(UsersRepository usersRepository, FileStoragePort fileStoragePort) {
         this.usersRepository = usersRepository;
-        this.fileService = fileService;
+        this.fileStoragePort = fileStoragePort;
     }
 
     public void ensureUserExistsById(UUID userId) {
@@ -67,13 +66,13 @@ public class UsersService {
         User user = findRawById(userId);
         String oldPicturePath = user.getProfilePicturePath();
 
-        String newPicturePath = fileService.saveFile(file, FileType.PROFILE_PICTURE);
+        String newPicturePath = fileStoragePort.saveFile(file, FileType.PROFILE_PICTURE);
 
         user.setProfilePicturePath(newPicturePath);
         usersRepository.save(user);
 
         if (oldPicturePath != null && !oldPicturePath.isEmpty() && !oldPicturePath.isBlank()) {
-            fileService.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
+            fileStoragePort.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
         }
 
         return newPicturePath;
@@ -138,6 +137,7 @@ public class UsersService {
         usersRepository.save(unfriend);
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> getFriends(UUID userId) {
         User user = findRawById(userId);
 

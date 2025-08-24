@@ -60,7 +60,7 @@ public class TaskDAO {
             predicates.add(criteriaBuilder.isMember(user, root.get("assignees")));
         }
         if (team != null) {
-            predicates.add(criteriaBuilder.equal(root.get("teams"), team));
+            predicates.add(criteriaBuilder.equal(root.get("team"), team));
         }
 
         criteriaQuery.where(predicates.toArray(new Predicate[0]));

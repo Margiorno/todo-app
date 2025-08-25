@@ -3,11 +3,9 @@ package com.pm.todoapp.presentation.controller;
 import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.core.user.model.Gender;
-import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.teams.dto.TeamMemberDTO;
 import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
-import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
 import com.pm.todoapp.notifications.service.NotificationService;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
@@ -36,15 +34,13 @@ public class ViewController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final UsersService usersService;
-    private final NotificationService notificationService;
     private final FriendRequestService friendRequestService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, NotificationService notificationService, FriendRequestService friendRequestService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendRequestService friendRequestService) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
-        this.notificationService = notificationService;
         this.friendRequestService = friendRequestService;
     }
 
@@ -142,8 +138,7 @@ public class ViewController {
     }
 
     @GetMapping("/chat")
-    public String showChatView(Model model) {
-
+    public String showChatView() {
         return "chat";
     }
 
@@ -164,20 +159,11 @@ public class ViewController {
 
     @GetMapping("/profile")
     public String redirectToMyProfile(@AuthenticationPrincipal UUID userId) {
-
         return "redirect:/profile/" + userId.toString();
     }
 
     @GetMapping("/notifications")
-    public String showNotifications(
-            @AuthenticationPrincipal UUID userId,
-            Model model) {
-
-        List<NotificationDTO> notifications = notificationService.getAllNotificationsByUserId(userId);
-        notificationService.markAllReadByUserId(userId);
-
-        model.addAttribute("notifications", notifications);
-
+    public String showNotifications() {
         return "notifications";
     }
 

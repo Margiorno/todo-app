@@ -15,25 +15,10 @@
 <div class="container mt-4">
   <h2>Notifications</h2>
   <hr>
-  <div id="notification-list">
+  <div id="notification-list"></div>
 
-    <div th:each="notification : ${notifications}">
-      <div th:switch="${notification.type.name()}">
-
-        <div th:case="'FRIEND_REQUEST'">
-          <div th:replace="~{fragments/notifications/friend_request :: card(notification=${notification})}"></div>
-        </div>
-
-        <div th:case="*">
-          <div th:replace="~{fragments/notifications/default :: card(notification=${notification})}"></div>
-        </div>
-      </div>
-    </div>
-
-    <div th:if="${#lists.isEmpty(notifications)}" class="alert alert-info" role="alert">
-      You have no new notifications.
-    </div>
-
+  <div id="no-notifications-message" class="alert alert-info" style="display:none;">
+    You have no new notifications.
   </div>
 </div>
 

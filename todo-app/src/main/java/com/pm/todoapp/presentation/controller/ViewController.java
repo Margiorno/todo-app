@@ -4,15 +4,14 @@ import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.teams.dto.TeamMemberDTO;
-import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
+import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
-import com.pm.todoapp.notifications.service.NotificationService;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.service.TaskService;
 import com.pm.todoapp.teams.service.TeamService;
 import com.pm.todoapp.users.profile.service.UsersService;
-import com.pm.todoapp.users.social.service.FriendRequestService;
+import com.pm.todoapp.users.social.service.SocialService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,10 +33,10 @@ public class ViewController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final UsersService usersService;
-    private final FriendRequestService friendRequestService;
+    private final SocialService friendRequestService;
 
     @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, FriendRequestService friendRequestService) {
+    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, SocialService friendRequestService) {
         this.taskService = taskService;
         this.teamService = teamService;
         this.usersService = usersService;
@@ -147,12 +146,11 @@ public class ViewController {
             @PathVariable UUID profileId,
             @AuthenticationPrincipal UUID userId,
             Model model) {
-
-        UserResponseDTO profile = usersService.findById(profileId);
+        
         ProfileStatusDTO status = friendRequestService.determineFriendshipStatus(userId, profileId);
 
         model.addAttribute("profileStatusInfo", status);
-        model.addAttribute("user", profile);
+        model.addAttribute("profileId", profileId);
         model.addAttribute("genders", Gender.values());
         return "profile";
     }

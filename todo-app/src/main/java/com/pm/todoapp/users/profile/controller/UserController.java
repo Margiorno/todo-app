@@ -2,6 +2,7 @@ package com.pm.todoapp.users.profile.controller;
 
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.service.UsersService;
+import com.pm.todoapp.users.social.service.SocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UsersService usersService;
+    private final SocialService socialService;
 
     @PostMapping("/profile/avatar")
     public ResponseEntity<Map<String,String>> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UUID userId) {
@@ -41,9 +43,9 @@ public class UserController {
         return ResponseEntity.ok(usersService.update(field, value, userId));
     }
 
-    @GetMapping("/friends")
-    public ResponseEntity<List<UserResponseDTO>> getFriendRequests(@AuthenticationPrincipal UUID userId) {
-
-        return ResponseEntity.ok(usersService.getFriends(userId));
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseDTO> getUser(@PathVariable UUID userId) {
+        return ResponseEntity.ok(usersService.findById(userId));
     }
+
 }

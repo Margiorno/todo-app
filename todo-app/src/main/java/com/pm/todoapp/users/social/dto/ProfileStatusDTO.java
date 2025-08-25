@@ -1,5 +1,6 @@
-package com.pm.todoapp.users.profile.dto;
+package com.pm.todoapp.users.social.dto;
 
+import com.pm.todoapp.users.profile.dto.ProfileStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

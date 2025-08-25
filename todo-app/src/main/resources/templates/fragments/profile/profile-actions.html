@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -16,15 +16,14 @@
     </div>
 
     <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).FRIEND}">
-        <button type="button" id="remove-friend-btn" class="btn btn-danger w-100"
-                th:attr="data-friend-id=${user.id}">
+        <button type="button" id="remove-friend-btn" class="btn btn-danger w-100">
             Remove Friend
         </button>
     </div>
 
     <div th:case="${T(com.pm.todoapp.users.profile.dto.ProfileStatus).INVITATION_SENT}">
         <div class="text-muted mb-2">
-            <small>Friend request send</small>
+            <small>Friend request sent</small>
         </div>
         <button type="button" class="btn btn-secondary" id="cancel-invitation-btn"
                 th:attr="data-request-id=${profileStatusInfo.friendRequestId}">
@@ -51,7 +50,6 @@
     <div th:case="*">
         <button type="button"
                 id="add-friend-btn"
-                th:attr="data-profile-id=${user.id}"
                 class="btn btn-success w-100">
             Add Friend
         </button>

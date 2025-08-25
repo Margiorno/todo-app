@@ -6,25 +6,27 @@ import com.pm.todoapp.core.user.event.FriendRequestAcceptedEvent;
 import com.pm.todoapp.core.user.event.FriendRequestResolvedEvent;
 import com.pm.todoapp.core.user.event.FriendRequestSentEvent;
 import com.pm.todoapp.users.profile.dto.ProfileStatus;
-import com.pm.todoapp.users.profile.dto.ProfileStatusDTO;
+import com.pm.todoapp.users.profile.dto.UserResponseDTO;
+import com.pm.todoapp.users.profile.mapper.UserMapper;
+import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import com.pm.todoapp.users.profile.service.UsersService;
 import com.pm.todoapp.users.social.model.FriendRequest;
 import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 // TODO DIVIDE TO PROFILE AND SOCIAL(FRIEND REQUESTS)
 
 @Service
 @RequiredArgsConstructor
-public class FriendRequestService {
+public class SocialService {
 
     private final UsersRepository usersRepository;
     private final FriendsRequestRepository friendsRequestRepository;
@@ -57,7 +59,6 @@ public class FriendRequestService {
             throw new UnauthorizedException("You must be the receiver to accept a friend request");
         }
 
-        // TODO accept friends in UsersService
         User currentUser = usersService.findRawById(currentUserId);
         User sender = request.getSender();
         currentUser.addFriend(sender);
@@ -103,7 +104,7 @@ public class FriendRequestService {
 
         if (userId.equals(profileId))
             return new ProfileStatusDTO(ProfileStatus.OWNER, null);
-        if (usersService.areFriends(userId, profileId))
+        if (areFriends(userId, profileId))
             return new ProfileStatusDTO(ProfileStatus.FRIEND, null);
 
         User user = usersService.findRawById(userId);
@@ -135,5 +136,30 @@ public class FriendRequestService {
         return friendsRequestRepository.findBySenderAndReceiver(sender, receiver).orElse(null);
     }
 
+    public boolean areFriends(UUID userId, UUID profileId) {
+        usersService.ensureUserExistsById(userId);
+        usersService.ensureUserExistsById(profileId);
+
+        return usersRepository.existsByIdAndFriendsId(userId,profileId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> getFriends(UUID userId) {
+        User user = usersService.findRawById(userId);
+
+        return user.getFriends().stream().map(UserMapper::toUserResponseDTO).toList();
+    }
+
+    public void removeFriend(UUID currentUserId, UUID userId) {
+        User currentUser = usersService.findRawById(currentUserId);
+        User unfriend = usersService.findRawById(userId);
+
+        if (!usersRepository.areFriends(currentUserId, userId))
+            throw new InvalidFriendInviteException("You cannot remove this user from friends, because you are not friends");
+
+        currentUser.removeFriend(unfriend);
+        usersRepository.save(currentUser);
+        usersRepository.save(unfriend);
+    }
 
 }

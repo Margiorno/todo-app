@@ -113,30 +113,4 @@ public class UsersService {
         user.setGender(gender);
         return usersRepository.save(user).getGender();
     }
-
-    public boolean areFriends(UUID userId, UUID profileId) {
-        ensureUserExistsById(userId);
-        ensureUserExistsById(profileId);
-
-        return usersRepository.existsByIdAndFriendsId(userId,profileId);
-    }
-
-    public void removeFriend(UUID currentUserId, UUID userId) {
-        User currentUser = findRawById(currentUserId);
-        User unfriend = findRawById(userId);
-
-        if (!usersRepository.areFriends(currentUserId, userId))
-            throw new InvalidFriendInviteException("You cannot remove this user from friends, because you are not friends");
-
-        currentUser.removeFriend(unfriend);
-        usersRepository.save(currentUser);
-        usersRepository.save(unfriend);
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserResponseDTO> getFriends(UUID userId) {
-        User user = findRawById(userId);
-
-        return user.getFriends().stream().map(UserMapper::toUserResponseDTO).toList();
-    }
 }

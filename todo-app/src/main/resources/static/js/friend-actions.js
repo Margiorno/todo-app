@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addFriendBtn) {
         addFriendBtn.addEventListener('click', () => {
             const profileId = addFriendBtn.getAttribute('data-profile-id');
-            sendRequest(`/friend-requests/${profileId}/invite`);
+            sendRequest(`/social/${profileId}/invite`);
         });
     }
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (acceptBtn) {
         acceptBtn.addEventListener('click', () => {
             const requestId = acceptBtn.getAttribute('data-request-id');
-            sendRequest(`/friend-requests/${requestId}/accept`);
+            sendRequest(`/social/${requestId}/accept`);
         });
     }
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (declineBtn) {
         declineBtn.addEventListener('click', () => {
             const requestId = declineBtn.getAttribute('data-request-id');
-            sendRequest(`/friend-requests/${requestId}/decline`);
+            sendRequest(`/social/${requestId}/decline`);
         });
     }
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
             const requestId = cancelBtn.getAttribute('data-request-id');
-            sendRequest(`/friend-requests/${requestId}/cancel`);
+            sendRequest(`/social/${requestId}/cancel`);
         });
     }
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (removeFriendBtn) {
         removeFriendBtn.addEventListener('click', () => {
             const friendId = removeFriendBtn.getAttribute('data-friend-id');
-            sendRequest(`/friend-requests/${friendId}/remove`);
+            sendRequest(`/social/${friendId}/remove`);
         });
     }
 });

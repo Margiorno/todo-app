@@ -2,18 +2,13 @@ package com.pm.todoapp.presentation.controller;
 
 import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
-import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.teams.dto.TeamMemberDTO;
-import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
-import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.service.TaskService;
 import com.pm.todoapp.teams.service.TeamService;
-import com.pm.todoapp.users.profile.service.UsersService;
-import com.pm.todoapp.users.social.service.SocialService;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -26,22 +21,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/")
 public class ViewController {
 
     private final TaskService taskService;
     private final TeamService teamService;
-    private final UsersService usersService;
-    private final SocialService friendRequestService;
-
-    @Autowired
-    public ViewController(TaskService taskService, TeamService teamService, UsersService usersService, SocialService friendRequestService) {
-        this.taskService = taskService;
-        this.teamService = teamService;
-        this.usersService = usersService;
-        this.friendRequestService = friendRequestService;
-    }
 
     @Data
     public static class TaskFilterCriteria {
@@ -142,16 +128,7 @@ public class ViewController {
     }
 
     @GetMapping("/profile/{profileId}")
-    public String showProfilePage(
-            @PathVariable UUID profileId,
-            @AuthenticationPrincipal UUID userId,
-            Model model) {
-        
-        ProfileStatusDTO status = friendRequestService.determineFriendshipStatus(userId, profileId);
-
-        model.addAttribute("profileStatusInfo", status);
-        model.addAttribute("profileId", profileId);
-        model.addAttribute("genders", Gender.values());
+    public String showProfilePage(@PathVariable String profileId) {
         return "profile";
     }
 

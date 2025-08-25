@@ -10,24 +10,18 @@
 </head>
 <body>
 
-
 <!--TOP NAVBAR-->
 <div th:replace="~{fragments/top-navbar :: navbar}"></div>
 
 <div class="container-fluid main-page-container" th:attr="data-profile-id=${profileId}">
     <div class="row">
         <div class="col-md-12 main-content mt-4">
-
             <div class="profile-container">
                 <div class="row">
-
-
-                    <!-- PROFILE PICTURE SECTION SECTION -->
+                    <!-- PROFILE PICTURE SECTION -->
                     <div th:replace="~{fragments/profile/profile_picture_section :: section}"></div>
-
                     <!-- USER DETAILS SECTION -->
                     <div th:replace="~{fragments/profile/user_details_section :: section}"></div>
-
                 </div>
                 <div class="text-center mt-3">
                     <a href="/" class="btn btn-secondary">Back to Dashboard</a>
@@ -37,7 +31,7 @@
     </div>
 </div>
 
-<!-- PHOTO CROP -->
+<!-- PHOTO CROP MODAL -->
 <div th:replace="~{fragments/profile/modals/photo_crop_modal :: modal}"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
@@ -45,11 +39,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
-<script th:src="@{/js/profile-loader.js}"></script>
-<script src="/js/profile-edit.js"></script>
-<script src="/js/profile-picture.js"></script>
-<script th:if="${status != T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" th:src="@{/js/friend-actions.js}"></script>
-
+<script th:src="@{/js/profile.js}"></script>
 
 </body>
 </html>

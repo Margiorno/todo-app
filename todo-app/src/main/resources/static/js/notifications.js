@@ -126,7 +126,7 @@ function handleRequestAction(button, action) {
     const notificationCard = button.closest('.card');
     if (!notificationCard) return;
 
-    const url = `/friend-requests/${requestId}/${action}`;
+    const url = `/social/${requestId}/${action}`;
 
     fetch(url, {
         method: 'POST',

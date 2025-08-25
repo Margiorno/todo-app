@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <body>
 
 <div th:fragment="section" class="col-lg-8">
@@ -15,7 +14,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-email">
                         <span id="display-value-email"></span>
-                        <button th:if="${profileStatusInfo.status == T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="email">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button d-none" data-field="email">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-email">
                         <input type="email" id="input-email" class="form-control">
@@ -33,7 +32,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-firstName">
                         <span id="display-value-firstName"></span>
-                        <button th:if="${profileStatusInfo.status == T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="firstName">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button d-none" data-field="firstName">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-firstName">
                         <input type="text" id="input-firstName" class="form-control">
@@ -51,7 +50,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-lastName">
                         <span id="display-value-lastName"></span>
-                        <button th:if="${profileStatusInfo.status == T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="lastName">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button d-none" data-field="lastName">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-lastName">
                         <input type="text" id="input-lastName" class="form-control">
@@ -69,7 +68,7 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-dateOfBirth">
                         <span id="display-value-dateOfBirth"></span>
-                        <button th:if="${profileStatusInfo.status == T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="dateOfBirth">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button d-none" data-field="dateOfBirth">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-dateOfBirth">
                         <input type="date" id="input-dateOfBirth" class="form-control">
@@ -87,12 +86,10 @@
                 <div class="col-sm-9">
                     <div class="display-view" id="display-view-gender">
                         <span id="display-value-gender"></span>
-                        <button th:if="${profileStatusInfo.status == T(com.pm.todoapp.users.profile.dto.ProfileStatus).OWNER}" type="button" class="btn btn-sm btn-outline-secondary edit-button" data-field="gender">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary edit-button d-none" data-field="gender">Edit</button>
                     </div>
                     <div class="edit-view hidden" id="edit-view-gender">
-                        <select id="input-gender" name="gender" class="form-select">
-                            <option th:each="g : ${genders}" th:value="${g}" th:text="${g.name()}"></option>
-                        </select>
+                        <select id="input-gender" name="gender" class="form-select"></select>
                         <button type="button" class="btn btn-sm btn-success save-button" data-field="gender">Save</button>
                         <button type="button" class="btn btn-sm btn-danger cancel-button" data-field="gender">Cancel</button>
                         <span class="update-status" id="status-gender"></span>

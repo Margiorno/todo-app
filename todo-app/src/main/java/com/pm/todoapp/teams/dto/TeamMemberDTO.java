@@ -13,5 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TeamMemberDTO {
     private UUID id;
+    private String firstName;
+    private String lastName;
     private String email;
 }

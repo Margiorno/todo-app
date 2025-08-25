@@ -14,10 +14,8 @@ import com.pm.todoapp.teams.mapper.InviteMapper;
 import com.pm.todoapp.teams.mapper.TeamMapper;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.model.Invite;
-import com.pm.todoapp.teams.repository.TeamInviteRepository;
 import com.pm.todoapp.teams.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +120,12 @@ public class TeamService {
         Set<UserDTO> usersDTOs = userProviderPort.getUsersByIds(memberIds);
 
         return usersDTOs.stream()
-                .map(userDto -> new TeamMemberDTO(userDto.getId(), userDto.getEmail()))
+                .map(userDto -> TeamMemberDTO.builder()
+                        .id(userDto.getId())
+                        .firstName(userDto.getFirstName())
+                        .lastName(userDto.getLastName())
+                        .email(userDto.getEmail())
+                        .build())
                 .collect(Collectors.toSet());
     }
 }

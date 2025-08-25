@@ -2,6 +2,7 @@ package com.pm.todoapp.teams.controller;
 
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.teams.dto.JoinTeamRequestDTO;
+import com.pm.todoapp.teams.dto.TeamMemberDTO;
 import com.pm.todoapp.teams.dto.TeamResponseDTO;
 import com.pm.todoapp.teams.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -48,15 +52,23 @@ public class TeamsController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> joinTeam(
+    public ResponseEntity<Map<String, String>> joinTeam(
             @AuthenticationPrincipal UUID userId,
             @RequestBody JoinTeamRequestDTO request
     ){
-
         teamService.join(request.getCode(), userId);
-        return ResponseEntity.ok("Joined");
+        return ResponseEntity.ok(Map.of("message", "Joined successfully"));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<TeamResponseDTO>> getAllTeams(
+            @AuthenticationPrincipal UUID userId
+    ){
+        return ResponseEntity.ok(teamService.findAllByUserId(userId));
+    }
 
-
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<Set<TeamMemberDTO>> getTeamMembers(@PathVariable UUID teamId) {
+        return ResponseEntity.ok(teamService.findTeamMembers(teamId));
+    }
 }

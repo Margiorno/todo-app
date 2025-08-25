@@ -1,9 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
+    setupCreateTeam();
     setupInviteCodeModal();
     setupJoinTeam();
     setupNotifications();
     setupManageMembers();
 });
+
+function setupCreateTeam() {
+    const form = document.getElementById('createTeamForm');
+    const errorMsg = document.getElementById('createTeamError');
+    const modalEl = document.getElementById('createTeamModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        errorMsg.classList.add('d-none');
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if(res.ok) return res.json();
+                return res.text().then(text => Promise.reject(text));
+            })
+            .then(data => {
+                modal.hide();
+                sessionStorage.setItem("teamManagementSuccessMessage", `Team "${data.name}" created successfully.`);
+                location.reload();
+            })
+            .catch(err => {
+                console.error('Create team error:', err);
+                errorMsg.textContent = err || 'Could not create team.';
+                errorMsg.classList.remove('d-none');
+            });
+    });
+}
 
 function setupInviteCodeModal() {
     const modalEl = document.getElementById('invitationCodeModal');

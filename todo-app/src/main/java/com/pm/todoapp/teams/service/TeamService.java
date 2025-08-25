@@ -55,7 +55,7 @@ public class TeamService {
         return StreamSupport.stream(teams.spliterator(), false).map(TeamMapper::toResponseDTO).toList();
     }
 
-    public void createTeam(String teamName, UUID userId) {
+    public TeamResponseDTO createTeam(String teamName, UUID userId) {
 
         userValidationPort.ensureUserExistsById(userId);
         User user = userRepository.getReferenceById(userId);
@@ -64,7 +64,8 @@ public class TeamService {
         team.setName(teamName);
         team.getMembers().add(user);
 
-        teamRepository.save(team);
+        return TeamMapper.toResponseDTO(teamRepository.save(team));
+
     }
 
     public TeamInviteResponseDTO generateInviteCode(UUID teamId) {

@@ -2,6 +2,7 @@ package com.pm.todoapp.teams.controller;
 
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.teams.dto.JoinTeamRequestDTO;
+import com.pm.todoapp.teams.dto.TeamResponseDTO;
 import com.pm.todoapp.teams.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,11 @@ public class TeamsController {
     private final TeamService teamService;
 
     @PostMapping("/create")
-    public String createTeam(
+    public ResponseEntity<TeamResponseDTO> createTeam(
             @AuthenticationPrincipal UUID userId,
             @RequestParam String teamName
     ) {
-
-        teamService.createTeam(teamName, userId);
-
-        return "redirect:/";
+        return ResponseEntity.ok(teamService.createTeam(teamName, userId));
     }
 
     @PostMapping("{teamId}/generate-invite-code")

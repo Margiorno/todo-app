@@ -1,11 +1,25 @@
 let stompClient = null;
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        return parts.pop().split(';').shift();
-    }
+function loadNotifications() {
+    fetch('/notifications/getAll')
+        .then(response => response.json())
+        .then(notifications => {
+            const notificationList = document.getElementById('notification-list');
+            notificationList.innerHTML = '';
+
+            if (notifications.length === 0) {
+                document.getElementById('no-notifications-message').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('no-notifications-message').style.display = 'none';
+            }
+
+            notifications.forEach(notification => {
+                const element = createNotificationElement(notification);
+                notificationList.appendChild(element);
+            });
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
 }
 
 function createFriendRequestElement(notification) {
@@ -112,7 +126,7 @@ function handleRequestAction(button, action) {
     const notificationCard = button.closest('.card');
     if (!notificationCard) return;
 
-    const url = `/friend-requests/${requestId}/${action}`;
+    const url = `/social/${requestId}/${action}`;
 
     fetch(url, {
         method: 'POST',
@@ -166,6 +180,10 @@ function connect() {
         });
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadNotifications();
+});
 
 document.getElementById('notification-list').addEventListener('click', function(event) {
     const acceptButton = event.target.closest('.accept-request');

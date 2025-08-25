@@ -12,14 +12,13 @@
                 <div>
                     <div>
                         <img id="profile-picture"
-                             th:src="@{/files/profile-pictures/{filename}(filename=${user.profilePicturePath != null ? user.profilePicturePath : 'default.png'})}"
+                             th:src="@{/files/profile-pictures/default.png}"
                              alt="Profile Picture">
                     </div>
-
                 </div>
             </div>
 
-            <!-- PROFILE PICTURE SECTION -->
+            <!-- PROFILE ACTIONS (BUTTONS) -->
             <div th:replace="~{fragments/profile/profile-actions.html :: buttons}"></div>
         </div>
     </div>

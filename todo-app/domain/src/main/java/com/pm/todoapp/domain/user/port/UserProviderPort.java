@@ -1,8 +1,8 @@
 package com.pm.todoapp.domain.user.port;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
 
-import java.util.Optional;
+import com.pm.todoapp.domain.user.dto.UserDTO;
+
 import java.util.Set;
 import java.util.UUID;
 

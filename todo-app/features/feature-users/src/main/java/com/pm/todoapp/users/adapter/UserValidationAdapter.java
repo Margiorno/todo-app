@@ -1,7 +1,6 @@
 package com.pm.todoapp.users.adapter;
 
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.users.profile.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

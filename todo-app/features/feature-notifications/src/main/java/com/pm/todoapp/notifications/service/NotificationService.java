@@ -1,22 +1,17 @@
 package com.pm.todoapp.notifications.service;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserProviderPort;
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
-import com.pm.todoapp.notifications.dto.FriendRequestUserDTO;
+import com.pm.todoapp.common.exceptions.NotificationNotFoundException;
+import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.repository.UserRepository;
 import com.pm.todoapp.notifications.factory.NotificationFactory;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
-import com.pm.todoapp.core.exceptions.NotificationNotFoundException;
 import com.pm.todoapp.notifications.mapper.NotificationConverter;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
 import com.pm.todoapp.notifications.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

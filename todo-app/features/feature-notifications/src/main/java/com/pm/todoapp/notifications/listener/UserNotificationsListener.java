@@ -1,11 +1,10 @@
 package com.pm.todoapp.notifications.listener;
 
-import com.pm.todoapp.core.user.event.FriendRequestAcceptedEvent;
-import com.pm.todoapp.core.user.event.FriendRequestResolvedEvent;
-import com.pm.todoapp.core.user.event.FriendRequestSentEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestSentEvent;
 import com.pm.todoapp.notifications.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 

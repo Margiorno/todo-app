@@ -1,12 +1,12 @@
 package com.pm.todoapp.tasks.service;
 
-import com.pm.todoapp.core.exceptions.TaskAccessDeniedException;
-import com.pm.todoapp.core.team.model.Team;
-import com.pm.todoapp.core.team.port.TeamValidationPort;
-import com.pm.todoapp.core.team.repository.TeamRepository;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.common.exceptions.TaskAccessDeniedException;
+import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.team.port.TeamValidationPort;
+import com.pm.todoapp.domain.team.repository.TeamRepository;
+import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.repository.UserRepository;
 import com.pm.todoapp.tasks.model.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

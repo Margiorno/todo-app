@@ -1,6 +1,6 @@
 package com.pm.todoapp.teams.service;
 
-import com.pm.todoapp.core.exceptions.InvalidTeamInviteException;
+import com.pm.todoapp.common.exceptions.InvalidTeamInviteException;
 import com.pm.todoapp.teams.model.Invite;
 import com.pm.todoapp.teams.model.Team;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;

@@ -1,16 +1,11 @@
 package com.pm.todoapp.tasks.service;
 
-import com.pm.todoapp.core.team.model.Team;
-import com.pm.todoapp.core.team.port.TeamValidationPort;
-import com.pm.todoapp.core.team.repository.TeamRepository;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.common.exceptions.TaskNotFoundException;
+import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
-import com.pm.todoapp.core.exceptions.TaskAccessDeniedException;
-import com.pm.todoapp.core.exceptions.TaskNotFoundException;
 import com.pm.todoapp.tasks.mapper.TaskMapper;
 import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
@@ -18,7 +13,6 @@ import com.pm.todoapp.tasks.model.Task;
 import com.pm.todoapp.tasks.repository.TaskDAO;
 import com.pm.todoapp.tasks.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

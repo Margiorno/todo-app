@@ -1,6 +1,6 @@
 package com.pm.todoapp.tasks.mapper;
 
-import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.model.Task;

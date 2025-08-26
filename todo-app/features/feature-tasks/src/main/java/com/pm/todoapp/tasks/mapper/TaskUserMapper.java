@@ -1,9 +1,9 @@
 package com.pm.todoapp.tasks.mapper;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserProviderPort;
-import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.dto.UserDTO;
+import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.domain.user.port.UserProviderPort;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.tasks.dto.TaskUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

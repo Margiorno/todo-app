@@ -6,7 +6,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
+        <!-- Używamy DOKŁADNIE tej samej wersji Spring Boot, co w starym pliku -->
+        <version>3.5.4</version>
         <relativePath/>
     </parent>
 
@@ -17,11 +18,14 @@
     <name>todo-app-parent</name>
 
     <properties>
+        <!-- Używamy DOKŁADNIE tej samej wersji Javy -->
         <java.version>21</java.version>
+
+        <!-- Używamy DOKŁADNIE tych samych wersji bibliotek -->
+        <lombok.version>1.18.38</lombok.version>
         <jjwt.version>0.12.6</jjwt.version>
         <tika.version>2.9.2</tika.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version>
-        <lombok.version>1.18.32</lombok.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
 
     <modules>
@@ -33,6 +37,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Zależności naszego projektu -->
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>application</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>domain</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>common</artifactId><version>${project.version}</version></dependency>
@@ -44,7 +49,14 @@
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-notifications</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-files</artifactId><version>${project.version}</version></dependency>
 
-            <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
+            <!-- Zarządzamy wersją Lomboka -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!-- Zarządzamy wersjami innych bibliotek (reszta jest dziedziczona z parenta) -->
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-api</artifactId><version>${jjwt.version}</version></dependency>
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-impl</artifactId><version>${jjwt.version}</version></dependency>
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-jackson</artifactId><version>${jjwt.version}</version></dependency>

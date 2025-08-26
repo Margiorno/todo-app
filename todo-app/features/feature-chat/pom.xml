@@ -33,5 +33,9 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.pm.todoapp</groupId>
+            <artifactId>feature-users</artifactId>
+        </dependency>
     </dependencies>
 </project>

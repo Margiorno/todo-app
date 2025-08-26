@@ -1,15 +1,15 @@
 package com.pm.todoapp.teams.service;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserProviderPort;
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.common.exceptions.InvalidTeamInviteException;
+import com.pm.todoapp.common.exceptions.TeamNotFoundException;
+import com.pm.todoapp.domain.user.dto.UserDTO;
+import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.domain.user.port.UserProviderPort;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.repository.UserRepository;
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
 import com.pm.todoapp.teams.dto.TeamMemberDTO;
 import com.pm.todoapp.teams.dto.TeamResponseDTO;
-import com.pm.todoapp.core.exceptions.InvalidTeamInviteException;
-import com.pm.todoapp.core.exceptions.TeamNotFoundException;
 import com.pm.todoapp.teams.mapper.InviteMapper;
 import com.pm.todoapp.teams.mapper.TeamMapper;
 import com.pm.todoapp.teams.model.Team;

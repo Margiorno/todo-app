@@ -1,6 +1,5 @@
 package com.pm.todoapp.tasks.dto;
 
-import com.pm.todoapp.teams.dto.TeamResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

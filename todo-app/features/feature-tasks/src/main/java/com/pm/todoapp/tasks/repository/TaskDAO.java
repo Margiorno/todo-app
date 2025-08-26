@@ -1,7 +1,7 @@
 package com.pm.todoapp.tasks.repository;
 
-import com.pm.todoapp.core.team.model.Team;
-import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.tasks.model.Priority;
 import com.pm.todoapp.tasks.model.Status;
 import com.pm.todoapp.tasks.model.Task;
@@ -12,7 +12,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;

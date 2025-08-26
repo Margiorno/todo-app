@@ -1,6 +1,6 @@
 package com.pm.todoapp.teams.model;
 
-import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

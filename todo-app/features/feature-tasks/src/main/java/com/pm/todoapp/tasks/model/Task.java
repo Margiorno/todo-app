@@ -1,4 +1,4 @@
-package com.pm.todoapp.domain.tasks.model;
+package com.pm.todoapp.tasks.model;
 
 import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.domain.user.model.User;

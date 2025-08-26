@@ -1,7 +1,7 @@
 package com.pm.todoapp.notifications.repository;
 
-import com.pm.todoapp.domain.notifications.model.FriendRequestNotification;
-import com.pm.todoapp.domain.notifications.model.Notification;
+import com.pm.todoapp.notifications.model.FriendRequestNotification;
+import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.domain.user.model.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

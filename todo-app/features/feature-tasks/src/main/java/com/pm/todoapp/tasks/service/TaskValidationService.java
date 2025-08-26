@@ -7,7 +7,7 @@ import com.pm.todoapp.domain.teams.repository.TeamRepository;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.domain.user.repository.UserRepository;
-import com.pm.todoapp.domain.tasks.model.Task;
+import com.pm.todoapp.tasks.model.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

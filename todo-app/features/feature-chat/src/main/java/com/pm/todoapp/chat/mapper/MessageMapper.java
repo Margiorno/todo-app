@@ -2,7 +2,7 @@ package com.pm.todoapp.chat.mapper;
 
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.dto.SenderDTO;
-import com.pm.todoapp.domain.chat.model.Message;
+import com.pm.todoapp.chat.model.Message;
 
 import java.util.UUID;
 

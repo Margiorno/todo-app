@@ -1,6 +1,6 @@
 package com.pm.todoapp.chat.repository;
 
-import com.pm.todoapp.domain.chat.model.Conversation;
+import com.pm.todoapp.chat.model.Conversation;
 import com.pm.todoapp.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

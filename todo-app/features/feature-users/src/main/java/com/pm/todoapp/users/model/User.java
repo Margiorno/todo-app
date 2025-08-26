@@ -1,6 +1,5 @@
 package com.pm.todoapp.users.model;
 
-import com.pm.todoapp.domain.chat.model.Conversation;
 import com.pm.todoapp.domain.user.model.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -41,14 +40,6 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
-
-
-    //TODO FULL MOVING CONVERSATION MANAGEMENT TO CONVERSATION ENTITY
-    @ManyToMany(mappedBy = "participants")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @Builder.Default
-    private Set<Conversation> conversations = new HashSet<>();
 
     @ManyToMany
     @JoinTable(

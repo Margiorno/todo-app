@@ -1,7 +1,7 @@
 package com.pm.todoapp.teams.mapper;
 
 import com.pm.todoapp.teams.dto.TeamResponseDTO;
-import com.pm.todoapp.domain.teams.model.Team;
+import com.pm.todoapp.teams.model.Team;
 
 
 public class TeamMapper {

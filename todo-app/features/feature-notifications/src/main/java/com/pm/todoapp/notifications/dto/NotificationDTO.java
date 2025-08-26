@@ -2,7 +2,7 @@ package com.pm.todoapp.notifications.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.pm.todoapp.domain.notifications.model.NotificationType;
+import com.pm.todoapp.notifications.model.NotificationType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

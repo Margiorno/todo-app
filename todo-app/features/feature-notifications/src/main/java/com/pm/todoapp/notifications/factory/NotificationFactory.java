@@ -3,9 +3,9 @@ package com.pm.todoapp.notifications.factory;
 import com.pm.todoapp.domain.user.dto.UserDTO;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.domain.user.port.UserProviderPort;
-import com.pm.todoapp.domain.notifications.model.FriendRequestNotification;
-import com.pm.todoapp.domain.notifications.model.Notification;
-import com.pm.todoapp.domain.notifications.model.NotificationType;
+import com.pm.todoapp.notifications.model.FriendRequestNotification;
+import com.pm.todoapp.notifications.model.Notification;
+import com.pm.todoapp.notifications.model.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

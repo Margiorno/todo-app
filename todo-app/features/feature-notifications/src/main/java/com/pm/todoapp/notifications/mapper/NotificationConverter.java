@@ -6,8 +6,8 @@ import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.notifications.dto.FriendRequestUserDTO;
 import com.pm.todoapp.notifications.dto.FriendRequestNotificationDTO;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
-import com.pm.todoapp.domain.notifications.model.FriendRequestNotification;
-import com.pm.todoapp.domain.notifications.model.Notification;
+import com.pm.todoapp.notifications.model.FriendRequestNotification;
+import com.pm.todoapp.notifications.model.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

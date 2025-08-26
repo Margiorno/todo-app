@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             friendsListEl.innerHTML = '<div class="text-center">Loading friends...</div>';
             noResultsEl.style.display = 'none';
             try {
-                const response = await fetch('/users/friends');
+                const response = await fetch('/social/friends');
                 if (!response.ok) throw new Error(`Network error: ${response.status}`);
                 const friends = await response.json();
                 displayFriends(friends);

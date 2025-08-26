@@ -1,4 +1,4 @@
-package com.pm.todoapp.domain.chat.model;
+package com.pm.todoapp.chat.model;
 
 import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;

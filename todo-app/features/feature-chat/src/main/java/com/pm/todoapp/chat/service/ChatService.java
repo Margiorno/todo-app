@@ -1,29 +1,25 @@
 package com.pm.todoapp.chat.service;
 
+
 import com.pm.todoapp.chat.dto.ConversationResponseDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.dto.SenderDTO;
-import com.pm.todoapp.chat.mapper.SenderMapper;
-import com.pm.todoapp.core.exceptions.ConversationNotFoundException;
-import com.pm.todoapp.core.exceptions.UnauthorizedException;
 import com.pm.todoapp.chat.mapper.MessageMapper;
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.model.User;
-import com.pm.todoapp.core.user.port.UserProviderPort;
-import com.pm.todoapp.core.user.port.UserValidationPort;
-import com.pm.todoapp.core.user.repository.UserRepository;
+import com.pm.todoapp.chat.mapper.SenderMapper;
 import com.pm.todoapp.chat.model.Conversation;
 import com.pm.todoapp.chat.model.ConversationType;
-import com.pm.todoapp.chat.model.Message;
 import com.pm.todoapp.chat.repository.ConversationRepository;
+import com.pm.todoapp.common.exceptions.ConversationNotFoundException;
+import com.pm.todoapp.common.exceptions.UnauthorizedException;
+import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.domain.user.port.UserProviderPort;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
@@ -33,6 +29,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final UserValidationPort userValidationPort;
     private final UserProviderPort userProviderPort;
+
 
     public Conversation findRawConversationById(UUID id){
         return conversationRepository.findById(id).orElseThrow(

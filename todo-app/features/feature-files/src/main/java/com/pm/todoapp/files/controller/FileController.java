@@ -1,7 +1,8 @@
 package com.pm.todoapp.files.controller;
 
-import com.pm.todoapp.file.service.FileService;
-import com.pm.todoapp.core.file.dto.FileType;
+
+import com.pm.todoapp.domain.file.dto.FileType;
+import com.pm.todoapp.files.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

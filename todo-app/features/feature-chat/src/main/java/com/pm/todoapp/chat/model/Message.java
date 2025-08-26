@@ -1,6 +1,6 @@
 package com.pm.todoapp.chat.model;
 
-import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

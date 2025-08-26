@@ -1,7 +1,7 @@
 package com.pm.todoapp.domain.file.port;
 
-import com.pm.todoapp.core.file.dto.FileType;
-import org.springframework.web.multipart.MultipartFile;
+
+import com.pm.todoapp.domain.file.dto.FileType;
 
 public interface FileStoragePort {
     String saveFile(MultipartFile file, FileType fileType);

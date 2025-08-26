@@ -1,7 +1,7 @@
 package com.pm.todoapp.users.adapter;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.port.UserProviderPort;
+import com.pm.todoapp.domain.user.dto.UserDTO;
+import com.pm.todoapp.domain.user.port.UserProviderPort;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
 import lombok.RequiredArgsConstructor;

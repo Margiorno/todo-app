@@ -1,7 +1,7 @@
 package com.pm.todoapp.chat.mapper;
 
 import com.pm.todoapp.chat.dto.SenderDTO;
-import com.pm.todoapp.core.user.dto.UserDTO;
+import com.pm.todoapp.domain.user.dto.UserDTO;
 
 
 public class SenderMapper {

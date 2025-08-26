@@ -1,6 +1,5 @@
 package com.pm.todoapp.chat.dto;
 
-import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

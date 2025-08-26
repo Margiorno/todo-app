@@ -1,4 +1,4 @@
-package com.pm.todoapp.file.controller;
+package com.pm.todoapp.files.controller;
 
 import com.pm.todoapp.file.service.FileService;
 import com.pm.todoapp.core.file.dto.FileType;

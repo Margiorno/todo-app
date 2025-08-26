@@ -1,4 +1,4 @@
-package com.pm.todoapp.file.adapter;
+package com.pm.todoapp.files.adapter;
 
 import com.pm.todoapp.core.file.dto.FileType;
 import com.pm.todoapp.core.file.port.FileStoragePort;

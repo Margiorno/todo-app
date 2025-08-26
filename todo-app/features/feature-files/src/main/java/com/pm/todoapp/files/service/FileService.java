@@ -1,4 +1,4 @@
-package com.pm.todoapp.file.service;
+package com.pm.todoapp.files.service;
 
 import com.pm.todoapp.core.exceptions.InvalidFileTypeException;
 import com.pm.todoapp.core.exceptions.StorageException;

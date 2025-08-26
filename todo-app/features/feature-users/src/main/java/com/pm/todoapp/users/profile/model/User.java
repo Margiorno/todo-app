@@ -2,6 +2,7 @@ package com.pm.todoapp.users.profile.model;
 
 import com.pm.todoapp.domain.user.model.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.time.LocalDate;

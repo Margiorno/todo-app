@@ -1,15 +1,14 @@
 package com.pm.todoapp.notifications.mapper;
 
-import com.pm.todoapp.core.user.dto.UserDTO;
-import com.pm.todoapp.core.user.port.UserProviderPort;
-import com.pm.todoapp.core.user.port.UserValidationPort;
+import com.pm.todoapp.domain.user.dto.UserDTO;
+import com.pm.todoapp.domain.user.port.UserProviderPort;
+import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.notifications.dto.FriendRequestUserDTO;
 import com.pm.todoapp.notifications.dto.FriendRequestNotificationDTO;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;

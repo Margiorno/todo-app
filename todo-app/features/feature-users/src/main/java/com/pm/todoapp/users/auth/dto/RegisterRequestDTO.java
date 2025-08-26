@@ -1,6 +1,6 @@
 package com.pm.todoapp.users.auth.dto;
 
-import com.pm.todoapp.core.user.model.Gender;
+import com.pm.todoapp.domain.user.model.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

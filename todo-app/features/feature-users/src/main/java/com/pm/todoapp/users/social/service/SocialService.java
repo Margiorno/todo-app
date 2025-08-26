@@ -1,10 +1,10 @@
 package com.pm.todoapp.users.social.service;
 
-import com.pm.todoapp.core.exceptions.InvalidFriendInviteException;
-import com.pm.todoapp.core.exceptions.UnauthorizedException;
-import com.pm.todoapp.core.user.event.FriendRequestAcceptedEvent;
-import com.pm.todoapp.core.user.event.FriendRequestResolvedEvent;
-import com.pm.todoapp.core.user.event.FriendRequestSentEvent;
+import com.pm.todoapp.common.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.common.exceptions.UnauthorizedException;
+import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestSentEvent;
 import com.pm.todoapp.users.profile.dto.ProfileStatus;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-
-// TODO DIVIDE TO PROFILE AND SOCIAL(FRIEND REQUESTS)
 
 @Service
 @RequiredArgsConstructor

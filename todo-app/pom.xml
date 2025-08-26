@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/201/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd
-http://www.w3.org/201/XMLSchema-instance ">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -21,6 +21,7 @@ http://www.w3.org/201/XMLSchema-instance ">
         <jjwt.version>0.12.6</jjwt.version>
         <tika.version>2.9.2</tika.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
+        <lombok.version>1.18.32</lombok.version>
     </properties>
 
     <modules>
@@ -32,82 +33,23 @@ http://www.w3.org/201/XMLSchema-instance ">
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>application</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>domain</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>features</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-tasks</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-users</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-teams</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-chat</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-notifications</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.pm.todoapp</groupId>
-                <artifactId>feature-files</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>application</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>domain</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>common</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>features</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-tasks</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-users</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-teams</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-chat</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-notifications</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-files</artifactId><version>${project.version}</version></dependency>
 
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
-                <version>${tika.version}</version>
-            </dependency>
+            <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
+            <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-api</artifactId><version>${jjwt.version}</version></dependency>
+            <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-impl</artifactId><version>${jjwt.version}</version></dependency>
+            <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-jackson</artifactId><version>${jjwt.version}</version></dependency>
+            <dependency><groupId>org.apache.commons</groupId><artifactId>commons-lang3</artifactId><version>${commons-lang3.version}</version></dependency>
+            <dependency><groupId>org.apache.tika</groupId><artifactId>tika-core</artifactId><version>${tika.version}</version></dependency>
         </dependencies>
     </dependencyManagement>
 </project>

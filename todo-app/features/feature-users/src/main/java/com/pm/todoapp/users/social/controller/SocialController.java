@@ -1,18 +1,12 @@
 package com.pm.todoapp.users.social.controller;
 
-import com.pm.todoapp.core.exceptions.InvalidFriendInviteException;
-import com.pm.todoapp.core.user.model.Gender;
+import com.pm.todoapp.domain.user.model.Gender;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
-import com.pm.todoapp.users.profile.mapper.UserMapper;
-import com.pm.todoapp.users.profile.model.User;
-import com.pm.todoapp.users.profile.repository.UsersRepository;
-import com.pm.todoapp.users.profile.service.UsersService;
 import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.social.service.SocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;

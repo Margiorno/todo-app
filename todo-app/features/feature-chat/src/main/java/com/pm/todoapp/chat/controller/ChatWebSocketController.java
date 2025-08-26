@@ -3,7 +3,7 @@ package com.pm.todoapp.chat.controller;
 import com.pm.todoapp.chat.dto.MessageDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.service.ChatService;
-import com.pm.todoapp.core.user.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

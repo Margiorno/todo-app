@@ -1,8 +1,8 @@
 package com.pm.todoapp.users.auth.controller;
 
+import com.pm.todoapp.domain.user.model.Gender;
 import com.pm.todoapp.users.auth.dto.LoginRequestDTO;
 import com.pm.todoapp.users.auth.dto.RegisterRequestDTO;
-import com.pm.todoapp.core.user.model.Gender;
 import com.pm.todoapp.users.auth.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

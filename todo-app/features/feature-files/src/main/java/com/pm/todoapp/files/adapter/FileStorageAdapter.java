@@ -16,8 +16,8 @@ public class FileStorageAdapter implements FileStoragePort {
     private final FileService fileService;
 
     @Override
-    public String saveFile(InputStream fileContent, String originalFilename, String contentType, FileType fileType) {
-        return fileService.saveFile(fileContent, originalFilename, contentType, fileType);
+    public String saveFile(InputStream fileContent, String originalFilename, FileType fileType) {
+        return fileService.saveFile(fileContent, originalFilename, fileType);
     }
 
     @Override

@@ -1,6 +1,5 @@
-package com.pm.todoapp.users.social.model;
+package com.pm.todoapp.domain.user.model;
 
-import com.pm.todoapp.users.profile.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +27,7 @@ public class FriendRequest {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    @Builder.Default
     private LocalDateTime sentAt = LocalDateTime.now();
 
     @PrePersist

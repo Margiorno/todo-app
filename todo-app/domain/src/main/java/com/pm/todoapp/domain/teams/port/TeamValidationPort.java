@@ -1,4 +1,4 @@
-package com.pm.todoapp.domain.team.port;
+package com.pm.todoapp.domain.teams.port;
 
 import java.util.UUID;
 

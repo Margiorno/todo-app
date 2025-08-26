@@ -1,4 +1,4 @@
-package com.pm.todoapp.teams.model;
+package com.pm.todoapp.domain.teams.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -11,7 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -37,21 +37,24 @@ public class FileService {
     }
 
     public String saveFile(MultipartFile file, FileType fileType) {
-        try (InputStream inputStream = file.getInputStream()) {
-            return saveFileInternal(inputStream, file.getOriginalFilename(), fileType);
+        try {
+            return saveFileInternal(file.getInputStream(), file.getOriginalFilename(), fileType);
         } catch (IOException e) {
-            throw new StorageException("Failed to store file: %s".formatted(e.getMessage()));
+            throw new StorageException("Failed to read file for saving: " + e.getMessage());
         }
     }
 
-    public String saveFile(InputStream fileContent, String originalFilename, String contentType, FileType fileType) {
+    public String saveFile(InputStream fileContent, String originalFilename, FileType fileType) {
         return saveFileInternal(fileContent, originalFilename, fileType);
     }
 
-    private String saveFileInternal(InputStream fileContent, String originalFilename, FileType fileType) {
-        try {
+    private String saveFileInternal(InputStream originalInputStream, String originalFilename, FileType fileType) {
+        try (InputStream inputStream = new BufferedInputStream(originalInputStream)) {
+            inputStream.mark(Integer.MAX_VALUE);
+
             Tika tika = new Tika();
-            String actualMimeType = tika.detect(fileContent);
+            String actualMimeType = tika.detect(inputStream);
+            inputStream.reset();
 
             if (!actualMimeType.startsWith(fileType.getType())) {
                 throw new InvalidFileTypeException(
@@ -65,24 +68,16 @@ public class FileService {
                     : "";
             String uniqueFilename = UUID.randomUUID().toString() + extension;
 
-            System.out.println("Root file storage location: " + rootLocation.toAbsolutePath());
-
-            Path targetDirectory = this.rootLocation.resolve(fileType.getPath());
+            Path targetDirectory = this.rootLocation.resolve(fileType.getPath()).normalize();
             Files.createDirectories(targetDirectory);
+            Path destinationFile = targetDirectory.resolve(uniqueFilename);
 
-            Path destinationFile = targetDirectory.resolve(uniqueFilename).normalize().toAbsolutePath();
-
-            System.out.println("Saving file to: " + destinationFile);
-
-            // reset inputStream do kopiowania (bo tika.detect mogło już zużyć bajty)
-            try (InputStream newInputStream = fileContent) {
-                Files.copy(newInputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 
             return uniqueFilename;
 
         } catch (IOException e) {
-            throw new StorageException("Failed to store file: %s".formatted(e.getMessage()));
+            throw new StorageException("Failed to store file: " + e.getMessage());
         }
     }
 

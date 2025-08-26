@@ -1,4 +1,4 @@
-package com.pm.todoapp.notifications.model;
+package com.pm.todoapp.domain.notifications.model;
 
 public enum NotificationType {
     FRIEND_REQUEST,

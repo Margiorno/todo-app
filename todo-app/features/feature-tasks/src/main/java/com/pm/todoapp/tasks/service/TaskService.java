@@ -1,15 +1,15 @@
 package com.pm.todoapp.tasks.service;
 
 import com.pm.todoapp.common.exceptions.TaskNotFoundException;
-import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.tasks.dto.TaskFetchScope;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
 import com.pm.todoapp.tasks.mapper.TaskMapper;
-import com.pm.todoapp.tasks.model.Priority;
-import com.pm.todoapp.tasks.model.Status;
-import com.pm.todoapp.tasks.model.Task;
+import com.pm.todoapp.domain.tasks.model.Priority;
+import com.pm.todoapp.domain.tasks.model.Status;
+import com.pm.todoapp.domain.tasks.model.Task;
 import com.pm.todoapp.tasks.repository.TaskDAO;
 import com.pm.todoapp.tasks.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;

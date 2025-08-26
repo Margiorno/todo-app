@@ -1,4 +1,4 @@
-package com.pm.todoapp.chat.model;
+package com.pm.todoapp.domain.chat.model;
 
 import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;
@@ -30,6 +30,7 @@ public class Conversation {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @EqualsAndHashCode.Exclude
+    @Builder.Default
     private Set<User> participants = new HashSet<>();
 
     @OneToMany(
@@ -38,6 +39,7 @@ public class Conversation {
             orphanRemoval = true
     )
     @EqualsAndHashCode.Exclude
+    @Builder.Default
     private List<Message> messages = new ArrayList<>();
 
     public void addMessage(Message message) {

@@ -1,10 +1,10 @@
 package com.pm.todoapp.tasks.repository;
 
 
-import com.pm.todoapp.domain.team.model.Team;
-import com.pm.todoapp.domain.user.model.User;
-import com.pm.todoapp.tasks.model.Task;
+import com.pm.todoapp.domain.teams.model.Team;
+import com.pm.todoapp.domain.tasks.model.Task;
 
+import com.pm.todoapp.domain.user.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

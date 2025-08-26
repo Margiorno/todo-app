@@ -1,4 +1,4 @@
-package com.pm.todoapp.notifications.model;
+package com.pm.todoapp.domain.notifications.model;
 
 import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;

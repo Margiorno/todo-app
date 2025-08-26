@@ -18,10 +18,8 @@
     <name>todo-app-parent</name>
 
     <properties>
-        <!-- Używamy DOKŁADNIE tej samej wersji Javy -->
         <java.version>21</java.version>
 
-        <!-- Używamy DOKŁADNIE tych samych wersji bibliotek -->
         <lombok.version>1.18.38</lombok.version>
         <jjwt.version>0.12.6</jjwt.version>
         <tika.version>2.9.2</tika.version>
@@ -37,7 +35,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Zależności naszego projektu -->
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>application</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>domain</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>common</artifactId><version>${project.version}</version></dependency>
@@ -49,14 +46,7 @@
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-notifications</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>com.pm.todoapp</groupId><artifactId>feature-files</artifactId><version>${project.version}</version></dependency>
 
-            <!-- Zarządzamy wersją Lomboka -->
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-
-            <!-- Zarządzamy wersjami innych bibliotek (reszta jest dziedziczona z parenta) -->
+            <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-api</artifactId><version>${jjwt.version}</version></dependency>
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-impl</artifactId><version>${jjwt.version}</version></dependency>
             <dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt-jackson</artifactId><version>${jjwt.version}</version></dependency>
@@ -64,4 +54,26 @@
             <dependency><groupId>org.apache.tika</groupId><artifactId>tika-core</artifactId><version>${tika.version}</version></dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

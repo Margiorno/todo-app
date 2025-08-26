@@ -103,6 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Apply</button></div></form></div></div>`;
             });
         },
+        taskFormOptions: () => {
+            render._findAndRender('#taskFormModal #priority', (el) => {
+                el.innerHTML = state.priorities
+                    .map(p => `<option value="${p}">${p}</option>`)
+                    .join('');
+            });
+
+            render._findAndRender('#taskFormModal #status', (el) => {
+                el.innerHTML = state.statuses
+                    .map(s => `<option value="${s}">${s}</option>`)
+                    .join('');
+            });
+        },
         updateActiveStates: () => {
             document.querySelectorAll('#view-selector .nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.currentView));
             document.querySelectorAll('#teams-list .nav-link').forEach(el => el.classList.toggle('active', el.dataset.teamId === (state.selectedTeamId || '')));
@@ -179,7 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const [teams, scopes, priorities, statuses] = await api.getContext();
             state.teams = teams; state.scopes = scopes; state.priorities = priorities; state.statuses = statuses;
-            render.teams(); render.all();
+            render.teams();
+            render.taskFormOptions();
+            render.all();
             await fetchAndRenderTasks();
         } catch (err) {
             console.error("Failed to initialize dashboard:", err);

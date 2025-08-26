@@ -3,7 +3,7 @@ package com.pm.todoapp.tasks.mapper;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.tasks.dto.TaskRequestDTO;
 import com.pm.todoapp.tasks.dto.TaskResponseDTO;
-import com.pm.todoapp.tasks.model.Task;
+import com.pm.todoapp.domain.tasks.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

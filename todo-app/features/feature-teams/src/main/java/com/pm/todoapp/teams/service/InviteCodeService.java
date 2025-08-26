@@ -1,8 +1,8 @@
 package com.pm.todoapp.teams.service;
 
 import com.pm.todoapp.common.exceptions.InvalidTeamInviteException;
-import com.pm.todoapp.teams.model.Invite;
-import com.pm.todoapp.teams.model.Team;
+import com.pm.todoapp.domain.teams.model.Invite;
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.teams.repository.TeamInviteRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;

@@ -1,9 +1,8 @@
 package com.pm.todoapp.users.profile.repository;
 
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
 

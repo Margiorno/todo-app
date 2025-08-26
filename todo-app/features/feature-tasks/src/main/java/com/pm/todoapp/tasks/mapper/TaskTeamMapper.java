@@ -1,6 +1,6 @@
 package com.pm.todoapp.tasks.mapper;
 
-import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.tasks.dto.TaskTeamDTO;
 
 public class TaskTeamMapper {

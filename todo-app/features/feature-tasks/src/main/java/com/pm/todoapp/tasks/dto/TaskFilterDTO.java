@@ -1,7 +1,7 @@
 package com.pm.todoapp.tasks.dto;
 
-import com.pm.todoapp.tasks.model.Priority;
-import com.pm.todoapp.tasks.model.Status;
+import com.pm.todoapp.domain.tasks.model.Priority;
+import com.pm.todoapp.domain.tasks.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

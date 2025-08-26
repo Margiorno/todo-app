@@ -1,6 +1,6 @@
 package com.pm.todoapp.teams.repository;
 
-import com.pm.todoapp.teams.model.Invite;
+import com.pm.todoapp.domain.teams.model.Invite;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

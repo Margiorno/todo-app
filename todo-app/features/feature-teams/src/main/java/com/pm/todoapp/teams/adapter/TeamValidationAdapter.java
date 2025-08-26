@@ -1,6 +1,6 @@
 package com.pm.todoapp.teams.adapter;
 
-import com.pm.todoapp.domain.team.port.TeamValidationPort;
+import com.pm.todoapp.domain.teams.port.TeamValidationPort;
 import com.pm.todoapp.teams.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

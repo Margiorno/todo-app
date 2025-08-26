@@ -1,7 +1,7 @@
 package com.pm.todoapp.users.profile.mapper;
 
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.domain.user.model.User;
 
 import java.time.format.DateTimeFormatter;
 

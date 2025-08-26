@@ -1,6 +1,6 @@
-package com.pm.todoapp.domain.team.repository;
+package com.pm.todoapp.domain.teams.repository;
 
-import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.teams.model.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

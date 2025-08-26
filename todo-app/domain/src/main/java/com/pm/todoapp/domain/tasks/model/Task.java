@@ -1,6 +1,6 @@
-package com.pm.todoapp.tasks.model;
+package com.pm.todoapp.domain.tasks.model;
 
-import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -18,8 +18,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Data
 @Builder
+@Data
+//@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

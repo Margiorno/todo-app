@@ -1,7 +1,7 @@
 package com.pm.todoapp.teams.repository;
 
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.domain.user.model.User;
-import com.pm.todoapp.teams.model.Team;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.pm.todoapp.teams.model;
+package com.pm.todoapp.domain.teams.model;
 
 import com.pm.todoapp.domain.user.model.User;
 import jakarta.persistence.*;
@@ -32,5 +32,6 @@ public class Team {
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<User> members = new HashSet<>();
 }

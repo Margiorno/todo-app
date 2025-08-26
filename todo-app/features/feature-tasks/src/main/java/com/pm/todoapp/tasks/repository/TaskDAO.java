@@ -1,10 +1,10 @@
 package com.pm.todoapp.tasks.repository;
 
-import com.pm.todoapp.domain.team.model.Team;
+import com.pm.todoapp.domain.teams.model.Team;
+import com.pm.todoapp.domain.tasks.model.Priority;
+import com.pm.todoapp.domain.tasks.model.Status;
+import com.pm.todoapp.domain.tasks.model.Task;
 import com.pm.todoapp.domain.user.model.User;
-import com.pm.todoapp.tasks.model.Priority;
-import com.pm.todoapp.tasks.model.Status;
-import com.pm.todoapp.tasks.model.Task;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;

@@ -1,11 +1,12 @@
 package com.pm.todoapp.users.profile.service;
 
 import com.pm.todoapp.common.exceptions.InvalidFieldException;
+import com.pm.todoapp.common.exceptions.StorageException;
 import com.pm.todoapp.common.exceptions.UserNotFoundException;
 import com.pm.todoapp.domain.file.dto.FileType;
 import com.pm.todoapp.domain.file.port.FileStoragePort;
 import com.pm.todoapp.domain.user.model.Gender;
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
@@ -62,33 +63,30 @@ public class UsersService {
         User user = findRawById(userId);
         String oldPicturePath = user.getProfilePicturePath();
 
-        try {
-            InputStream fileContent = file.getInputStream();
-            String originalFilename = file.getOriginalFilename();
-            String contentType = file.getContentType();
+        String newPicturePath;
 
-            String newPicturePath = fileStoragePort.saveFile(
-                    fileContent,
-                    originalFilename,
-                    contentType,
+        try {
+            newPicturePath = fileStoragePort.saveFile(
+                    file.getInputStream(),
+                    file.getOriginalFilename(),
                     FileType.PROFILE_PICTURE
             );
-
-            user.setProfilePicturePath(newPicturePath);
-            usersRepository.save(user);
-
-            if (oldPicturePath != null && !oldPicturePath.isEmpty() && !oldPicturePath.isBlank()) {
-                fileStoragePort.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
-            }
-
-            return newPicturePath;
-
         } catch (IOException e) {
-            //TODO
-            throw new RuntimeException(e.getMessage());
+            throw new StorageException("Failed to read uploaded profile picture for user: " + userId);
         }
 
+        user.setProfilePicturePath(newPicturePath);
+        usersRepository.save(user);
 
+        if (oldPicturePath != null && !oldPicturePath.isBlank()) {
+            try {
+                fileStoragePort.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
+            } catch (Exception e) {
+                System.err.println("Could not delete old profile picture " + oldPicturePath + " for user " + userId);
+            }
+        }
+
+        return newPicturePath;
     }
 
     public Map<String, Object> update(String field, String value, UUID userId) {

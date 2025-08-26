@@ -1,7 +1,7 @@
 package com.pm.todoapp.teams.mapper;
 
 import com.pm.todoapp.teams.dto.TeamInviteResponseDTO;
-import com.pm.todoapp.teams.model.Invite;
+import com.pm.todoapp.domain.teams.model.Invite;
 
 
 public class InviteMapper {

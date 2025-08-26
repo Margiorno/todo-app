@@ -1,7 +1,7 @@
 package com.pm.todoapp.users.social.repository;
 
-import com.pm.todoapp.users.social.model.FriendRequest;
-import com.pm.todoapp.users.profile.model.User;
+import com.pm.todoapp.domain.user.model.FriendRequest;
+import com.pm.todoapp.domain.user.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -2,7 +2,7 @@ package com.pm.todoapp.users.adapter;
 
 import com.pm.todoapp.domain.user.dto.UserDTO;
 import com.pm.todoapp.domain.user.port.UserProviderPort;
-import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.users.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

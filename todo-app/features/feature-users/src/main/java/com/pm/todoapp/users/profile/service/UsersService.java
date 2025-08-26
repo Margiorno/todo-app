@@ -6,7 +6,7 @@ import com.pm.todoapp.common.exceptions.UserNotFoundException;
 import com.pm.todoapp.domain.file.dto.FileType;
 import com.pm.todoapp.domain.file.port.FileStoragePort;
 import com.pm.todoapp.domain.user.model.Gender;
-import com.pm.todoapp.domain.user.model.User;
+import com.pm.todoapp.users.model.User;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 

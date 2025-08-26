@@ -38,19 +38,32 @@ public class FileService {
 
     public String saveFile(MultipartFile file, FileType fileType) {
         try (InputStream inputStream = file.getInputStream()) {
-            Tika tika = new Tika();
+            return saveFileInternal(inputStream, file.getOriginalFilename(), fileType);
+        } catch (IOException e) {
+            throw new StorageException("Failed to store file: %s".formatted(e.getMessage()));
+        }
+    }
 
-            String actualMimeType = tika.detect(inputStream);
+    public String saveFile(InputStream fileContent, String originalFilename, String contentType, FileType fileType) {
+        return saveFileInternal(fileContent, originalFilename, fileType);
+    }
+
+    private String saveFileInternal(InputStream fileContent, String originalFilename, FileType fileType) {
+        try {
+            Tika tika = new Tika();
+            String actualMimeType = tika.detect(fileContent);
 
             if (!actualMimeType.startsWith(fileType.getType())) {
-                throw new InvalidFileTypeException("Invalid file type. Expected " + fileType.getType() + " but was " + actualMimeType);
+                throw new InvalidFileTypeException(
+                        "Invalid file type. Expected " + fileType.getType() + " but was " + actualMimeType
+                );
             }
 
-            String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String cleanFilename = StringUtils.cleanPath(Objects.requireNonNull(originalFilename));
+            String extension = cleanFilename.contains(".")
+                    ? cleanFilename.substring(cleanFilename.lastIndexOf("."))
+                    : "";
             String uniqueFilename = UUID.randomUUID().toString() + extension;
-
-
 
             System.out.println("Root file storage location: " + rootLocation.toAbsolutePath());
 
@@ -61,7 +74,8 @@ public class FileService {
 
             System.out.println("Saving file to: " + destinationFile);
 
-            try (InputStream newInputStream = file.getInputStream()) {
+            // reset inputStream do kopiowania (bo tika.detect mogło już zużyć bajty)
+            try (InputStream newInputStream = fileContent) {
                 Files.copy(newInputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
             }
 

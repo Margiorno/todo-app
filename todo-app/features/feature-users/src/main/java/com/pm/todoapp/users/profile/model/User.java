@@ -1,11 +1,7 @@
 package com.pm.todoapp.users.profile.model;
 
-import com.pm.todoapp.chat.model.Conversation;
-import com.pm.todoapp.core.user.model.Gender;
-import com.pm.todoapp.tasks.model.Task;
-import com.pm.todoapp.teams.model.Team;
+import com.pm.todoapp.domain.user.model.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -43,9 +39,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @ManyToMany(mappedBy = "participants")
-    @EqualsAndHashCode.Exclude
-    private Set<Conversation> conversations = new HashSet<>();
+
+    //TODO FULL MOVING CONVERSATION MANAGEMENT TO CONVERSATION ENTITY
+//    @ManyToMany(mappedBy = "participants")
+//    @EqualsAndHashCode.Exclude
+//    private Set<Conversation> conversations = new HashSet<>();
 
     @ManyToMany
     @JoinTable(

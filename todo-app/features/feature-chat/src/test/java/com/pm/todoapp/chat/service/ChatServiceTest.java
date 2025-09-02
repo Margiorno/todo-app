@@ -23,10 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -257,4 +254,48 @@ public class ChatServiceTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void prepareMessagesToSend_shouldPreparePersonalizedMessagesAndSaveChanges() {
+        UUID conversationId = UUID.randomUUID();
+        String messageContent =Instancio.create(String.class);
+
+        doNothing().when(userValidationPort).ensureUserExistsById(any(UUID.class));
+        when(userRepository.getReferenceById(user1Id)).thenReturn(user1);
+
+        UserDTO user1Dto = Instancio.create(UserDTO.class);
+        user1Dto.setId(user1Id);
+        when(userProviderPort.getUserById(user1Id)).thenReturn(user1Dto);
+
+        Conversation conversation = Instancio.create(Conversation.class);
+        conversation.setId(conversationId);
+        conversation.setParticipants(Set.of(user1, user2));
+        conversation.setMessages(new ArrayList<>());
+
+        when(conversationRepository.findById(conversationId)).thenReturn(Optional.of(conversation));
+
+        Map<User, MessageResponseDTO> messages = chatService.prepareMessagesToSend(conversationId, user1Id, messageContent);
+
+        assertThat(messages).isNotNull();
+        assertThat(messages.size()).isEqualTo(2);
+        assertThat(messages.get(user1).isSentByCurrentUser()).isTrue();
+        assertThat(messages.get(user2).isSentByCurrentUser()).isFalse();
+
+        assertThat(messages.values())
+                .extracting(MessageResponseDTO::getContent)
+                .containsOnly(messageContent);
+
+        ArgumentCaptor<Conversation> conversationCaptor = ArgumentCaptor.forClass(Conversation.class);
+        verify(conversationRepository).save(conversationCaptor.capture());
+
+        Conversation savedConversation = conversationCaptor.getValue();
+        assertThat(savedConversation.getMessages()).hasSize(1);
+
+        Message savedMessage = savedConversation.getMessages().getFirst();
+        assertThat(savedMessage.getContent()).isEqualTo(messageContent);
+        assertThat(savedMessage.getSender()).isEqualTo(user1);
+
+    }
+
+
 }

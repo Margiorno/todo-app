@@ -2,6 +2,7 @@ package com.pm.todoapp.chat.service;
 
 import com.pm.todoapp.chat.dto.ConversationResponseDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
+import com.pm.todoapp.chat.dto.SenderDTO;
 import com.pm.todoapp.chat.model.Conversation;
 import com.pm.todoapp.chat.model.ConversationType;
 import com.pm.todoapp.chat.model.Message;
@@ -294,6 +295,44 @@ public class ChatServiceTest {
         Message savedMessage = savedConversation.getMessages().getFirst();
         assertThat(savedMessage.getContent()).isEqualTo(messageContent);
         assertThat(savedMessage.getSender()).isEqualTo(user1);
+
+    }
+
+    @Test
+    public void newConversation_shouldCreateNewConversation() {
+        UUID conversationId = UUID.randomUUID();
+        String title =Instancio.create(String.class);
+
+        doNothing().when(userValidationPort).ensureUserExistsById(any(UUID.class));
+        when(userRepository.getReferenceById(user1Id)).thenReturn(user1);
+        when(userRepository.getReferenceById(user2Id)).thenReturn(user2);
+
+        UserDTO user1Dto = Instancio.create(UserDTO.class);
+        user1Dto.setId(user1Id);
+
+        UserDTO user2Dto = Instancio.create(UserDTO.class);
+        user2Dto.setId(user2Id);
+
+        when(userProviderPort.getUsersByIds(Set.of(user1Id, user2Id)))
+                .thenReturn(Set.of(user1Dto, user2Dto));
+
+
+        when(conversationRepository.save(any(Conversation.class)))
+                .thenAnswer(invocation -> {
+                    Conversation conv = invocation.getArgument(0);
+                    conv.setId(conversationId);
+                    return conv;
+                });
+
+        ConversationResponseDTO result = chatService.newConversation(title, Set.of(user2Id), user1Id);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(conversationId);
+        assertThat(result.getTitle()).isEqualTo(title);
+        assertThat(result.getParticipants().size()).isEqualTo(2);
+        assertThat(result.getParticipants())
+                .extracting(SenderDTO::getId)
+                .contains(user1Id.toString(), user2Id.toString());
 
     }
 

@@ -223,6 +223,7 @@ public class ChatServiceTest {
         Conversation conversation3 = Instancio.create(Conversation.class);
         conversation3.setId(conversation3id);
         conversation3.setParticipants(Set.of(user1));
+        conversation3.setMessages(List.of());
 
         conversation1message.setConversation(conversation1);
         conversation2message.setConversation(conversation2);

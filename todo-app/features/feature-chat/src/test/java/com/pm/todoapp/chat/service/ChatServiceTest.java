@@ -15,6 +15,7 @@ import com.pm.todoapp.domain.user.port.UserProviderPort;
 import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.crossstore.ChangeSetPersister;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -112,20 +112,11 @@ public class ChatServiceTest {
                             return conversation;
                 });
 
-        UserDTO user1Dto = UserDTO.builder()
-                .id(user1Id)
-                .firstName("John")
-                .lastName("Doe")
-                .profilePicturePath("/img/john.png")
-                .build();
+        UserDTO user1Dto = Instancio.create(UserDTO.class);
+        user1Dto.setId(user1Id);
 
-        //TODO biblioteka która robi jakakolwiek implementacje //Instantio
-        UserDTO user2Dto = UserDTO.builder()
-                .id(user2Id)
-                .firstName("Jane1")
-                .lastName("Smith")
-                .profilePicturePath("/img/jane.png")
-                .build();
+        UserDTO user2Dto = Instancio.create(UserDTO.class);
+        user2Dto.setId(user2Id);
 
         when(userProviderPort.getUsersByIds(anySet())).thenReturn(Set.of(user1Dto, user2Dto));
 
@@ -145,15 +136,16 @@ public class ChatServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(expectedConversationId);
         assertThat(result.getType()).isEqualTo(ConversationType.PRIVATE);
-        assertThat(result.getTitle()).isEqualTo("Jane Smith");
+        assertThat(result.getTitle())
+                .isEqualTo("%s %s".formatted(user2Dto.getFirstName(), user2Dto.getLastName()));
 
         assertThat(result.getParticipants())
                 .isNotNull()
                 .hasSize(2)
                 .extracting("id", "firstName", "lastName", "profilePicturePath")
                 .containsExactlyInAnyOrder(
-                        tuple(user1Id.toString(), "John", "Doe", "/img/john.png"),
-                        tuple(user2Id.toString(), "Jane", "Smith", "/img/jane.png")
+                        tuple(user1Id.toString(), user1Dto.getFirstName(), user1Dto.getLastName(), user1Dto.getProfilePicturePath()),
+                        tuple(user2Id.toString(), user2Dto.getFirstName(), user2Dto.getLastName(), user2Dto.getProfilePicturePath())
                 );
         log.info("SUCCESS: All assertions for creating a new conversation passed.");
     }
@@ -168,10 +160,8 @@ public class ChatServiceTest {
         when(userRepository.getReferenceById(user1Id)).thenReturn(user1);
 
         log.debug("Mocking conversationRepository.findById to simulate conversation without participants");
-        Conversation conversation = Conversation.builder()
-                .id(conversationId)
-                .participants(Set.of())
-                .build();
+        Conversation conversation = Instancio.create(Conversation.class);
+        conversation.setId(conversationId);
 
         when(conversationRepository.findById(conversationId))
                 .thenReturn(Optional.of(conversation));
@@ -189,52 +179,33 @@ public class ChatServiceTest {
     void getMessages_shouldReturnMessageDTOs_whenUserIsParticipant() {
 
         UUID conversationId = UUID.randomUUID();
-        UUID message1Id = UUID.randomUUID();
-        UUID message2Id = UUID.randomUUID();
-
         log.info("Test case: getMessages when user={} is a participant of conversation={}", user1Id, conversationId);
-
 
         doNothing().when(userValidationPort).ensureUserExistsById(any(UUID.class));
         log.debug("Mocking userRepository.getReferenceById for user1");
         when(userRepository.getReferenceById(user1Id)).thenReturn(user1);
 
         log.debug("Setting up conversation with messages and participants");
-        Message message1 = Message.builder()
-                .id(message1Id)
-                .content("message1")
-                .sender(user1)
-                .build();
+        Conversation conversation = Instancio.create(Conversation.class);
+        conversation.setId(conversationId);
+        conversation.setParticipants(Set.of(user1, user2));
 
-        Message message2 = Message.builder()
-                .id(message2Id)
-                .content("message2")
-                .sender(user2)
-                .build();
-
-        Conversation conversation = Conversation.builder()
-                .id(conversationId)
-                .participants(Set.of(user1, user2))
-                .messages(List.of(message1, message2))
-                .build();
-
+        Message message1 = Instancio.create(Message.class);
+        message1.setSender(user1);
         message1.setConversation(conversation);
+
+        Message message2 = Instancio.create(Message.class);
+        message2.setSender(user2);
         message2.setConversation(conversation);
 
-        log.debug("Setting up UserDTOs for participants");
-        UserDTO user1Dto = UserDTO.builder()
-                .id(user1Id)
-                .firstName("John")
-                .lastName("Doe")
-                .profilePicturePath("/img/john.png")
-                .build();
+        conversation.setMessages(List.of(message1, message2));
 
-        UserDTO user2Dto = UserDTO.builder()
-                .id(user2Id)
-                .firstName("Jane")
-                .lastName("Smith")
-                .profilePicturePath("/img/jane.png")
-                .build();
+        log.debug("Setting up UserDTOs for participants");
+        UserDTO user1Dto = Instancio.create(UserDTO.class);
+        user1Dto.setId(user1Id);
+
+        UserDTO user2Dto = Instancio.create(UserDTO.class);
+        user2Dto.setId(user2Id);
 
         log.debug("Mocking userProviderPort.getUserById for user1 and user2");
         when(userProviderPort.getUserById(user1Id)).thenReturn(user1Dto);
@@ -255,7 +226,7 @@ public class ChatServiceTest {
         log.debug("Verifying message contents");
         assertThat(result)
                 .extracting(MessageResponseDTO::getContent)
-                .containsExactly("message1", "message2");
+                .containsExactly(message1.getContent(), message2.getContent());
 
         log.debug("Verifying which messages were sent by the current user");
         assertThat(result.get(0).isSentByCurrentUser()).isTrue();
@@ -273,37 +244,29 @@ public class ChatServiceTest {
         log.info("Test case: getConversations for user={}", user1Id);
 
         log.debug("Creating messages with timestamps for ordering");
-        Message conversation1message = Message.builder()
-                .sentAt(LocalDateTime.now())
-                .build();
+        Message conversation1message = Instancio.create(Message.class);
+        conversation1message.setSentAt(LocalDateTime.now());
 
-        Message conversation2message = Message.builder()
-                .sentAt(LocalDateTime.now().minusDays(1))
-                .build();
+        Message conversation2message = Instancio.create(Message.class);
+        conversation2message.setSentAt(LocalDateTime.now().minusDays(1));
 
         log.debug("Setting up conversations with participants and messages");
-        Conversation conversation1 = Conversation.builder()
-                .id(conversation1id)
-                .conversationType(ConversationType.GROUP_CHAT)
-                .title("conversation1")
-                .participants(Set.of(user1))
-                .messages(List.of(conversation1message))
-                .build();
+        Conversation conversation1 = Instancio.create(Conversation.class);
+        conversation1.setId(conversation1id);
+        conversation1.setParticipants(Set.of(user1));
+        conversation1.setMessages(List.of(conversation1message));
 
-        Conversation conversation2 = Conversation.builder()
-                .id(conversation2id)
-                .conversationType(ConversationType.GROUP_CHAT)
-                .title("conversation2")
-                .participants(Set.of(user1))
-                .messages(List.of(conversation2message))
-                .build();
+        Conversation conversation2 = Instancio.create(Conversation.class);
+        conversation2.setId(conversation2id);
+        conversation2.setParticipants(Set.of(user1));
+        conversation2.setMessages(List.of(conversation2message));
 
-        Conversation conversation3 = Conversation.builder()
-                .id(conversation3id)
-                .conversationType(ConversationType.GROUP_CHAT)
-                .title("conversation3")
-                .participants(Set.of(user1))
-                .build();
+        Conversation conversation3 = Instancio.create(Conversation.class);
+        conversation3.setId(conversation3id);
+        conversation3.setParticipants(Set.of(user1));
+
+        conversation1message.setConversation(conversation1);
+        conversation2message.setConversation(conversation2);
 
         log.debug("Mocking user validation and user repository");
         doNothing().when(userValidationPort).ensureUserExistsById(any(UUID.class));
@@ -350,5 +313,4 @@ public class ChatServiceTest {
 
         log.info("SUCCESS: All assertions for getConversations returned no conversations.");
     }
-
 }

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/todo-app/application/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/application/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/domain/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-chat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-files/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-notifications/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-tasks/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-teams/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/feature-users/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/features/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/todo-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/todo-app/src/main/resources" charset="UTF-8" />
   </component>
 </project>

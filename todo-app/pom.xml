@@ -6,7 +6,6 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <!-- Używamy DOKŁADNIE tej samej wersji Spring Boot, co w starym pliku -->
         <version>3.5.4</version>
         <relativePath/>
     </parent>

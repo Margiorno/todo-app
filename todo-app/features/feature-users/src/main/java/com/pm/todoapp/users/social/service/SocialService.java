@@ -9,7 +9,7 @@ import com.pm.todoapp.users.profile.dto.ProfileStatus;
 import com.pm.todoapp.users.profile.dto.UserResponseDTO;
 import com.pm.todoapp.users.profile.mapper.UserMapper;
 import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
-import com.pm.todoapp.users.model.User;
+import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import com.pm.todoapp.users.profile.service.UsersService;
 import com.pm.todoapp.users.social.model.FriendRequest;

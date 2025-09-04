@@ -1,4 +1,4 @@
-package com.pm.todoapp.users.model;
+package com.pm.todoapp.users.profile.model;
 
 import com.pm.todoapp.domain.user.model.Gender;
 import jakarta.persistence.*;

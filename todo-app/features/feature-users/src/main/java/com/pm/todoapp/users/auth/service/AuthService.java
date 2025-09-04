@@ -5,7 +5,7 @@ import com.pm.todoapp.common.exceptions.UnauthorizedException;
 import com.pm.todoapp.common.security.JwtUtil;
 import com.pm.todoapp.users.auth.dto.LoginRequestDTO;
 import com.pm.todoapp.users.auth.dto.RegisterRequestDTO;
-import com.pm.todoapp.users.model.User;
+import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

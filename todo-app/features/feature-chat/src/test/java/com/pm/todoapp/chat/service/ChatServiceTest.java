@@ -335,6 +335,4 @@ public class ChatServiceTest {
                 .contains(user1Id.toString(), user2Id.toString());
 
     }
-
-
 }

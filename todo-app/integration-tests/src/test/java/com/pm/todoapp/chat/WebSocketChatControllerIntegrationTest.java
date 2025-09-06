@@ -1,23 +1,20 @@
 package com.pm.todoapp.chat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.pm.todoapp.TodoAppApplication;
 import com.pm.todoapp.chat.dto.MessageDTO;
 import com.pm.todoapp.chat.dto.MessageResponseDTO;
 import com.pm.todoapp.chat.model.Conversation;
-import com.pm.todoapp.chat.model.ConversationType;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -27,13 +24,16 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.net.http.WebSocket;
 import java.util.*;
 import java.util.concurrent.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
 
+@SpringBootTest(
+        classes = TodoAppApplication.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
 
     @LocalServerPort private int port;
@@ -47,6 +47,67 @@ public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
 
         assertThat(session.isConnected()).isTrue();
         session.disconnect();
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void sendMessage_shouldSendMessageToAllParticipants() throws Exception {
+
+        var user3 = usersRepository.saveAndFlush(
+                Instancio.of(com.pm.todoapp.users.profile.model.User.class)
+                        .ignore(field(com.pm.todoapp.users.profile.model.User::getId))
+                        .set(field(com.pm.todoapp.users.profile.model.User::getEmail), randomEmail())
+                        .create()
+        );
+        UUID user3Id = user3.getId();
+
+        Conversation conversation = createTestConversation(Set.of(user1Id, user2Id, user3Id));
+        UUID conversationId = conversation.getId();
+
+        MessageDTO messageToSend = Instancio.of(MessageDTO.class)
+                .set(field(MessageDTO::getSender), userProviderPort.getUserById(user1Id))
+                .set(field(MessageDTO::getConversationId), conversationId)
+                .create();
+
+        WebSocketStompClient stompClient1 = createWebSocketStompClient();
+        WebSocketStompClient stompClient2 = createWebSocketStompClient();
+        WebSocketStompClient stompClient3 = createWebSocketStompClient();
+
+        BlockingDeque<MessageResponseDTO> receivedMessages1 = new LinkedBlockingDeque<>();
+        BlockingDeque<MessageResponseDTO> receivedMessages2 = new LinkedBlockingDeque<>();
+        BlockingDeque<MessageResponseDTO> receivedMessages3 = new LinkedBlockingDeque<>();
+
+        System.out.println("user1");
+        StompSession session1 = connectWebSocket(stompClient1, user1Id.toString(), receivedMessages1);
+        System.out.println("user2");
+        StompSession session2 = connectWebSocket(stompClient2, user2Id.toString(), receivedMessages2);
+        System.out.println("user3");
+        StompSession session3 = connectWebSocket(stompClient3, user3Id.toString(), receivedMessages3);
+
+        String destination = "/app/chat/" + conversationId + "/sendMessage";
+        session1.send(destination, messageToSend);
+
+        System.out.println("2?");
+        MessageResponseDTO receivedMsg1 = receivedMessages1.poll(5, TimeUnit.SECONDS);
+        MessageResponseDTO receivedMsg2 = receivedMessages2.poll(5, TimeUnit.SECONDS);
+        MessageResponseDTO receivedMsg3 = receivedMessages3.poll(5, TimeUnit.SECONDS);
+
+        System.out.println("3?");
+        assertThat(receivedMsg1).isNotNull();
+        assertThat(receivedMsg1.getContent()).isEqualTo(messageToSend.getContent());
+        assertThat(receivedMsg1.getSender().getId()).isEqualTo(user1Id.toString());
+
+        assertThat(receivedMsg2).isNotNull();
+        assertThat(receivedMsg2.getContent()).isEqualTo(messageToSend.getContent());
+        assertThat(receivedMsg2.getSender().getId()).isEqualTo(user1Id.toString());
+
+        assertThat(receivedMsg3).isNotNull();
+        assertThat(receivedMsg3.getContent()).isEqualTo(messageToSend.getContent());
+        assertThat(receivedMsg3.getSender().getId()).isEqualTo(user1Id.toString());
+
+        session1.disconnect();
+        session2.disconnect();
+        session3.disconnect();
     }
 
     private WebSocketStompClient createWebSocketStompClient() {
@@ -63,4 +124,38 @@ public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
 
         return stompClient;
     }
+
+    private StompSession connectWebSocket(
+            WebSocketStompClient stompClient,
+            String userId,
+            BlockingQueue<MessageResponseDTO> messageQueue) throws Exception {
+
+        String url = "http://localhost:" + port + "/ws";
+
+        StompHeaders connectHeaders = new StompHeaders();
+        System.out.println("tutaj?: " + userId);
+        connectHeaders.add("user-id", userId);
+
+        StompSessionHandlerAdapter sessionHandler = new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                session.subscribe("/user/queue/messages", new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(StompHeaders headers) {
+                        return MessageResponseDTO.class;
+                    }
+                    @Override
+                    public void handleFrame(StompHeaders headers, Object payload) {
+                        messageQueue.add((MessageResponseDTO) payload);
+                    }
+                });
+            }
+        };
+
+        return stompClient.connectAsync(url, new WebSocketHttpHeaders(), connectHeaders, sessionHandler)
+                .get(5, TimeUnit.SECONDS);
+    }
+
+
+
 }

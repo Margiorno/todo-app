@@ -1,6 +1,5 @@
 package com.pm.todoapp.chat;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.todoapp.TodoAppApplication;
 import com.pm.todoapp.chat.model.Conversation;

@@ -77,22 +77,17 @@ public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
         BlockingDeque<MessageResponseDTO> receivedMessages2 = new LinkedBlockingDeque<>();
         BlockingDeque<MessageResponseDTO> receivedMessages3 = new LinkedBlockingDeque<>();
 
-        System.out.println("user1");
         StompSession session1 = connectWebSocket(stompClient1, user1Id.toString(), receivedMessages1);
-        System.out.println("user2");
         StompSession session2 = connectWebSocket(stompClient2, user2Id.toString(), receivedMessages2);
-        System.out.println("user3");
         StompSession session3 = connectWebSocket(stompClient3, user3Id.toString(), receivedMessages3);
 
         String destination = "/app/chat/" + conversationId + "/sendMessage";
         session1.send(destination, messageToSend);
 
-        System.out.println("2?");
         MessageResponseDTO receivedMsg1 = receivedMessages1.poll(5, TimeUnit.SECONDS);
         MessageResponseDTO receivedMsg2 = receivedMessages2.poll(5, TimeUnit.SECONDS);
         MessageResponseDTO receivedMsg3 = receivedMessages3.poll(5, TimeUnit.SECONDS);
 
-        System.out.println("3?");
         assertThat(receivedMsg1).isNotNull();
         assertThat(receivedMsg1.getContent()).isEqualTo(messageToSend.getContent());
         assertThat(receivedMsg1.getSender().getId()).isEqualTo(user1Id.toString());
@@ -133,7 +128,6 @@ public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
         String url = "http://localhost:" + port + "/ws";
 
         StompHeaders connectHeaders = new StompHeaders();
-        System.out.println("tutaj?: " + userId);
         connectHeaders.add("user-id", userId);
 
         StompSessionHandlerAdapter sessionHandler = new StompSessionHandlerAdapter() {
@@ -155,6 +149,8 @@ public class WebSocketChatControllerIntegrationTest extends ChatIntegrationTest{
         return stompClient.connectAsync(url, new WebSocketHttpHeaders(), connectHeaders, sessionHandler)
                 .get(5, TimeUnit.SECONDS);
     }
+
+
 
 
 

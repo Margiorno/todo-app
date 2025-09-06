@@ -155,5 +155,61 @@ public class ChatControllerIntegrationTest {
         assertThat(responseDTO.getType()).isEqualTo(ConversationType.PRIVATE);
     }
 
+    @Test
+    public void createConversation_shouldCreateConversation_whenAuthenticated() throws Exception {
 
+        ConversationRequestDTO request = Instancio.of(ConversationRequestDTO.class)
+                .set(field(ConversationRequestDTO::getParticipantIds),Set.of(user2Id))
+                .create();
+
+        MvcResult result1 = mockMvc.perform(post("/chat/new")
+                .with(authentication(
+                        new UsernamePasswordAuthenticationToken(
+                                user1Id,
+                                null,
+                                List.of()
+                        )))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MvcResult result2 = mockMvc.perform(get("/chat/conversations")
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        user1Id,
+                                        null,
+                                        List.of()
+                                )
+                        )))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ConversationResponseDTO response1DTO = objectMapper.readValue(
+                result1.getResponse().getContentAsString(StandardCharsets.UTF_8),
+                ConversationResponseDTO.class);
+
+        List<ConversationResponseDTO> response2DTOs = objectMapper.readValue(
+                result2.getResponse().getContentAsString(StandardCharsets.UTF_8),
+                new TypeReference<>() {});
+
+        assertThat(response2DTOs)
+                .isNotNull()
+                .hasSize(1);
+
+        ConversationResponseDTO response2DTO = response2DTOs.getFirst();
+
+        assertThat(response1DTO.getId())
+                .isEqualTo(response2DTO.getId());
+        assertThat(response1DTO.getTitle())
+                .isEqualTo(response2DTO.getTitle());
+        assertThat(response1DTO.getType())
+                .isEqualTo(response2DTO.getType())
+                .isEqualTo(ConversationType.GROUP_CHAT);
+        assertThat(response1DTO.getParticipants())
+                .hasSize(2);
+        assertThat(response1DTO.getParticipants())
+                .extracting("id")
+                .containsExactlyInAnyOrder(user1Id.toString(), user2Id.toString());
+    }
 }

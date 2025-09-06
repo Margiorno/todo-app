@@ -4,10 +4,13 @@ import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.domain.user.port.UserValidationPort;
 import com.pm.todoapp.domain.user.repository.UserRepository;
 import com.pm.todoapp.notifications.dto.NotificationDTO;
+import com.pm.todoapp.notifications.factory.NotificationFactory;
 import com.pm.todoapp.notifications.mapper.NotificationConverter;
+import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.model.NotificationType;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
+import com.pm.todoapp.notifications.sender.NotificationSender;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +27,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.instancio.Select.field;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationServiceTest {
@@ -34,16 +36,22 @@ public class NotificationServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private UserValidationPort userValidationPort;
     @Mock private NotificationConverter notificationConverter;
+    @Mock private NotificationSender notificationSender;
+    @Mock private NotificationFactory notificationFactory;
 
     @InjectMocks
     private NotificationService notificationService;
 
     private User user1;
+    private User user2;
 
     @BeforeEach
     public void setUp() {
         UUID user1Id = UUID.randomUUID();
         user1 = User.builder().id(user1Id).build();
+
+        UUID user2Id = UUID.randomUUID();
+        user2 = User.builder().id(user2Id).build();
     }
 
 
@@ -78,6 +86,35 @@ public class NotificationServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().getId()).isEqualTo(todayNotification.getId());
         assertThat(result.getLast().getId()).isEqualTo(yesterdayNotification.getId());
+    }
+
+    @Test
+    void createAndSendFriendRequestNotification_shouldSendNotification() {
+        UUID requestId = UUID.randomUUID();
+
+        FriendRequestNotification notificationEntity = Instancio.create(FriendRequestNotification.class);
+
+        NotificationDTO notificationDTO = NotificationDTO.builder()
+                .id(notificationEntity.getId())
+                .build();
+
+        doNothing().when(userValidationPort).ensureUserExistsById(any(UUID.class));
+        when(userRepository.getReferenceById(user1.getId())).thenReturn(user1);
+        when(userRepository.getReferenceById(user2.getId())).thenReturn(user2);
+        when(notificationFactory.createFriendRequestNotification(requestId, user1, user2))
+                .thenReturn(notificationEntity);
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notificationEntity);
+        when(notificationConverter.toDTO(notificationEntity)).thenReturn(notificationDTO);
+        doNothing().when(notificationSender).send(notificationDTO, user2.getId());
+
+        notificationService.createAndSendFriendRequestNotification(requestId, user1.getId(), user2.getId());
+
+        verify(userValidationPort, times(1)).ensureUserExistsById(user1.getId());
+        verify(userValidationPort, times(1)).ensureUserExistsById(user2.getId());
+        verify(notificationFactory, times(1)).createFriendRequestNotification(requestId, user1, user2);
+        verify(notificationRepository, times(1)).save(notificationEntity);
+        verify(notificationConverter, times(1)).toDTO(notificationEntity);
+        verify(notificationSender, times(1)).send(notificationDTO, user2.getId());
     }
 
 }

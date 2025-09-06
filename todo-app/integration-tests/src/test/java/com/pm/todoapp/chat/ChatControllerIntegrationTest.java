@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.instancio.Select.field;
@@ -27,14 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ChatControllerIntegrationTest extends ChatIntegrationTest{
     @Test
     void getConversations_returnsUserConversations_whenAuthenticated() throws Exception {
-        Conversation conversation = conversationRepository.save(Instancio.of(Conversation.class)
-                .ignore(field(Conversation::getId))
-                .set(field(Conversation::getMessages), new ArrayList<>())
-                .set(field(Conversation::getConversationType), ConversationType.GROUP_CHAT)
-                .set(field(Conversation::getParticipants), Set.of(
-                        userRepository.getReferenceById(user1Id),
-                        userRepository.getReferenceById(user2Id)))
-                .create());
+        Conversation conversation = createTestConversation(Set.of(user1Id, user2Id));
 
 
         MvcResult result = mockMvc.perform(get("/chat/conversations")

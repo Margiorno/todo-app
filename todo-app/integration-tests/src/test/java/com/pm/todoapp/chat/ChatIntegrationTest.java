@@ -57,7 +57,7 @@ public abstract class ChatIntegrationTest {
     UUID user1Id;
     UUID user2Id;
 
-    private static String randomEmail() {
+    protected static String randomEmail() {
         return UUID.randomUUID().toString().substring(0, 8) + "@example.com";
     }
 
@@ -79,5 +79,14 @@ public abstract class ChatIntegrationTest {
 
         user1Id = user1.getId();
         user2Id = user2.getId();
+    }
+
+    protected Conversation createTestConversation(Set<UUID> participants) throws Exception {
+        return conversationRepository.save(Instancio.of(Conversation.class)
+                .ignore(field(Conversation::getId))
+                .set(field(Conversation::getMessages), new ArrayList<>())
+                .set(field(Conversation::getConversationType), ConversationType.GROUP_CHAT)
+                .set(field(Conversation::getParticipants), participants)
+                .create());
     }
 }

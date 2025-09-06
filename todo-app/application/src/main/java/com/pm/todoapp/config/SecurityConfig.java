@@ -65,6 +65,7 @@ public class SecurityConfig {
                         "/css/**",
                         "/js/**",
                         "/error",
+                        "/ws/**",
                         "/h2-console/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))

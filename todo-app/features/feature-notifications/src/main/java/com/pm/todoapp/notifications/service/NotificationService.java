@@ -39,7 +39,7 @@ public class NotificationService {
         Iterable<Notification> notifications = notificationRepository.findAllByReceiver(user);
 
         return StreamSupport.stream(notifications.spliterator(), false)
-                .sorted(Comparator.comparing(Notification::getCreatedAt))
+                .sorted(Comparator.comparing(Notification::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                 .map(notificationConverter::toDTO)
                 .toList();
     }

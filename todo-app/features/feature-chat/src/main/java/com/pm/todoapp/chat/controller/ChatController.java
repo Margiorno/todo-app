@@ -51,7 +51,7 @@ public class ChatController {
                 userId));
     }
 
-    @GetMapping("get-chat/{userId}")
+    @GetMapping("/get-chat/{userId}")
     public ResponseEntity<ConversationResponseDTO> getChat(
             @AuthenticationPrincipal UUID loggedInUserId,
             @PathVariable UUID userId

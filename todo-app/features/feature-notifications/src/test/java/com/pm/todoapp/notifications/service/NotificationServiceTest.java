@@ -8,19 +8,21 @@ import com.pm.todoapp.notifications.factory.NotificationFactory;
 import com.pm.todoapp.notifications.mapper.NotificationConverter;
 import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
-import com.pm.todoapp.notifications.model.NotificationType;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
 import com.pm.todoapp.notifications.sender.NotificationSender;
+import org.hibernate.mapping.Any;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -89,7 +91,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    void createAndSendFriendRequestNotification_shouldSendNotification() {
+    public void createAndSendFriendRequestNotification_shouldSendNotification() {
         UUID requestId = UUID.randomUUID();
 
         FriendRequestNotification notificationEntity = Instancio.create(FriendRequestNotification.class);
@@ -116,5 +118,29 @@ public class NotificationServiceTest {
         verify(notificationConverter, times(1)).toDTO(notificationEntity);
         verify(notificationSender, times(1)).send(notificationDTO, user2.getId());
     }
+
+    @Test
+    void resolveFriendRequestNotification_shouldResolveNotification() {
+        UUID requestId = UUID.randomUUID();
+        FriendRequestNotification notification = Instancio.of(FriendRequestNotification.class)
+                .set(field(FriendRequestNotification::getRequestId),requestId)
+                .set(field(FriendRequestNotification::isResolved),false)
+                .create();
+
+        when(notificationRepository.findNotificationByRequestId(requestId)).thenReturn(Optional.ofNullable(notification));
+
+        ArgumentCaptor<FriendRequestNotification> notificationCaptor =
+                ArgumentCaptor.forClass(FriendRequestNotification.class);
+
+        notificationService.resolveNotification(requestId);
+
+        verify(notificationRepository, times(1)).findNotificationByRequestId(requestId);
+
+        verify(notificationRepository, times(1)).save(notificationCaptor.capture());
+
+        FriendRequestNotification capturedNotification = notificationCaptor.getValue();
+        assertThat(capturedNotification.isResolved()).isTrue();
+    }
+
 
 }

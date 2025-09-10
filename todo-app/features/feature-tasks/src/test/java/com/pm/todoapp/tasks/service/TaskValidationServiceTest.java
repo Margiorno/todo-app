@@ -1,6 +1,7 @@
 package com.pm.todoapp.tasks.service;
 
 import com.pm.todoapp.common.exceptions.TaskAccessDeniedException;
+import com.pm.todoapp.domain.teams.model.Team;
 import com.pm.todoapp.domain.teams.port.TeamValidationPort;
 import com.pm.todoapp.domain.teams.repository.TeamRepository;
 import com.pm.todoapp.domain.user.model.User;
@@ -46,9 +47,7 @@ public class TaskValidationServiceTest {
     @Test
     public void shouldThrowExceptionWhenUserIsNotAssignedToTask(){
         User user = Instancio.create(User.class);
-        Task task = Instancio.of(Task.class)
-                .set(field(Task::getAssignees), Set.of())
-                .create();
+        Task task = Instancio.of(Task.class).create();
 
         TaskAccessDeniedException exception = assertThrows(TaskAccessDeniedException.class,
                 () -> taskValidationService.validateUserAssignedToTask(task, user)
@@ -58,5 +57,25 @@ public class TaskValidationServiceTest {
                 .formatted(user.getId(), task.getId());
 
         assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenTeamIsAssignedToTask(){
+        Team team = Instancio.create(Team.class);
+        Task task = Instancio.of(Task.class)
+                .set(field(Task::getTeam), team)
+                .create();
+
+        assertDoesNotThrow(() -> taskValidationService.validateTeamMatches(task, team.getId()));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTeamIsNotAssignedToTask(){
+        Team team = Instancio.create(Team.class);
+        Task task = Instancio.create(Task.class);
+
+        TaskAccessDeniedException exception = assertThrows(TaskAccessDeniedException.class,
+                () -> taskValidationService.validateTeamMatches(task, team.getId())
+        );
     }
 }

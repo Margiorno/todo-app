@@ -13,5 +13,5 @@ public class ConversationResponseDTO {
     private UUID id;
     private ConversationType type;
     private String title;
-    private List<SenderDTO> participants;
+    private Set<SenderDTO> participants;
 }

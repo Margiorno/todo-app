@@ -5,10 +5,20 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/todo-app/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/application/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/common/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-users/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-teams/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-tasks/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-notifications/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-files/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/features/feature-chat/pom.xml" />
+        <option value="$PROJECT_DIR$/todo-app/domain/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" project-jdk-name="openjdk-24 (9)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

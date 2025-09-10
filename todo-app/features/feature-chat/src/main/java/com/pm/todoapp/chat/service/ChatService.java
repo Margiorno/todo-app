@@ -171,6 +171,7 @@ public class ChatService {
 
         Set<UserDTO> participants = userProviderPort.getUsersByIds(participantsIds);
 
+
         String title = switch (conversation.getConversationType()){
             case PRIVATE -> participants.stream()
                     .filter(participant -> !participant.getId().equals(currentUserId))
@@ -184,6 +185,10 @@ public class ChatService {
                 .id(conversation.getId())
                 .type(conversation.getConversationType())
                 .title(title)
+                .participants(participants
+                        .stream()
+                        .map(SenderMapper::fromUserDtoToSenderDTO)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 

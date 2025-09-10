@@ -1,6 +1,6 @@
 package com.pm.todoapp.users.social.model;
 
-import com.pm.todoapp.users.model.User;
+import com.pm.todoapp.users.profile.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

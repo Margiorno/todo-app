@@ -154,5 +154,35 @@ class TeamServiceTest {
         assertThat(savedTeam.getMembers()).contains(user, newUser);
     }
 
+    @Test
+    void join_shouldThrowException_whenUserIsAlreadyMember() {
+        String validCode = Instancio.create(String.class);
+
+        doNothing().when(userValidationPort).ensureUserExistsById(user.getId());
+        when(userRepository.getReferenceById(user.getId())).thenReturn(user);
+        when(inviteCodeService.resolveInvitationCode(validCode)).thenReturn(team);
+
+        assertThatThrownBy(() -> teamService.join(validCode, user.getId()))
+                .isInstanceOf(InvalidTeamInviteException.class)
+                .hasMessage("You are already in a member of this team");
+
+        verify(teamRepository, never()).save(any(Team.class));
+    }
+
+    @Test
+    void deleteUserFromTeam_shouldRemoveUserAndSaveChanges() {
+        when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
+        doNothing().when(userValidationPort).ensureUserExistsById(user.getId());
+        when(userRepository.getReferenceById(user.getId())).thenReturn(user);
+
+        teamService.deleteUserFromTeam(team.getId(), user.getId());
+
+        ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
+        verify(teamRepository).save(teamCaptor.capture());
+        Team savedTeam = teamCaptor.getValue();
+
+        assertThat(savedTeam.getMembers()).doesNotContain(user);
+    }
+
 
 }

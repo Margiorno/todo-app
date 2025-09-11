@@ -90,4 +90,27 @@ class TaskServiceTest {
         verify(taskRepository).save(any(Task.class));
         assertThat(result).isEqualTo(taskResponseDTO);
     }
+
+    @Test
+    void update_shouldUpdateTask_whenValidationsPass() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+        TaskRequestDTO taskRequestDTO = Instancio.create(TaskRequestDTO.class);
+
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(task));
+        doNothing().when(taskValidationService).validateUserAssignedToTask(task, user);
+        doNothing().when(taskValidationService).validateTeamMatches(task, team.getId());
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
+        when(taskMapper.toResponseDTO(task)).thenReturn(taskResponseDTO);
+
+        TaskResponseDTO result = taskService.update(taskRequestDTO, task.getId(), user.getId(), team.getId());
+
+        verify(taskRepository).findById(task.getId());
+        verify(taskValidationService).validateUserAssignedToTask(task, user);
+        verify(taskValidationService).validateTeamMatches(task, team.getId());
+        verify(taskRepository).save(any(Task.class));
+        assertThat(result).isEqualTo(taskResponseDTO);
+    }
+
+
 }

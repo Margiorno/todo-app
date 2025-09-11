@@ -122,4 +122,47 @@ class TaskServiceTest {
                 .isInstanceOf(TaskNotFoundException.class)
                 .hasMessage("Task with this id does not exists: %s".formatted(task.getId()));
     }
+
+    @Test
+    void findByUserId_shouldReturnUserTasks() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskRepository.findByAssigneesContaining(user)).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(task)).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByUserId(user.getId());
+
+        assertThat(result).isNotNull().hasSize(1);
+        assertThat(result.getFirst()).isEqualTo(taskResponseDTO);
+        verify(taskRepository).findByAssigneesContaining(user);
+    }
+
+    @Test
+    void findById_shouldReturnTaskDTO_whenTaskExists() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.of(task));
+        when(taskMapper.toResponseDTO(task)).thenReturn(taskResponseDTO);
+
+        TaskResponseDTO result = taskService.findById(task.getId());
+
+        assertThat(result).isEqualTo(taskResponseDTO);
+    }
+
+    @Test
+    void findByDate_shouldReturnUserTasksForDate_whenNoTeamId() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        LocalDate date = LocalDate.now();
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskRepository.findByAssigneesContainingAndTaskDate(user, date)).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(any(Task.class))).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByDate(date, user.getId(), null, TaskFetchScope.USER_TASKS);
+
+        assertThat(result).isNotEmpty();
+        verify(taskRepository).findByAssigneesContainingAndTaskDate(user, date);
+        verify(taskRepository, never()).findByTeamAndTaskDate(any(), any());
+    }
 }

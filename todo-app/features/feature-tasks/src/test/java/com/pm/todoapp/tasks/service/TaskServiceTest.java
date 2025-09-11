@@ -112,5 +112,14 @@ class TaskServiceTest {
         assertThat(result).isEqualTo(taskResponseDTO);
     }
 
+    @Test
+    void update_shouldThrowException_whenTaskNotFound() {
+        TaskRequestDTO taskRequestDTO = Instancio.create(TaskRequestDTO.class);
 
+        when(taskRepository.findById(task.getId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> taskService.update(taskRequestDTO, task.getId(), user.getId(), team.getId()))
+                .isInstanceOf(TaskNotFoundException.class)
+                .hasMessage("Task with this id does not exists: %s".formatted(task.getId()));
+    }
 }

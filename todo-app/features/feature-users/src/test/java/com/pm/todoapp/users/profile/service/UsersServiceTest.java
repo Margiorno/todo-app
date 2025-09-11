@@ -1,9 +1,11 @@
 package com.pm.todoapp.users.profile.service;
 
+import com.pm.todoapp.common.exceptions.InvalidFieldException;
 import com.pm.todoapp.common.exceptions.StorageException;
 import com.pm.todoapp.common.exceptions.UserNotFoundException;
 import com.pm.todoapp.domain.file.dto.FileType;
 import com.pm.todoapp.domain.file.port.FileStoragePort;
+import com.pm.todoapp.domain.user.model.Gender;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import org.instancio.Instancio;
@@ -19,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -125,6 +129,65 @@ public class UsersServiceTest {
 
         verify(usersRepository, never()).save(any(User.class));
         verify(fileStoragePort, never()).deleteFile(anyString(), any(FileType.class));
+    }
+
+    @Test
+    void update_shouldUpdateFirstNameAndSaveChanges() {
+        String newFirstName = Instancio.create(String.class);
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(usersRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, Object> result = usersService.update("firstName", newFirstName, user.getId());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository).save(userCaptor.capture());
+
+        assertThat(userCaptor.getValue().getFirstName()).isEqualTo(newFirstName);
+        assertThat(result).containsEntry("firstName", newFirstName);
+    }
+
+    @Test
+    void update_shouldUpdateDateOfBirthAndSaveChanges() {
+        String newDateString = Instancio.create(LocalDate.class).toString();
+        LocalDate newDate = LocalDate.parse(newDateString);
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(usersRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, Object> result = usersService.update("dateOfBirth", newDateString, user.getId());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository).save(userCaptor.capture());
+
+        assertThat(userCaptor.getValue().getDateOfBirth()).isEqualTo(newDate);
+        assertThat(result).containsEntry("dateOfBirth", newDate);
+    }
+
+    @Test
+    void update_shouldUpdateGenderAndSaveChanges() {
+        String newGenderString = Instancio.create(Gender.class).toString();
+        Gender newGender = Gender.valueOf(newGenderString);
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(usersRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, Object> result = usersService.update("gender", newGenderString, user.getId());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository).save(userCaptor.capture());
+
+        assertThat(userCaptor.getValue().getGender()).isEqualTo(newGender);
+        assertThat(result).containsEntry("gender", newGender);
+    }
+
+    @Test
+    void update_shouldThrowInvalidFieldException_forUnsupportedField() {
+        String invalidField = Instancio.create(String.class);
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> usersService.update(invalidField, "brown", user.getId()))
+                .isInstanceOf(InvalidFieldException.class)
+                .hasMessage("Unsupported field: " + invalidField);
+
+        verify(usersRepository, never()).save(any(User.class));
     }
 
 }

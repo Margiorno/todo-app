@@ -84,5 +84,44 @@ class TeamServiceTest {
         assertThat(result.getId()).isEqualTo(team.getId());
     }
 
+    @Test
+    void findAllByUserId_shouldReturnTeamDTOs() {
+        doNothing().when(userValidationPort).ensureUserExistsById(user.getId());
+        when(userRepository.getReferenceById(user.getId())).thenReturn(user);
+        when(teamRepository.findByMembersContaining(user)).thenReturn(List.of(team));
+
+        List<TeamResponseDTO> result = teamService.findAllByUserId(user.getId());
+
+        assertThat(result).isNotNull().hasSize(1);
+        assertThat(result.getFirst().getId()).isEqualTo(team.getId().toString());
+        assertThat(result.getFirst().getName()).isEqualTo(team.getName());
+    }
+
+    @Test
+    void createTeam_shouldCreateAndSaveTeam_andReturnDTO() {
+        String teamName = Instancio.create(String.class);
+
+        doNothing().when(userValidationPort).ensureUserExistsById(user.getId());
+        when(userRepository.getReferenceById(user.getId())).thenReturn(user);
+
+        when(teamRepository.save(any(Team.class))).thenAnswer(invocation -> {
+            Team savedTeam = invocation.getArgument(0);
+            savedTeam.setId(UUID.randomUUID());
+            return savedTeam;
+        });
+
+        TeamResponseDTO result = teamService.createTeam(teamName, user.getId());
+
+        ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
+        verify(teamRepository).save(teamCaptor.capture());
+        Team capturedTeam = teamCaptor.getValue();
+
+        assertThat(capturedTeam.getName()).isEqualTo(teamName);
+        assertThat(capturedTeam.getMembers()).containsExactly(user);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getName()).isEqualTo(teamName);
+    }
+
 
 }

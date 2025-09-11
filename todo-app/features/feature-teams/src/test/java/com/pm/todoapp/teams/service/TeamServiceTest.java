@@ -66,5 +66,14 @@ class TeamServiceTest {
                 .hasMessage("Team not found");
     }
 
+    @Test
+    void findRawById_shouldThrowException_whenTeamDoesNotExist() {
+        when(teamRepository.findById(team.getId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> teamService.findRawById(team.getId()))
+                .isInstanceOf(TeamNotFoundException.class)
+                .hasMessage("Team with this id does not exist: " + team.getId());
+    }
+
 
 }

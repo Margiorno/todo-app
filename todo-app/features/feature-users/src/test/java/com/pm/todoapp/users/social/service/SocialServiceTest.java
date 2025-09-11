@@ -1,6 +1,9 @@
 package com.pm.todoapp.users.social.service;
 
 import com.pm.todoapp.common.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.common.exceptions.UnauthorizedException;
+import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
+import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
 import com.pm.todoapp.domain.user.event.FriendRequestSentEvent;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
@@ -11,10 +14,13 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -78,5 +84,36 @@ class SocialServiceTest {
 
         verify(friendsRequestRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void acceptFriendRequest_shouldAddFriendAndDeleteRequest_whenUserIsReceiver() {
+        when(friendsRequestRepository.findById(friendRequest.getId())).thenReturn(Optional.of(friendRequest));
+        when(usersService.findRawById(receiver.getId())).thenReturn(receiver);
+
+        socialService.acceptFriendRequest(friendRequest.getId(), receiver.getId());
+
+        verify(usersRepository, times(2)).save(any(User.class));
+        verify(friendsRequestRepository).delete(friendRequest);
+        verify(eventPublisher).publishEvent(any(FriendRequestAcceptedEvent.class));
+        verify(eventPublisher).publishEvent(any(FriendRequestResolvedEvent.class));
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository, atLeastOnce()).save(userCaptor.capture());
+        assertThat(userCaptor.getAllValues()).anySatisfy(user ->
+                assertThat(user.getFriends()).contains(sender)
+        );
+    }
+
+    @Test
+    void acceptFriendRequest_shouldThrowException_whenUserIsNotReceiver() {
+        when(friendsRequestRepository.findById(friendRequest.getId())).thenReturn(Optional.of(friendRequest));
+
+        assertThatThrownBy(() -> socialService.acceptFriendRequest(friendRequest.getId(), sender.getId()))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("You must be the receiver to accept a friend request");
+
+        verify(usersRepository, never()).save(any());
+        verify(friendsRequestRepository, never()).delete(any());
     }
 }

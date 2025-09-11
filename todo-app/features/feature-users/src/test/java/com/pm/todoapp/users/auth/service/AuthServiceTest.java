@@ -1,5 +1,6 @@
 package com.pm.todoapp.users.auth.service;
 
+import com.pm.todoapp.common.exceptions.EmailAlreadyExistsException;
 import com.pm.todoapp.common.security.JwtUtil;
 import com.pm.todoapp.users.auth.dto.RegisterRequestDTO;
 import com.pm.todoapp.users.profile.model.User;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -59,6 +61,20 @@ class AuthServiceTest {
         verify(jwtUtil).generateToken(savedUser.getId().toString());
 
         assertThat(resultToken).isEqualTo(generatedToken);
+    }
+
+    @Test
+    void registerUser_shouldThrowException_whenEmailAlreadyExists() {
+        RegisterRequestDTO registerRequest = Instancio.create(RegisterRequestDTO.class);
+        when(usersService.existByEmail(registerRequest.getEmail())).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.registerUser(registerRequest))
+                .isInstanceOf(EmailAlreadyExistsException.class)
+                .hasMessage("Account with this email already exists");
+
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(usersService, never()).save(any(User.class));
+        verify(jwtUtil, never()).generateToken(anyString());
     }
 
 }

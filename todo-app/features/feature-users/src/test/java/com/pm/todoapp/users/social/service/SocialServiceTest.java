@@ -116,4 +116,26 @@ class SocialServiceTest {
         verify(usersRepository, never()).save(any());
         verify(friendsRequestRepository, never()).delete(any());
     }
+
+    @Test
+    void declineFriendRequest_shouldDeleteRequest_whenUserIsReceiver() {
+        when(friendsRequestRepository.findById(friendRequest.getId())).thenReturn(Optional.of(friendRequest));
+
+        socialService.declineFriendRequest(friendRequest.getId(), receiver.getId());
+
+        verify(friendsRequestRepository).delete(friendRequest);
+        verify(eventPublisher).publishEvent(any(FriendRequestResolvedEvent.class));
+        verify(usersRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelFriendRequest_shouldDeleteRequest_whenUserIsSender() {
+        when(friendsRequestRepository.findById(friendRequest.getId())).thenReturn(Optional.of(friendRequest));
+
+        socialService.cancelFriendRequest(friendRequest.getId(), sender.getId());
+
+        verify(friendsRequestRepository).delete(friendRequest);
+        verify(eventPublisher).publishEvent(any(FriendRequestResolvedEvent.class));
+        verify(usersRepository, never()).save(any());
+    }
 }

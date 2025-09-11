@@ -73,5 +73,21 @@ class TaskServiceTest {
         assertThat(result).isEqualTo(taskResponseDTO);
     }
 
+    @Test
+    void save_shouldCreateTeamTask_whenTeamIdIsProvided() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+        TaskRequestDTO taskRequestDTO = Instancio.create(TaskRequestDTO.class);
 
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskValidationService.getValidatedTeam(team.getId())).thenReturn(team);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
+        when(taskMapper.toResponseDTO(task)).thenReturn(taskResponseDTO);
+
+        TaskResponseDTO result = taskService.save(taskRequestDTO, user.getId(), team.getId());
+
+        verify(taskValidationService).getValidatedUser(user.getId());
+        verify(taskValidationService).getValidatedTeam(team.getId());
+        verify(taskRepository).save(any(Task.class));
+        assertThat(result).isEqualTo(taskResponseDTO);
+    }
 }

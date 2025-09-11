@@ -167,4 +167,33 @@ class SocialServiceTest {
         assertThat(result.getStatus()).isEqualTo(ProfileStatus.INVITATION_SENT);
         assertThat(result.getFriendRequestId()).isEqualTo(friendRequest.getId());
     }
+
+    @Test
+    void removeFriend_shouldRemoveFriendshipAndSaveChanges() {
+        sender.addFriend(receiver);
+        when(usersService.findRawById(sender.getId())).thenReturn(sender);
+        when(usersService.findRawById(receiver.getId())).thenReturn(receiver);
+        when(usersRepository.areFriends(sender.getId(), receiver.getId())).thenReturn(true);
+
+        socialService.removeFriend(sender.getId(), receiver.getId());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository, times(2)).save(userCaptor.capture());
+
+        assertThat(sender.getFriends()).doesNotContain(receiver);
+        assertThat(receiver.getFriends()).doesNotContain(sender);
+    }
+
+    @Test
+    void removeFriend_shouldThrowException_whenUsersAreNotFriends() {
+        when(usersService.findRawById(sender.getId())).thenReturn(sender);
+        when(usersService.findRawById(receiver.getId())).thenReturn(receiver);
+        when(usersRepository.areFriends(sender.getId(), receiver.getId())).thenReturn(false);
+
+        assertThatThrownBy(() -> socialService.removeFriend(sender.getId(), receiver.getId()))
+                .isInstanceOf(InvalidFriendInviteException.class)
+                .hasMessage("You cannot remove this user from friends, because you are not friends");
+
+        verify(usersRepository, never()).save(any());
+    }
 }

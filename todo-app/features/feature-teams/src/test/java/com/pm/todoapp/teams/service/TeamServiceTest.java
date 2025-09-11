@@ -75,5 +75,14 @@ class TeamServiceTest {
                 .hasMessage("Team with this id does not exist: " + team.getId());
     }
 
+    @Test
+    void findRawById_shouldReturnTeam_whenTeamExists() {
+        when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
+        Team result = teamService.findRawById(team.getId());
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(team.getId());
+    }
+
 
 }

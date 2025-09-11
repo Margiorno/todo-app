@@ -1,7 +1,9 @@
 package com.pm.todoapp.users.auth.service;
 
 import com.pm.todoapp.common.exceptions.EmailAlreadyExistsException;
+import com.pm.todoapp.common.exceptions.UnauthorizedException;
 import com.pm.todoapp.common.security.JwtUtil;
+import com.pm.todoapp.users.auth.dto.LoginRequestDTO;
 import com.pm.todoapp.users.auth.dto.RegisterRequestDTO;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.service.UsersService;
@@ -77,4 +79,45 @@ class AuthServiceTest {
         verify(jwtUtil, never()).generateToken(anyString());
     }
 
+    @Test
+    void loginUser_shouldReturnToken_whenCredentialsAreCorrect() {
+        LoginRequestDTO loginRequest = Instancio.create(LoginRequestDTO.class);
+        String hashedPassword = Instancio.create(String.class);
+        String generatedToken = Instancio.create(String.class);
+
+        User userFromDb = Instancio.create(User.class);
+        userFromDb.setId(UUID.randomUUID());
+        userFromDb.setEmail(loginRequest.getEmail());
+        userFromDb.setPassword(hashedPassword);
+
+        when(usersService.findByEmail(loginRequest.getEmail())).thenReturn(userFromDb);
+        when(passwordEncoder.matches(loginRequest.getPassword(), hashedPassword)).thenReturn(true);
+        when(jwtUtil.generateToken(userFromDb.getId().toString())).thenReturn(generatedToken);
+
+        String resultToken = authService.loginUser(loginRequest);
+
+        verify(usersService).findByEmail(loginRequest.getEmail());
+        verify(passwordEncoder).matches(loginRequest.getPassword(), hashedPassword);
+        verify(jwtUtil).generateToken(userFromDb.getId().toString());
+        assertThat(resultToken).isEqualTo(generatedToken);
+    }
+
+    @Test
+    void loginUser_shouldThrowException_whenPasswordIsIncorrect() {
+        LoginRequestDTO loginRequest = Instancio.create(LoginRequestDTO.class);
+        String hashedPassword = Instancio.create(String.class);
+
+        User userFromDb = Instancio.create(User.class);
+        userFromDb.setEmail(loginRequest.getEmail());
+        userFromDb.setPassword(hashedPassword);
+
+        when(usersService.findByEmail(loginRequest.getEmail())).thenReturn(userFromDb);
+        when(passwordEncoder.matches(loginRequest.getPassword(), hashedPassword)).thenReturn(false);
+
+        assertThatThrownBy(() -> authService.loginUser(loginRequest))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Wrong password");
+
+        verify(jwtUtil, never()).generateToken(anyString());
+    }
 }

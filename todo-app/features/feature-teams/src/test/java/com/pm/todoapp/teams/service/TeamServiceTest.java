@@ -201,5 +201,31 @@ class TeamServiceTest {
                 .doesNotThrowAnyException();
     }
 
+    @Test
+    void findTeamMembers_shouldReturnMappedMemberDTOs() {
+        User user2 = Instancio.create(User.class);
+        team.getMembers().add(user2);
 
+        UserDTO user1DTO = Instancio.of(UserDTO.class)
+                .set(field(UserDTO::getId),user.getId())
+                .create();
+        UserDTO user2DTO = Instancio.of(UserDTO.class)
+                .set(field(UserDTO::getId),user2.getId())
+                .create();
+
+        Set<UUID> memberIds = Set.of(user.getId(), user2.getId());
+        when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
+        when(userProviderPort.getUsersByIds(memberIds)).thenReturn(Set.of(user1DTO, user2DTO));
+
+        Set<TeamMemberDTO> result = teamService.findTeamMembers(team.getId());
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(2)
+                .extracting("id", "firstName", "lastName", "email")
+                .containsExactlyInAnyOrder(
+                        tuple(user1DTO.getId(), user1DTO.getFirstName(), user1DTO.getLastName(), user1DTO.getEmail()),
+                        tuple(user2DTO.getId(), user2DTO.getFirstName(), user2DTO.getLastName(), user2DTO.getEmail())
+                );
+    }
 }

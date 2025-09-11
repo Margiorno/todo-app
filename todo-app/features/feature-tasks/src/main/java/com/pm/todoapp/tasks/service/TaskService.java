@@ -26,11 +26,9 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskDAO taskDAO;
     private final TaskMapper taskMapper;
-    private final TaskValidationService taskAuthorizationService;
     private final TaskValidationService taskValidationService;
 
     public TaskResponseDTO save(TaskRequestDTO taskDto, UUID userId, UUID teamId) {
-
         User user = taskValidationService.getValidatedUser(userId);
         Task task = TaskMapper.toEntity(taskDto, Set.of(user));
 
@@ -49,8 +47,8 @@ public class TaskService {
         User user = taskValidationService.getValidatedUser(userId);
         Task fromDb = findRawById(taskId);
 
-        taskAuthorizationService.validateUserAssignedToTask(fromDb, user);
-        taskAuthorizationService.validateTeamMatches(fromDb, teamId);
+        taskValidationService.validateUserAssignedToTask(fromDb, user);
+        taskValidationService.validateTeamMatches(fromDb, teamId);
 
         Task task = TaskMapper.toEntity(taskDto, fromDb.getAssignees(), taskId);
         task.setTeam(fromDb.getTeam());
@@ -59,7 +57,6 @@ public class TaskService {
         return taskMapper.toResponseDTO(savedTask);
     }
 
-
     public List<TaskResponseDTO> findByUserId(UUID userId) {
 
         User user = taskValidationService.getValidatedUser(userId);
@@ -67,7 +64,6 @@ public class TaskService {
         Iterable<Task> tasks = taskRepository.findByAssigneesContaining(user);
         return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
-
 
     private Task findRawById(UUID id) {
         return taskRepository.findById(id).orElseThrow(
@@ -141,6 +137,4 @@ public class TaskService {
 
         return StreamSupport.stream(tasks.spliterator(), false).map(taskMapper::toResponseDTO).toList();
     }
-
-
 }

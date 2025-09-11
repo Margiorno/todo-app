@@ -10,7 +10,6 @@ import com.pm.todoapp.notifications.model.FriendRequestNotification;
 import com.pm.todoapp.notifications.model.Notification;
 import com.pm.todoapp.notifications.repository.NotificationRepository;
 import com.pm.todoapp.notifications.sender.NotificationSender;
-import org.hibernate.mapping.Any;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,12 +134,9 @@ public class NotificationServiceTest {
         notificationService.resolveNotification(requestId);
 
         verify(notificationRepository, times(1)).findNotificationByRequestId(requestId);
-
         verify(notificationRepository, times(1)).save(notificationCaptor.capture());
 
         FriendRequestNotification capturedNotification = notificationCaptor.getValue();
         assertThat(capturedNotification.isResolved()).isTrue();
     }
-
-
 }

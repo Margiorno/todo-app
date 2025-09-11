@@ -5,9 +5,11 @@ import com.pm.todoapp.common.exceptions.UnauthorizedException;
 import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
 import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
 import com.pm.todoapp.domain.user.event.FriendRequestSentEvent;
+import com.pm.todoapp.users.profile.dto.ProfileStatus;
 import com.pm.todoapp.users.profile.model.User;
 import com.pm.todoapp.users.profile.repository.UsersRepository;
 import com.pm.todoapp.users.profile.service.UsersService;
+import com.pm.todoapp.users.social.dto.ProfileStatusDTO;
 import com.pm.todoapp.users.social.model.FriendRequest;
 import com.pm.todoapp.users.social.repository.FriendsRequestRepository;
 import org.instancio.Instancio;
@@ -137,5 +139,32 @@ class SocialServiceTest {
         verify(friendsRequestRepository).delete(friendRequest);
         verify(eventPublisher).publishEvent(any(FriendRequestResolvedEvent.class));
         verify(usersRepository, never()).save(any());
+    }
+
+    @Test
+    void determineFriendshipStatus_shouldReturnOwner_whenIdsAreEqual() {
+        ProfileStatusDTO result = socialService.determineFriendshipStatus(sender.getId(), sender.getId());
+        assertThat(result.getStatus()).isEqualTo(ProfileStatus.OWNER);
+    }
+
+    @Test
+    void determineFriendshipStatus_shouldReturnFriend_whenUsersAreFriends() {
+        when(usersRepository.existsByIdAndFriendsId(sender.getId(), receiver.getId())).thenReturn(true);
+        ProfileStatusDTO result = socialService.determineFriendshipStatus(sender.getId(), receiver.getId());
+        assertThat(result.getStatus()).isEqualTo(ProfileStatus.FRIEND);
+    }
+
+    @Test
+    void determineFriendshipStatus_shouldReturnInvitationSent_whenRequestExists() {
+        when(usersRepository.existsByIdAndFriendsId(sender.getId(), receiver.getId())).thenReturn(false);
+        when(usersService.findRawById(sender.getId())).thenReturn(sender);
+        when(usersService.findRawById(receiver.getId())).thenReturn(receiver);
+        when(friendsRequestRepository.existsBySenderAndReceiver(sender, receiver)).thenReturn(true);
+        when(friendsRequestRepository.findBySenderAndReceiver(sender, receiver)).thenReturn(Optional.of(friendRequest));
+
+        ProfileStatusDTO result = socialService.determineFriendshipStatus(sender.getId(), receiver.getId());
+
+        assertThat(result.getStatus()).isEqualTo(ProfileStatus.INVITATION_SENT);
+        assertThat(result.getFriendRequestId()).isEqualTo(friendRequest.getId());
     }
 }

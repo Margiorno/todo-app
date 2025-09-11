@@ -165,4 +165,71 @@ class TaskServiceTest {
         verify(taskRepository).findByAssigneesContainingAndTaskDate(user, date);
         verify(taskRepository, never()).findByTeamAndTaskDate(any(), any());
     }
+
+    @Test
+    void findByDate_shouldReturnTeamTasksForDate_whenScopeIsTeam() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        LocalDate date = LocalDate.now();
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskValidationService.getValidatedTeam(team.getId())).thenReturn(team);
+        when(taskRepository.findByTeamAndTaskDate(team, date)).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(any(Task.class))).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByDate(date, user.getId(), team.getId(), TaskFetchScope.TEAM_TASKS);
+
+        assertThat(result).isNotEmpty();
+        verify(taskRepository).findByTeamAndTaskDate(team, date);
+        verify(taskRepository, never()).findByAssigneesContainingAndTeamAndTaskDate(any(), any(), any());
+    }
+
+    @Test
+    void findByTeam_shouldReturnUserTasksInTeam_whenScopeIsUser() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskValidationService.getValidatedTeam(team.getId())).thenReturn(team);
+        when(taskRepository.findByAssigneesContainingAndTeam(user, team)).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(any(Task.class))).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByTeam(team.getId(), user.getId(), TaskFetchScope.USER_TASKS);
+
+        assertThat(result).isNotEmpty();
+        verify(taskRepository).findByAssigneesContainingAndTeam(user, team);
+        verify(taskRepository, never()).findByTeam(team);
+    }
+
+    @Test
+    void findByBasicFilters_shouldCallDaoWithUserAndTeam_whenScopeIsUserTasks() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        when(taskValidationService.getValidatedUser(user.getId())).thenReturn(user);
+        when(taskValidationService.getValidatedTeam(team.getId())).thenReturn(team);
+        when(taskDAO.findByBasicFilters(any(), any(), any(), any(), eq(user), eq(team))).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(any(Task.class))).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByBasicFilters(
+                Priority.HIGH, Status.IN_PROGRESS, null, null, user.getId(), team.getId(), TaskFetchScope.USER_TASKS
+        );
+
+        assertThat(result).isNotEmpty();
+        verify(taskDAO).findByBasicFilters(any(), any(), any(), any(), eq(user), eq(team));
+    }
+
+    @Test
+    void findByBasicFilters_shouldCallDaoWithOnlyTeam_whenScopeIsTeamTasks() {
+        TaskResponseDTO taskResponseDTO = Instancio.create(TaskResponseDTO.class);
+
+        when(taskValidationService.getValidatedTeam(team.getId())).thenReturn(team);
+        when(taskDAO.findByBasicFilters(any(), any(), any(), any(), isNull(), eq(team))).thenReturn(List.of(task));
+        when(taskMapper.toResponseDTO(any(Task.class))).thenReturn(taskResponseDTO);
+
+        List<TaskResponseDTO> result = taskService.findByBasicFilters(
+                null, null, null, null, user.getId(), team.getId(), TaskFetchScope.TEAM_TASKS
+        );
+
+        assertThat(result).isNotEmpty();
+        verify(taskValidationService, never()).getValidatedUser(user.getId());
+        verify(taskDAO).findByBasicFilters(any(), any(), any(), any(), isNull(), eq(team));
+    }
 }

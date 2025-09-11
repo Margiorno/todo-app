@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -51,6 +53,33 @@ public class UsersServiceTest {
         assertThatThrownBy(() -> usersService.ensureUserExistsById(user.getId()))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User with this id does not exist: " + user.getId());
+    }
+
+    @Test
+    void findRawById_shouldReturnUser_whenUserExists() {
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        User result = usersService.findRawById(user.getId());
+
+        assertThat(result).isEqualTo(user);
+    }
+
+    @Test
+    void findByEmail_shouldReturnUser_whenUserExists() {
+        when(usersRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        User result = usersService.findByEmail(user.getEmail());
+
+        assertThat(result).isEqualTo(user);
+    }
+
+    @Test
+    void findByEmail_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
+        when(usersRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usersService.findByEmail(user.getEmail()))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User with this email does not exist: " + user.getEmail());
     }
 
 }

@@ -184,5 +184,22 @@ class TeamServiceTest {
         assertThat(savedTeam.getMembers()).doesNotContain(user);
     }
 
+    @Test
+    void ensureTeamExistsById_shouldThrowException_whenTeamDoesNotExist() {
+        when(teamRepository.existsById(team.getId())).thenReturn(false);
+
+        assertThatThrownBy(() -> teamService.ensureTeamExistsById(team.getId()))
+                .isInstanceOf(TeamNotFoundException.class)
+                .hasMessage("Team with this id does not exist: " + team.getId());
+    }
+
+    @Test
+    void ensureTeamExistsById_shouldNotThrowException_whenTeamExists() {
+        when(teamRepository.existsById(team.getId())).thenReturn(true);
+
+        assertThatCode(() -> teamService.ensureTeamExistsById(team.getId()))
+                .doesNotThrowAnyException();
+    }
+
 
 }

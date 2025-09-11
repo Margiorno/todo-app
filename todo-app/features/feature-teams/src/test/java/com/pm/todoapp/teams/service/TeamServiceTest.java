@@ -55,7 +55,7 @@ class TeamServiceTest {
     void setUp() {
         user = Instancio.create(User.class);
         team = Instancio.of(Team.class)
-                .set(field(Team::getMembers),Set.of(user))
+                .set(field(Team::getMembers),new HashSet<>(Set.of(user)))
                 .create();
     }
 
@@ -121,6 +121,37 @@ class TeamServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(teamName);
+    }
+
+    @Test
+    void generateInviteCode_shouldCreateAndReturnInviteDTO() {
+        Invite invite = Instancio.create(Invite.class);
+        when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
+        when(inviteCodeService.createAndSaveInvite(team)).thenReturn(invite);
+
+        TeamInviteResponseDTO result = teamService.generateInviteCode(team.getId());
+
+        verify(inviteCodeService).createAndSaveInvite(team);
+        assertThat(result).isNotNull();
+        assertThat(result.getCode()).isEqualTo(invite.getCode());
+    }
+
+    @Test
+    void join_shouldAddUserToTeam_whenCodeIsValid() {
+        String validCode = Instancio.create(String.class);
+        User newUser = Instancio.create(User.class);
+
+        doNothing().when(userValidationPort).ensureUserExistsById(newUser.getId());
+        when(userRepository.getReferenceById(newUser.getId())).thenReturn(newUser);
+        when(inviteCodeService.resolveInvitationCode(validCode)).thenReturn(team);
+
+        teamService.join(validCode, newUser.getId());
+
+        ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
+        verify(teamRepository).save(teamCaptor.capture());
+        Team savedTeam = teamCaptor.getValue();
+
+        assertThat(savedTeam.getMembers()).contains(user, newUser);
     }
 
 

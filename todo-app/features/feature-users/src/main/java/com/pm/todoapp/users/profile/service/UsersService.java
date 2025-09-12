@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
+@Tag(name = "User Profile API", description = "Endpoints for managing user profiles")
 public class UsersService {
 
     private final UsersRepository usersRepository;

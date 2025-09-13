@@ -46,7 +46,7 @@ public class ChatController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully retrieved messages"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized if the user is not authenticated"),
-                    //TODO @ApiResponse(responseCode = "403", description = "Forbidden if the user is not a participant of the conversation"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden if the user is not a participant of the conversation"),
                     @ApiResponse(responseCode = "404", description = "Not Found if the conversation does not exist")
             }
     )

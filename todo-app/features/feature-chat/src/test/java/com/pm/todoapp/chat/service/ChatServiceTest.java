@@ -9,6 +9,7 @@ import com.pm.todoapp.chat.model.Message;
 import com.pm.todoapp.chat.repository.ConversationRepository;
 import com.pm.todoapp.common.exceptions.ConversationNotFoundException;
 import com.pm.todoapp.common.exceptions.UnauthorizedException;
+import com.pm.todoapp.common.exceptions.UserNotConversationParticipantException;
 import com.pm.todoapp.domain.user.dto.UserDTO;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.domain.user.port.UserProviderPort;
@@ -144,7 +145,7 @@ public class ChatServiceTest {
                 .thenReturn(Optional.of(conversation));
 
         assertThatThrownBy(() -> chatService.getMessages(conversationId, user1Id))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(UserNotConversationParticipantException.class)
                 .hasMessageContaining("You do not have permission to access this conversation");
 
     }

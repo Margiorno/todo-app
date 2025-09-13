@@ -1,6 +1,7 @@
 package com.pm.todoapp.users.social.service;
 
 import com.pm.todoapp.common.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.common.exceptions.InvalidFriendRequestAccessException;
 import com.pm.todoapp.common.exceptions.UnauthorizedException;
 import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
 import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
@@ -112,7 +113,7 @@ class SocialServiceTest {
         when(friendsRequestRepository.findById(friendRequest.getId())).thenReturn(Optional.of(friendRequest));
 
         assertThatThrownBy(() -> socialService.acceptFriendRequest(friendRequest.getId(), sender.getId()))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(InvalidFriendRequestAccessException.class)
                 .hasMessage("You must be the receiver to accept a friend request");
 
         verify(usersRepository, never()).save(any());

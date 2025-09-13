@@ -58,7 +58,7 @@ public class TaskController {
                     @ApiResponse(responseCode = "200", description = "Task updated successfully"),
                     @ApiResponse(responseCode = "400", description = "Bad Request if the task data is invalid"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized if the user is not authenticated"),
-                    //TODO @ApiResponse(responseCode = "403", description = "Forbidden if the user is not assigned to the task or if the team context is incorrect"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden if the user is not assigned to the task or if the team context is incorrect"),
                     @ApiResponse(responseCode = "404", description = "Not Found if the task does not exist")
             }
     )

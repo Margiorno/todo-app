@@ -15,7 +15,6 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
-
 @RequiredArgsConstructor
 @Controller
 public class ChatWebSocketController {

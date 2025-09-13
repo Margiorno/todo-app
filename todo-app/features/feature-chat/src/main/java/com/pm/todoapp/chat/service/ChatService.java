@@ -12,6 +12,7 @@ import com.pm.todoapp.chat.model.Message;
 import com.pm.todoapp.chat.repository.ConversationRepository;
 import com.pm.todoapp.common.exceptions.ConversationNotFoundException;
 import com.pm.todoapp.common.exceptions.UnauthorizedException;
+import com.pm.todoapp.common.exceptions.UserNotConversationParticipantException;
 import com.pm.todoapp.domain.user.dto.UserDTO;
 import com.pm.todoapp.domain.user.model.User;
 import com.pm.todoapp.domain.user.port.UserProviderPort;
@@ -93,7 +94,7 @@ public class ChatService {
         Conversation conversation = findRawConversationById(conversationId);
 
         if (!conversation.getParticipants().contains(user))
-            throw new UnauthorizedException("You do not have permission to access this conversation");
+            throw new UserNotConversationParticipantException("You do not have permission to access this conversation");
 
         return conversation.getMessages().stream().map(
                 message ->  {

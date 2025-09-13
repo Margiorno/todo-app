@@ -114,8 +114,6 @@ public class FileService {
         }
     }
 
-
-
     private Resource loadDefaultProfilePicture() throws MalformedURLException {
         Path defaultFile = rootLocation.resolve(FileType.PROFILE_PICTURE.getPath()).resolve("default.jpg").normalize();
         Resource defaultResource = new UrlResource(defaultFile.toUri());

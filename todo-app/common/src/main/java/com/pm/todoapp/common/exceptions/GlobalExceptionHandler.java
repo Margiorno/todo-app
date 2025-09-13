@@ -12,8 +12,10 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     // TODO
-    @ExceptionHandler(ConversationNotFoundException.class)
-    public ResponseEntity<Map<String,String>> handleConversationNotFoundException(ConversationNotFoundException ex) {
+    @ExceptionHandler({
+            ConversationNotFoundException.class,
+            StorageFileNotFoundException.class})
+    public ResponseEntity<Map<String,String>> handleNotFoundStatusExceptions(ConversationNotFoundException ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();
         map.put("message", message);
@@ -28,6 +30,15 @@ public class GlobalExceptionHandler {
         map.put("message", message);
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+    }
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<Map<String,String>> handleStorageException(StorageException ex) {
+        String message = ex.getMessage();
+        Map<String,String> map = new HashMap<>();
+        map.put("message", message);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
     }
 
 }

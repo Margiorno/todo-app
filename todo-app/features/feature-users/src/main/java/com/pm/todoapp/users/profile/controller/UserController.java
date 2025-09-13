@@ -34,6 +34,7 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "Profile picture updated successfully"),
                     @ApiResponse(responseCode = "400", description = "Bad Request if the file is missing or invalid"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized if the user is not authenticated"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error if storage operation fails")
             }
     )
     @PostMapping("/profile/avatar")

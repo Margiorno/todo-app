@@ -14,7 +14,9 @@ public class GlobalExceptionHandler {
     // TODO
     @ExceptionHandler({
             ConversationNotFoundException.class,
-            StorageFileNotFoundException.class})
+            StorageFileNotFoundException.class,
+            NotificationNotFoundException.class
+    })
     public ResponseEntity<Map<String,String>> handleNotFoundStatusExceptions(ConversationNotFoundException ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();

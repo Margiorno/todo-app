@@ -14,12 +14,13 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="feature-notifications" />
         <module name="feature-tasks" />
+        <module name="application" />
         <module name="common" />
         <module name="feature-files" />
-        <module name="application" />
         <module name="feature-chat" />
         <module name="domain" />
         <module name="feature-teams" />

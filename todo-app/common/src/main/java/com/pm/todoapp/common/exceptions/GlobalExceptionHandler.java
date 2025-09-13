@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
             StorageFileNotFoundException.class,
             NotificationNotFoundException.class,
             TaskNotFoundException.class,
+            TeamNotFoundException.class
     })
     public ResponseEntity<Map<String,String>> handleNotFoundStatusExceptions(ConversationNotFoundException ex) {
         String message = ex.getMessage();
@@ -28,8 +29,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
     }
 
-    @ExceptionHandler(UserNotConversationParticipantException.class)
-    public ResponseEntity<Map<String,String>> handleUserNotConversationParticipantException(UserNotConversationParticipantException ex) {
+    @ExceptionHandler({
+            UserNotConversationParticipantException.class,
+            TaskAccessDeniedException.class,
+            InvalidTeamInviteException.class
+    })
+    public ResponseEntity<Map<String,String>> handleForbiddenStatusExceptions(UserNotConversationParticipantException ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();
         map.put("message", message);
@@ -44,15 +49,6 @@ public class GlobalExceptionHandler {
         map.put("message", message);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
-    }
-
-    @ExceptionHandler(TaskAccessDeniedException.class)
-    public ResponseEntity<Map<String,String>> handleTaskAccessDeniedException(TaskAccessDeniedException ex) {
-        String message = ex.getMessage();
-        Map<String,String> map = new HashMap<>();
-        map.put("message", message);
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

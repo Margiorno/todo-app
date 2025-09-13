@@ -17,9 +17,9 @@
         </processorPath>
         <module name="feature-notifications" />
         <module name="feature-tasks" />
-        <module name="application" />
         <module name="common" />
         <module name="feature-files" />
+        <module name="application" />
         <module name="feature-chat" />
         <module name="domain" />
         <module name="feature-teams" />

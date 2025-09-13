@@ -19,9 +19,11 @@ public class GlobalExceptionHandler {
             StorageFileNotFoundException.class,
             NotificationNotFoundException.class,
             TaskNotFoundException.class,
-            TeamNotFoundException.class
+            TeamNotFoundException.class,
+            UserNotFoundException.class,
+            FriendRequestNotFoundException.class
     })
-    public ResponseEntity<Map<String,String>> handleNotFoundStatusExceptions(ConversationNotFoundException ex) {
+    public ResponseEntity<Map<String,String>> handleNotFoundStatusExceptions(Exception ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();
         map.put("message", message);
@@ -32,9 +34,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UserNotConversationParticipantException.class,
             TaskAccessDeniedException.class,
-            InvalidTeamInviteException.class
+            InvalidTeamInviteException.class,
+            InvalidFriendRequestAccessException.class
     })
-    public ResponseEntity<Map<String,String>> handleForbiddenStatusExceptions(UserNotConversationParticipantException ex) {
+    public ResponseEntity<Map<String,String>> handleForbiddenStatusExceptions(Exception ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();
         map.put("message", message);
@@ -42,13 +45,39 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
-    @ExceptionHandler(StorageException.class)
-    public ResponseEntity<Map<String,String>> handleStorageException(StorageException ex) {
+    @ExceptionHandler({
+            StorageException.class
+    })
+    public ResponseEntity<Map<String,String>> handleInternalServerExceptions(Exception ex) {
         String message = ex.getMessage();
         Map<String,String> map = new HashMap<>();
         map.put("message", message);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
+    }
+
+    @ExceptionHandler({
+            EmailAlreadyExistsException.class,
+            InvalidFieldException.class,
+            InvalidFriendInviteException.class
+    })
+    public ResponseEntity<Map<String,String>> handleBadRequestExceptions(Exception ex) {
+        String message = ex.getMessage();
+        Map<String,String> map = new HashMap<>();
+        map.put("message", message);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
+    @ExceptionHandler({
+            UnauthorizedException.class
+    })
+    public ResponseEntity<Map<String,String>> handleUnauthorizedExceptions(Exception ex) {
+        String message = ex.getMessage();
+        Map<String,String> map = new HashMap<>();
+        map.put("message", message);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

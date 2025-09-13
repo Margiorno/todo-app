@@ -1,6 +1,8 @@
 package com.pm.todoapp.users.social.service;
 
+import com.pm.todoapp.common.exceptions.FriendRequestNotFoundException;
 import com.pm.todoapp.common.exceptions.InvalidFriendInviteException;
+import com.pm.todoapp.common.exceptions.InvalidFriendRequestAccessException;
 import com.pm.todoapp.common.exceptions.UnauthorizedException;
 import com.pm.todoapp.domain.user.event.FriendRequestAcceptedEvent;
 import com.pm.todoapp.domain.user.event.FriendRequestResolvedEvent;
@@ -54,7 +56,7 @@ public class SocialService {
         FriendRequest request = findRawFriendRequest(requestId);
 
         if (!request.getReceiver().getId().equals(currentUserId)) {
-            throw new UnauthorizedException("You must be the receiver to accept a friend request");
+            throw new InvalidFriendRequestAccessException("You must be the receiver to accept a friend request");
         }
 
         User currentUser = usersService.findRawById(currentUserId);
@@ -78,7 +80,7 @@ public class SocialService {
     public void declineFriendRequest(UUID requestId, UUID currentUserId) {
         FriendRequest request = findRawFriendRequest(requestId);
         if (!request.getReceiver().getId().equals(currentUserId)) {
-            throw new UnauthorizedException("You must be the receiver to accept a friend request");
+            throw new InvalidFriendRequestAccessException("You must be the receiver to accept a friend request");
         }
         friendsRequestRepository.delete(request);
         eventPublisher.publishEvent(
@@ -90,7 +92,7 @@ public class SocialService {
     public void cancelFriendRequest(UUID requestId, UUID currentUserId) {
         FriendRequest request = findRawFriendRequest(requestId);
         if (!request.getSender().getId().equals(currentUserId)) {
-            throw new UnauthorizedException("You must be the sender to cancel a friend request");
+            throw new InvalidFriendRequestAccessException("You must be the sender to cancel a friend request");
         }
         friendsRequestRepository.delete(request);
         eventPublisher.publishEvent(
@@ -123,7 +125,7 @@ public class SocialService {
 
     private FriendRequest findRawFriendRequest(UUID requestId) {
         return friendsRequestRepository.findById(requestId).orElseThrow(
-                () -> new InvalidFriendInviteException("Friend request not found")
+                () -> new FriendRequestNotFoundException("Friend request not found")
         );
     }
 

@@ -48,7 +48,7 @@ public class SocialController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Friend request accepted successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "400", description = "Forbidden if the user is not the receiver of the request"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden if the user is not the receiver of the request"),
                     @ApiResponse(responseCode = "404", description = "Not Found if the request does not exist")
             }
     )
@@ -67,7 +67,7 @@ public class SocialController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Friend request declined successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "400", description = "Forbidden if the user is not the receiver of the request"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden if the user is not the receiver of the request"),
                     @ApiResponse(responseCode = "404", description = "Not Found if the request does not exist")
             }
     )
@@ -86,7 +86,7 @@ public class SocialController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Friend request cancelled successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "400", description = "Forbidden if the user is not the sender of the request"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden if the user is not the sender of the request"),
                     @ApiResponse(responseCode = "404", description = "Not Found if the request does not exist")
             }
     )

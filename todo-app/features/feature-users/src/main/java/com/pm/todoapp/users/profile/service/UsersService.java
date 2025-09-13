@@ -81,7 +81,6 @@ public class UsersService {
 
         if (oldPicturePath != null && !oldPicturePath.isBlank()) {
             try {
-                // 500 ERROR POSSIBLE
                 fileStoragePort.deleteFile(oldPicturePath, FileType.PROFILE_PICTURE);
             } catch (Exception e) {
                 System.err.println("Could not delete old profile picture " + oldPicturePath + " for user " + userId);

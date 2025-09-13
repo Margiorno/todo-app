@@ -56,10 +56,15 @@ Real-time features like live chat and notifications are implemented using **STOM
     ```bash
     git clone https://github.com/Margiorno/todo-app.git
     cd todo-app
+    cd todo-app
     ```
 
 2.  **Run the application:**
-    // TODO
+    ```bash
+    mvn -N wrapper:wrapper
+    ./mvnw clean install
+    ./mvnw spring-boot:run -pl application
+    ```
 
 3.  The application will start on port **11111**.
     *   **API URL**: `http://localhost:11111`
